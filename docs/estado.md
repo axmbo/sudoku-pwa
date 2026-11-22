@@ -7,9 +7,12 @@
 - **Passo atual:** 1 concluído.
   - nvm 0.41.0 e Node 26.13.1 (npm 11.20.0) instalados; o default global continua 22.17.1.
   - O `.nvmrc` fixa 26.13.1. Nos comandos Bash do projeto, prefixar `. ~/.nvm/nvm.sh && nvm use`.
-  - Passo 1.3 (`cdnvm` no `~/.bashrc`): comando entregue ao Diretor, aguardando execução.
+  - Passo 1.3 feito: o `cdnvm` no `~/.bashrc` troca a versão sozinho (repo → 26.13.1, home → 22.17.1); backup em `~/.bashrc.bak-cdnvm`.
 - **Passo 2 concluído:** resultado e decisões derivadas em [conferencia-claude-code.md](process/conferencia-claude-code.md).
-- **Passo 3:** ADR 0006 escrito, com status **Proposto**: GitHub + Renovate. **Pausa:** aguarda a aprovação do Diretor, a decisão sobre o rebase merge e a decisão sobre bloquear todo o `~/.ssh/**`.
+- **Passo 3 concluído:** ADR 0006 **Aceito**.
+  - GitHub + Renovate; o Dependabot fica só para alertas.
+  - Rebase merge no lugar de "merge sem squash"; testar o selo "Verified" num PR no passo 6.
+- **Pendente:** decisão do Diretor sobre bloquear todo o `~/.ssh/**`, inclusive `*.pub`. Explicação entregue; afeta o `settings.json` do passo 4.
 - **Próximo:** depois da aprovação, ponto sugerido de `/clear` + retomada; em seguida, o passo 4 (estrutura do processo).
 
 ## Decisões do Diretor (22/11/2026)

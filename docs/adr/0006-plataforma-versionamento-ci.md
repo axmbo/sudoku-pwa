@@ -1,6 +1,6 @@
 # ADR 0006: Plataforma de versionamento, CI e hospedagem (GitHub × GitLab)
 
-- **Status:** Proposto (aguarda aprovação do Diretor)
+- **Status:** Aceito pelo Diretor em 22/11/2026, com rebase merge no lugar de "merge sem squash" (ver Consequências). Validar o selo "Verified" com um PR de teste no passo 6 da Fase 0.
 - **Data:** 22/11/2026
 - **Autor:** agente `devsecops`
 

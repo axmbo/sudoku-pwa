@@ -12,7 +12,7 @@
 - **Passo 3 concluído:** ADR 0006 **Aceito**.
   - GitHub + Renovate; o Dependabot fica só para alertas.
   - Rebase merge no lugar de "merge sem squash"; testar o selo "Verified" num PR no passo 6.
-- **Pendente:** decisão do Diretor sobre bloquear todo o `~/.ssh/**`, inclusive `*.pub`. Explicação entregue; afeta o `settings.json` do passo 4.
+- **Decidido:** o `settings.json` do passo 4 nega a pasta `~/.ssh/**` inteira, inclusive `*.pub`, mais `~/.gnupg/**` e `**/.env*`. Chave pública só chega ao agente quando o Diretor cola no chat.
 - **Próximo:** depois da aprovação, ponto sugerido de `/clear` + retomada; em seguida, o passo 4 (estrutura do processo).
 
 ## Decisões do Diretor (22/11/2026)

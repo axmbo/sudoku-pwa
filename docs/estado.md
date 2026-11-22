@@ -9,7 +9,8 @@
   - O `.nvmrc` fixa 26.13.1. Nos comandos Bash do projeto, prefixar `. ~/.nvm/nvm.sh && nvm use`.
   - Passo 1.3 (`cdnvm` no `~/.bashrc`): comando entregue ao Diretor, aguardando execução.
 - **Passo 2 concluído:** resultado e decisões derivadas em [conferencia-claude-code.md](process/conferencia-claude-code.md).
-- **Próximo:** passo 3, ADR da plataforma (devsecops, pesquisa nas docs atuais), com pausa para o Diretor aprovar.
+- **Passo 3:** ADR 0006 escrito, com status **Proposto**: GitHub + Renovate. **Pausa:** aguarda a aprovação do Diretor, a decisão sobre o rebase merge e a decisão sobre bloquear todo o `~/.ssh/**`.
+- **Próximo:** depois da aprovação, ponto sugerido de `/clear` + retomada; em seguida, o passo 4 (estrutura do processo).
 
 ## Decisões do Diretor (22/11/2026)
 

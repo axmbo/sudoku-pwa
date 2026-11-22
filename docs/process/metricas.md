@@ -6,22 +6,23 @@ Fonte única das definições das colunas de [metrics.csv](metrics.csv). A estim
 
 - **`tokens` = input + cache write + output**, somados entre todos os modelos que aparecem nas linhas de uso do `/cost`. Mede o que a sessão processou de novo.
 - **Cache read** fica fora de `tokens` e vai para a coluna própria `cache_read_real`. Em sessões longas ele domina o total e distorceria a calibração da estimativa.
-- Custo em dólares (`usd_real`): o valor total que o `/cost` mostra.
+- Custo em dólares (`usd_real`): `n/d` enquanto não houver uma fonte oficial de preço aplicada aos tokens. Não estimar.
 - Colunas reais: `tokens_in_real`, `tokens_cache_write_real`, `tokens_out_real`, `cache_read_real`, `tokens_real` (= in + cache_write + out), `usd_real`.
 - Colunas estimadas: `tokens_est_otim`, `tokens_est` (provável) e `tokens_est_pess`, todas pela mesma regra de `tokens`.
 
 ## Coleta do real
 
-- O Diretor cola a saída do `/cost` ao fim de cada passo ou tarefa.
-- O `/cost` é acumulado na sessão. O real de um passo é a diferença entre a leitura do fim do passo e a leitura anterior.
-- Depois de um `/clear`, confira se o contador zerou. Se zerou, a leitura seguinte já é o real do passo; anote isso em `obs` na primeira vez.
+- **Fonte:** o log da sessão do Claude Code, `~/.claude/projects/<projeto>/<sessão>.jsonl`. Cada resposta do modelo traz `message.usage` com `input_tokens`, `cache_creation_input_tokens` (cache write), `output_tokens` e `cache_read_input_tokens`. A extensão do VS Code não tem `/cost`, por isso o log é a fonte.
+- Some deduplicando por `message.id` (o streaming repete a mesma mensagem) e recorte por intervalo de tempo. O real de um passo vai do commit do passo anterior até o commit do próprio passo.
+- Subagentes gravam logs próprios. Antes de usar a primeira vez, confira se aparecem num arquivo à parte.
+- Um `/clear` inicia outro arquivo de sessão, e o recorte por tempo continua valendo.
 - Subagentes: se o resultado do subagente informar tokens, registre numa linha própria (`agente` = nome do subagente). Se não informar, o custo fica dentro da leitura do `/cost` da sessão, e `obs` diz isso.
 - Número indisponível = `n/d`. Nunca estimar o real.
 
 ## Tempo
 
 - `min_est_otim`, `min_est`, `min_est_pess`: minutos de trabalho estimados, sem contar a espera pelo Diretor.
-- `min_real`: minutos de trabalho efetivo, também sem a espera pelo Diretor. Sai da duração da API no `/cost` quando ela estiver disponível. Se não estiver, vem do relógio, e `obs` registra isso.
+- `min_real`: minutos de relógio entre o início e o commit do passo, **incluindo** a espera pelo Diretor, porque o log não separa as duas coisas; `obs` registra isso. A estimativa não inclui a espera, e a diferença entre as duas entra na calibração.
 
 ## Contexto
 

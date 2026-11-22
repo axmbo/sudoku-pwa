@@ -1,6 +1,6 @@
 ciclo,spec,tarefa,agente,modelo,limpeza_antes,tokens_est_otim,tokens_est,tokens_est_pess,min_est_otim,min_est,min_est_pess,tokens_in_real,tokens_cache_write_real,tokens_out_real,cache_read_real,tokens_real,usd_real,ctx_inicial_est,min_real,leituras_fora_manifesto,rodadas_revisao,achados_blocker,achados_major,achados_minor,testes_novos,cobertura_dominio,mutation_score,obs
-fase-0,-,0-estimativa-estado,orquestrador,claude-opus-5-5,nao,5000,10000,20000,2,5,10,,,,,,,,,,,,,,,,,inclui o planejamento (perguntas e contestacao) feito antes do passo 0
-fase-0,-,1-node,orquestrador,claude-opus-5-5,,15000,30000,60000,10,20,40,,,,,,,,,,,,,,,,,o Diretor executa os comandos
+fase-0,-,0-estimativa-estado,orquestrador,claude-opus-5-5,nao,5000,10000,20000,2,5,10,30,81078,22404,1090771,103512,n/d,,38,,,,,,,,,real inclui o planejamento (perguntas e contestacao) que a estimativa nao cobria; min_real de relogio 19:03-19:41 BRT com espera do Diretor; fonte log jsonl
+fase-0,-,1-node,orquestrador,claude-opus-5-5,nao,15000,30000,60000,10,20,40,28,13213,9832,1173286,23073,n/d,,12,,,,,,,,,o Diretor executou os comandos; inclui a regra de etiqueta de risco e a troca do /cost pelo log jsonl; relogio 19:41-19:53 BRT
 fase-0,-,2-conferencia-claude-code,claude-code-guide,sonnet,,30000,60000,120000,5,10,20,,,,,,,,,,,,,,,,,
 fase-0,-,3-adr-plataforma,devsecops,sonnet,,60000,120000,250000,15,30,60,,,,,,,,,,,,,,,,,pesquisa em docs oficiais
 fase-0,-,4-estrutura-processo,orquestrador,claude-opus-5-5,,150000,300000,500000,40,80,150,,,,,,,,,,,,,,,,,

@@ -4,7 +4,10 @@
 
 - **Fase:** 0 (bootstrap do processo), na branch `chore/fase-0`.
 - **Plano aprovado:** [docs/process/plano-fase-0.md](process/plano-fase-0.md). No passo 4, o conteúdo passa para `PROCESSO.md`/ADRs.
-- **Passo atual:** 0 concluído. Próximo: passo 1 (Node 26.13.1 via nvm, guiado).
+- **Passo atual:** 1 concluído.
+  - nvm 0.41.0 e Node 26.13.1 (npm 11.20.0) instalados; o default global continua 22.17.1.
+  - O `.nvmrc` fixa 26.13.1. Nos comandos Bash do projeto, prefixar `. ~/.nvm/nvm.sh && nvm use`.
+  - Próximo: passo 2, conferência do formato do Claude Code 2.1.278.
 
 ## Decisões do Diretor (22/11/2026)
 
@@ -18,11 +21,17 @@
 
 ## Regras da execução da Fase 0
 
-- Ao fim de cada passo: commit, depois entregar hash, resumo de ≤ 5 linhas e o que conferir no diff; pedir `/cost`.
-- Todo Bash proposto diz em uma linha o que faz e se mexe fora do repositório.
+- Ao fim de cada passo: commit, depois entregar hash, resumo de ≤ 5 linhas e o que conferir no diff. O real de tokens sai do log jsonl da sessão (ver `metricas.md`); a extensão não tem `/cost`.
+- Todo Bash proposto começa a descrição com uma etiqueta de risco:
+  - `[LEITURA]`: só consulta;
+  - `[REPO]`: escreve dentro do repositório;
+  - `[FORA]`: escreve fora do repositório ou instala algo;
+  - `[CRÍTICO]`: apaga, faz push, mexe em chaves ou credenciais.
+
+  Em `[FORA]` e `[CRÍTICO]`, uma linha diz o que muda e como desfazer. No passo 4 esta regra vai para o `CLAUDE.md`.
 - Depois dos passos 3, 5 e 7: sugerir `/clear` + retomada.
 - Tokens conforme `docs/process/metricas.md`.
 
 ## Pendências
 
-- Real do passo 0: aguardando o `/cost` do Diretor.
+- Nenhuma.

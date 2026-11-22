@@ -7,7 +7,9 @@
 - **Passo atual:** 1 concluído.
   - nvm 0.41.0 e Node 26.13.1 (npm 11.20.0) instalados; o default global continua 22.17.1.
   - O `.nvmrc` fixa 26.13.1. Nos comandos Bash do projeto, prefixar `. ~/.nvm/nvm.sh && nvm use`.
-  - Próximo: passo 2, conferência do formato do Claude Code 2.1.278.
+  - Passo 1.3 (`cdnvm` no `~/.bashrc`): comando entregue ao Diretor, aguardando execução.
+- **Passo 2 concluído:** resultado e decisões derivadas em [conferencia-claude-code.md](process/conferencia-claude-code.md).
+- **Próximo:** passo 3, ADR da plataforma (devsecops, pesquisa nas docs atuais), com pausa para o Diretor aprovar.
 
 ## Decisões do Diretor (22/11/2026)
 

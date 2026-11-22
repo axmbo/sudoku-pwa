@@ -14,9 +14,8 @@ Fonte única das definições das colunas de [metrics.csv](metrics.csv). A estim
 
 - **Fonte:** o log da sessão do Claude Code, `~/.claude/projects/<projeto>/<sessão>.jsonl`. Cada resposta do modelo traz `message.usage` com `input_tokens`, `cache_creation_input_tokens` (cache write), `output_tokens` e `cache_read_input_tokens`. A extensão do VS Code não tem `/cost`, por isso o log é a fonte.
 - Some deduplicando por `message.id` (o streaming repete a mesma mensagem) e recorte por intervalo de tempo. O real de um passo vai do commit do passo anterior até o commit do próprio passo.
-- Subagentes gravam logs próprios. Antes de usar a primeira vez, confira se aparecem num arquivo à parte.
+- Subagentes gravam logs próprios em `~/.claude/projects/<projeto>/<sessão>/subagents/agent-<id>.jsonl`, e esse arquivo é somado à parte, numa linha própria. O `subagent_tokens` da notificação de término usa outra regra e não é usado.
 - Um `/clear` inicia outro arquivo de sessão, e o recorte por tempo continua valendo.
-- Subagentes: se o resultado do subagente informar tokens, registre numa linha própria (`agente` = nome do subagente). Se não informar, o custo fica dentro da leitura do `/cost` da sessão, e `obs` diz isso.
 - Número indisponível = `n/d`. Nunca estimar o real.
 
 ## Tempo

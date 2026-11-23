@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Edit(~/.ssh/**)",
+      "Write(~/.ssh/**)",
+      "Read(~/.gnupg/**)",
+      "Edit(~/.gnupg/**)",
+      "Write(~/.gnupg/**)",
+      "Read(**/.env*)",
+      "Edit(**/.env*)",
+      "Write(**/.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Bash(cat ~/.ssh/*)",
+      "Bash(cp ~/.ssh/*)",
+      "Bash(mv ~/.ssh/*)",
+      "Bash(ssh-keygen *)",
+      "Bash(gpg --export-secret-keys *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '## docs/estado.md (injetado pelo hook SessionStart)\\n\\n'; cat \"$CLAUDE_PROJECT_DIR/docs/estado.md\""
+          }
+        ]
+      }
+    ]
+  }
+}

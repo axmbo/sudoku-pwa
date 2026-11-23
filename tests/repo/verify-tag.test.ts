@@ -59,4 +59,17 @@ describe('scripts/ci/verify-tag.sh', () => {
     expect(r.status).not.toBe(0);
     expect(r.stderr).toContain('v1.0.0');
   });
+
+  it('CA-REL-02: recusa tag cujo commit alvo não é alcançável da main e cita a main', () => {
+    const repo = makeRepo();
+    git(repo, 'switch', '-c', 'feature');
+    git(repo, 'commit', '--allow-empty', '-m', 'fora da main');
+    git(repo, 'tag', '-a', 'v1.0.0', '-m', 'release de branch');
+    git(repo, 'switch', 'main');
+
+    const r = runScript(repo, 'v1.0.0', makeSigners(repo), 'main');
+
+    expect(r.status).not.toBe(0);
+    expect(r.stderr).toContain('main');
+  });
 });

@@ -4,9 +4,8 @@
 
 - **Fase:** 0 (bootstrap do processo), na branch `chore/fase-0`. Regras vivas: `PROCESSO.md` v0.2.
 - **Passos 0 a 4 concluídos:** Node 26.13.1 via `.nvmrc`; ADR 0006 (GitHub + Renovate, rebase merge); estrutura do processo (agentes, skills, ADRs 0001–0005 aceitos, docs).
-- **Passo 5 (esqueleto), em revisão:** tarefas e isenções em [passo-5-tarefas.md](process/passo-5-tarefas.md). `npm run check` verde (100 testes, cobertura 100% do domínio), E2E + axe verde, Stryker 100%.
-  - Revisão r1 ([parecer](process/revisoes/passo-5-r1.md)): 2 major e 3 minor corrigidos; Diretor aprovou `PROCESSO.md` v0.2 (minors 3 e 4).
-  - **Próximo:** r2 do `revisor` só sobre o delta desde `784c61f`; depois, fechar o passo (rito abaixo) e `/clear`.
+- **Passo 5 (esqueleto) concluído:** tarefas em [passo-5-tarefas.md](process/passo-5-tarefas.md); `check` verde (100 testes, cobertura e Stryker 100% no domínio), E2E + axe verde. Revisão: r1 não saiu (2 major, 3 minor, corrigidos; `PROCESSO.md` v0.2), [r2](process/revisoes/passo-5-r2.md) sai (2 minor, débito abaixo). Tokens: 558k (1,4× o pessimista), ver `metrics.csv`.
+- **Próximo:** `/clear` + `/retomar`; provar o hook novo do `dev` (abaixo); depois o passo 6 (assinatura, com `devsecops`).
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; hook do `dev` bloqueia edição de teste. A definição do agente é lida no início da sessão: **na próxima sessão, provar** que o script `guard-test-files.mjs` (não o jq antigo) bloqueia `src/domain/__arbitraries__/x.ts`.
 - **Depois:** passo 6 (assinatura), 7 (plano da Fase 1 + spec 001), 8 (teste de sobrevivência), 9 (resumo). `/clear` sugerido depois dos passos 5 e 7.
 
@@ -32,4 +31,6 @@ Ao fim de cada passo: commit, hash, resumo ≤ 5 linhas, o que conferir no diff,
 - Fora do passo 5: ordem TDD no CI, cobertura do diff, orçamento de bundle/Worker, Lighthouse CI, matriz E2E no `full-ci`, release por tag.
 - Proteção da `main` (passo 6): PR só de docs não dispara o `check`; se ele for obrigatório, o PR trava (r1, nit 6). Desligar o "default setup" do CodeQL; criar a label `full-ci`.
 - CSP em `<meta>`: `frame-ancestors` não funciona; `style-src 'self'` barra `style` inline do Preact; testar a CSP quando houver estilo dinâmico (r1, nit 8).
+- Lint do domínio deixa passar alias (`const a = Date; a.now()`), `globalThis.setTimeout`, `import()` dinâmico de `ui/`, `crypto.randomUUID`, `requestAnimationFrame` (r2, minor 1).
+- Commits de T2, T3 e T6 sem o vermelho no corpo (anteriores à regra v0.2; evidência em `passo-5-tarefas.md`) (r2, minor 2). Lista de caminhos de teste duplicada entre `pre-commit.sh` e `guard-test-files.mjs` (r2, nit).
 - `npm audit`: 5 moderadas em dependências de dev (Stryker → minimatch; qs), sem correção disponível; o gate é `high`.

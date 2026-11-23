@@ -4,13 +4,18 @@
 import { readFileSync } from 'node:fs';
 
 const TEST_FILE = /\.(test|spec)\.[cm]?[jt]sx?$/;
-const BLOCKED_DIRS = new Set(['e2e', 'tests', '__arbitraries__']);
+const SNAPSHOT_FILE = /\.snap$/;
+const BLOCKED_DIRS = new Set(['e2e', 'tests', '__arbitraries__', '__snapshots__']);
 
 /** @param {string} path */
 function isTestPath(path) {
   const segments = path.split(/[\\/]/).filter(Boolean);
   const name = segments[segments.length - 1] ?? '';
-  return TEST_FILE.test(name) || segments.slice(0, -1).some((s) => BLOCKED_DIRS.has(s));
+  return (
+    TEST_FILE.test(name) ||
+    SNAPSHOT_FILE.test(name) ||
+    segments.slice(0, -1).some((s) => BLOCKED_DIRS.has(s))
+  );
 }
 
 /** @param {string} message */

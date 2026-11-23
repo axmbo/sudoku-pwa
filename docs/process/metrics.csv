@@ -27,18 +27,18 @@ fase-1,002,ciclo-completo,todos,claude-sonnet-5-5,,200000,400000,800000,45,90,18
 fase-1,003,ciclo-completo,todos,claude-sonnet-5-5,,400000,800000,1600000,90,180,360,,,,,,,15000,,,,,,,,,,risco alto; provavel divisao em 003a e 003b
 fase-1,004,ciclo-completo,todos,claude-sonnet-5-5,,250000,500000,1000000,60,120,240,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra no /planejar
 fase-1,005,ciclo-completo,todos,claude-sonnet-5-5,,350000,700000,1400000,90,180,360,,,,,,,15000,,,,,,,,,,inclui qa-auditor; quebra no /planejar
-fase-1,001,T01,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,15,30,,,,,,,7000,,,,,,,,,,1 execucao; ancora passo 5 da Fase 0 (eng-testes ~39k/execucao); inclui ctx inicial
-fase-1,001,T01,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,10,20,,,,,,,7000,,,,,,,,,,ancora passo 5 (dev ~24k/execucao)
+fase-1,001,T01,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,15,30,,,,,,,7300,,,,,,,,,,1 execucao; ancora passo 5 da Fase 0 (eng-testes ~39k/execucao); inclui ctx inicial
+fase-1,001,T01,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,10,20,,,,,,,7300,,,,,,,,,,ancora passo 5 (dev ~24k/execucao)
 fase-1,001,T02,eng-testes,claude-sonnet-5-5,nao,24000,40000,80000,6,12,24,,,,,,,6500,,,,,,,,,,tabelas it.each em 5 classes; 1 execucao
 fase-1,001,T02,dev,claude-sonnet-5-5,nao,15000,25000,50000,4,8,16,,,,,,,6500,,,,,,,,,,
 fase-1,001,T03,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,12,21,42,,,,,,,5500,,,,,,,,,,maior volume de casos (7 CA + P2a)
 fase-1,001,T03,dev,claude-sonnet-5-5,nao,24000,40000,80000,8,14,28,,,,,,,5500,,,,,,,,,,
-fase-1,001,T04,eng-testes,claude-sonnet-5-5,nao,18000,30000,60000,6,12,24,,,,,,,7000,,,,,,,,,,
-fase-1,001,T04,dev,claude-sonnet-5-5,nao,12000,20000,40000,4,8,16,,,,,,,7000,,,,,,,,,,
-fase-1,001,T05,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,18,36,,,,,,,9000,,,,,,,,,,
-fase-1,001,T05,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,12,24,,,,,,,9000,,,,,,,,,,
-fase-1,001,T06,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,9,15,30,,,,,,,12000,,,,,,,,,,manifesto >10k; avaliar divisao T06a/T06b se board.test.ts passar de ~7k tokens
-fase-1,001,T06,dev,claude-sonnet-5-5,nao,24000,40000,80000,6,10,20,,,,,,,12000,,,,,,,,,,
-fase-1,001,T07,eng-testes,claude-sonnet-5-5,nao,33000,55000,110000,15,25,50,,,,,,,8500,,,,,,,,,,tdd isento; dev so se propriedade achar bug (sem linha); inclui npm run mutation local
+fase-1,001,T04,eng-testes,claude-sonnet-5-5,nao,18000,30000,60000,6,12,24,,,,,,,6800,,,,,,,,,,
+fase-1,001,T04,dev,claude-sonnet-5-5,nao,12000,20000,40000,4,8,16,,,,,,,6800,,,,,,,,,,
+fase-1,001,T05,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,18,36,,,,,,,8500,,,,,,,,,,
+fase-1,001,T05,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,12,24,,,,,,,8500,,,,,,,,,,
+fase-1,001,T06,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,9,15,30,,,,,,,11700,,,,,,,,,,manifesto >10k; avaliar divisao T06a/T06b se board.test.ts passar de ~7k tokens
+fase-1,001,T06,dev,claude-sonnet-5-5,nao,24000,40000,80000,6,10,20,,,,,,,11700,,,,,,,,,,
+fase-1,001,T07,eng-testes,claude-sonnet-5-5,nao,33000,55000,110000,15,25,50,,,,,,,8700,,,,,,,,,,tdd isento; dev so se propriedade achar bug (sem linha); inclui npm run mutation local
 fase-1,001,revisao-ciclo,revisor,claude-sonnet-5-5,nao,60000,120000,250000,10,20,40,,,,,,,15000,,,,,,,,,,revisao so do diff; 2 rodadas; ancora passo 5 (revisor 152k em 2 rodadas)
 fase-1,001,retro-ciclo,curador-pdca,claude-sonnet-5-5,nao,15000,30000,60000,5,10,20,,,,,,,10000,,,,,,,,,,retro + estado + RESUMO; excluidas orquestrador (opus) e espera do Diretor

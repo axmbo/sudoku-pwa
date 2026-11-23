@@ -9,7 +9,8 @@
 - **Passo 7 concluído:** [plano da Fase 1](process/plano-fase-1.md) (specs 001–005 = B-01 a B-05; B-06 a B-10 na Fase 2, aprovado em 22/11/2026) e [spec 001](../specs/001-tabuleiro-conflitos/spec.md) aprovada (25 CA; o CA-001-25 entrou na revisão do PR #1). A spec 001 nasceu na `chore/fase-0`; o ciclo dela (`/planejar 001`) abre a `feat/001-tabuleiro-conflitos` na Fase 1. Tokens: 113k (1,13× o provável), ver `metrics.csv`.
 - **Passos 8 e 9 concluídos (22/11/2026):** teste de sobrevivência aprovado pelo Diretor (54k tokens, 1,34× o provável) e resumo entregue. A Fase 0 somou 1,73M tokens, 1,75× o provável de 990k, abaixo do pessimista de 1,9M.
 - **Spec 001 planejada (23/11/2026):** [plan.md](../specs/001-tabuleiro-conflitos/plan.md) e [tasks.md](../specs/001-tabuleiro-conflitos/tasks.md) com 7 tarefas (T01–T07, T07 isenta por invariante), 25 de 25 CA cobertos, manifestos de 5,5k a 12k tokens; [ADR 0007](adr/0007-convencoes-do-dominio.md) aceito (Result, `unknown` na fronteira, índices 0–8, imutabilidade). Estimativa: 670k tokens prováveis (1,34× a agregada), ver `metrics.csv`.
-- **Próximo:** `/analisar 001` (o Diretor aciona), depois `/implementar` a partir da T01.
+- **Análise de consistência da 001: ok (23/11/2026)** na rodada 3, com 2 minor e 1 nit aceitos: M1 (vermelhos próprios de CA-14/19 na T03 e coluna/bloco na T04 tendem a nascer verdes), M2 (vermelho por símbolo inexistente × "falha por asserção") e N6 (somas de manifesto de T01–T04).
+- **Próximo:** `/clear` + `/retomar`, depois `/implementar 001 T01`.
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o hook do `dev` bloqueia arquivo de teste (provado em 22/11/2026).
 
 ## Decisões do Diretor (22/11/2026)
@@ -24,7 +25,6 @@
 ## Pendências do Diretor
 
 1. Preparar já, como proposta, a proteção da `main` + regra de quem cria tags `v*`, para aplicar após o merge da Fase 0?
-2. `-0` como linha/coluna aceito como 0 e como valor recusado (proposta da `eng-testes`; bloqueia só a T06)?
 
 ## Débitos e pendências técnicas (viram issues quando houver remoto)
 

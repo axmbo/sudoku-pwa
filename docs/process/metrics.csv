@@ -5,7 +5,8 @@ fase-0,-,2-conferencia-claude-code,claude-code-guide,claude-sonnet-5-5,nao,30000
 fase-0,-,2-conferencia-claude-code,orquestrador,claude-opus-5-5,nao,,,,,,,22,15145,9166,1103741,24333,n/d,,24,,,,,,,,,consolidacao + preparo do cdnvm (passo 1.3); relogio 19:53-20:17 BRT; total do passo 136553 contra 60000 provavel
 fase-0,-,3-adr-plataforma,devsecops,claude-sonnet-5-5,nao,60000,120000,250000,15,30,60,18,69162,9673,437543,78853,n/d,,3,,,,,,,,,31 ferramentas; 21 fontes oficiais; rodou em paralelo com a espera do Diretor no passo 1.3
 fase-0,-,3-adr-plataforma,orquestrador,claude-opus-5-5,nao,,,,,,,12,10757,5995,670735,16764,n/d,,4,,,,,,,,,revisao do ADR; total do passo 95617 contra 120000 provavel; aprovacao do Diretor pendente
-fase-0,-,4-estrutura-processo,orquestrador,claude-opus-5-5,,150000,300000,500000,40,80,150,,,,,,,,,,,,,,,,,
+fase-0,-,4-estrutura-processo,arquiteto,claude-sonnet-5-5,sim,,,,,,,22,138034,16538,573588,154594,n/d,,23,,,,,,,,,ADRs 0001 0003 0004 0005; 32 ferramentas; rodou em paralelo com o orquestrador; subagente general-purpose no papel de arquiteto (agentes ainda nao existiam)
+fase-0,-,4-estrutura-processo,orquestrador,claude-opus-5-5,sim,150000,300000,500000,40,80,150,44,123207,51048,2293282,174299,n/d,,29,,,,,,,,,~45 arquivos; estimativa cobria o passo inteiro; total do passo 328893 contra 300000 provavel; relogio 20:33-21:02 BRT; 1 mensagem final da sessao anterior incluida pela regra do recorte
 fase-0,-,5-esqueleto,orquestrador,claude-opus-5-5,,100000,200000,400000,30,60,120,,,,,,,,,,,,,,,,,
 fase-0,-,6-assinatura,devsecops,sonnet,,60000,120000,250000,30,60,120,,,,,,,,,,,,,,,,,o Diretor executa tudo que envolve chave privada
 fase-0,-,7-plano-fase-1-spec-001,orquestrador,claude-opus-5-5,,50000,100000,200000,15,30,60,,,,,,,,,,,,,,,,,

@@ -12,5 +12,11 @@ printf '%s\n' "$staged" | xargs npx --no-install prettier --check --ignore-unkno
 if [ -n "$code" ]; then
   printf '%s\n' "$code" | xargs npx --no-install eslint --max-warnings 0 --no-warn-ignored
   npx --no-install tsc -p tsconfig.json
-  printf '%s\n' "$code" | xargs npx --no-install vitest related --run --passWithNoTests
+  # Commit só de testes é a fase RED do TDD: o vermelho é esperado, então não roda os testes.
+  production=$(printf '%s\n' "$code" | grep -Ev '(\.(test|spec)\.[cm]?[jt]sx?$|(^|/)(e2e|tests|__arbitraries__)/)' || true)
+  if [ -n "$production" ]; then
+    printf '%s\n' "$code" | xargs npx --no-install vitest related --run --passWithNoTests
+  else
+    echo 'pre-commit: só arquivos de teste (fase RED); testes não executados.'
+  fi
 fi

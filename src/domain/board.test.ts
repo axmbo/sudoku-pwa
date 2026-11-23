@@ -32,4 +32,54 @@ describe('board', () => {
       ),
     ).toBe(true);
   });
+
+  it('CA-001-02: as pistas são exatamente as células com valor na entrada, nas mesmas posições', () => {
+    const result = createBoard(input);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { cells } = result.value;
+    // Índices escritos à mão: (0,0)=0, (0,8)=8, (2,7)=25, (8,0)=72, (8,8)=80.
+    expect(cells[0]).toEqual({ value: 3, given: true });
+    expect(cells[8]).toEqual({ value: 1, given: true });
+    expect(cells[25]).toEqual({ value: 5, given: true });
+    expect(cells[72]).toEqual({ value: 7, given: true });
+    expect(cells[80]).toEqual({ value: 9, given: true });
+  });
+
+  it('CA-001-02: as demais células estão vazias e não são pistas', () => {
+    const result = createBoard(input);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const givenIndexes = [0, 8, 25, 72, 80];
+    const others = result.value.cells.filter((_cell, i) => !givenIndexes.includes(i));
+    expect(others.length).toBe(76);
+    expect(others.every((cell) => cell.value === null && cell.given === false)).toBe(true);
+  });
+
+  it('CA-001-02: tabuleiro, cells e cada célula são congelados', () => {
+    const result = createBoard(input);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(Object.isFrozen(result.value)).toBe(true);
+    expect(Object.isFrozen(result.value.cells)).toBe(true);
+    expect(result.value.cells.every((cell) => Object.isFrozen(cell))).toBe(true);
+  });
+
+  it('CA-001-02: mutar a entrada depois de criar não altera o tabuleiro', () => {
+    const mutable = input.map((row) => [...row]);
+    const result = createBoard(mutable);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    mutable[0]?.splice(0, 1, 4);
+    mutable[2]?.splice(7, 1, null);
+    mutable[4]?.splice(4, 1, 8);
+
+    expect(result.value.cells[0]).toEqual({ value: 3, given: true });
+    expect(result.value.cells[25]).toEqual({ value: 5, given: true });
+    expect(result.value.cells[40]).toEqual({ value: null, given: false });
+  });
 });

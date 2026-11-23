@@ -1,6 +1,6 @@
 # ADR 0002: Spec-Driven Development com equivalente próprio (sem GitHub Spec Kit)
 
-- **Status:** Proposto
+- **Status:** Aceito pelo Diretor em 22/11/2026.
 - **Data:** 22/11/2026
 - **Autor:** Orquestrador
 

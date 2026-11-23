@@ -16,7 +16,8 @@ fase-0,-,5-esqueleto,dev,claude-sonnet-5-5,nao,,,,,,,22,43240,5358,200600,48620,
 fase-0,-,5-esqueleto,dev,claude-haiku-5-5,nao,,,,,,,8,34343,854,37383,35205,n/d,15000,,0,,,,,,,,2 provas do hook PreToolUse no Claude Code
 fase-0,-,5-esqueleto,devsecops,claude-sonnet-5-5,nao,,,,,,,12,53356,6134,91465,59502,n/d,15000,,0,,,,,,,,workflows T8
 fase-0,-,5-esqueleto,revisor,claude-sonnet-5-5,nao,,,,,,,28,131413,21071,356472,152512,n/d,15000,,0,2,,,,,,,r1 (102296) e r2 (50216)
-fase-0,-,6-assinatura,devsecops,sonnet,,60000,120000,250000,30,60,120,,,,,,,,,,,,,,,,,o Diretor executa tudo que envolve chave privada
+fase-0,-,6-assinatura,devsecops,claude-sonnet-5-5,nao,60000,120000,250000,30,60,120,24,85864,17590,195287,103478,n/d,15000,,,,,,,,,,o Diretor executa tudo que envolve chave privada; real soma 3 execucoes (entrevista de assinatura; runbook; workflow de verificacao de tag); estimativa cobria o passo inteiro; min_real de relogio na linha do orquestrador; fonte log jsonl
+fase-0,-,6-assinatura,orquestrador,claude-opus-5-5,nao,,,,,,,128,39967,27490,4402389,67585,n/d,,40,,,,,,,,,real so da sessao principal; total do passo 171063 contra 120000 provavel (1.43x); relogio 22:45-23:25 BRT com espera do Diretor (comandos com chave privada); recorte 2daa8ca-247584b; fonte log jsonl
 fase-0,-,7-plano-fase-1-spec-001,orquestrador,claude-opus-5-5,,50000,100000,200000,15,30,60,,,,,,,,,,,,,,,,,
 fase-0,-,8-teste-sobrevivencia,orquestrador,claude-opus-5-5,,20000,40000,80000,5,10,20,,,,,,,,,,,,,,,,,
 fase-0,-,9-resumo,orquestrador,claude-opus-5-5,,5000,10000,20000,2,5,10,,,,,,,,,,,,,,,,,

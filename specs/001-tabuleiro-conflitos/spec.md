@@ -150,6 +150,11 @@ Linha e coluna são numeradas de 1 a 9 (como o jogador as vê). Bloco é cada um
   - Quando a recusa ocorre
   - Então o tabuleiro e seus conflitos ficam exatamente como estavam antes da tentativa, e o motivo da recusa é distinguível dos demais motivos
 
+- **CA-001-25** — Precedência entre motivos de recusa
+  - Dado uma tentativa a que se aplica mais de um motivo de recusa
+  - Quando a recusa ocorre
+  - Então vale um único motivo, pela ordem: ao colocar ou apagar, "célula inexistente" antes de "valor inválido" e este antes de "célula é pista"; ao criar o tabuleiro, "grade malformada" antes de "pistas em conflito"
+
 ## Acessibilidade e UX
 
 Esta spec não tem interface. Ela obriga, porém, informação que a interface das specs seguintes precisa para ser acessível:
@@ -178,3 +183,8 @@ Estimativa de 5 a 7 tarefas (contrato, criação e validação da entrada, coloc
 1. Valor que conflita é aceito e marcado em conflito (CA-001-15), não recusado.
 2. O conflito marca todas as células envolvidas na repetição (CA-001-14), derivado só do estado.
 3. Grade de entrada com pistas em conflito é recusada na criação (CA-001-23).
+4. Precedência entre motivos de recusa (CA-001-25), aprovada na revisão do PR #1.
+
+## Perguntas em aberto
+
+Nenhuma.

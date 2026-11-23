@@ -57,6 +57,8 @@ describe('guard-test-files', () => {
       'src/domain/__arbitraries__/grid.ts',
       '__arbitraries__/grid.ts',
       'src/x/e2e/helper.ts',
+      'src/ui/__snapshots__/grid.test.tsx.snap',
+      'src/ui/x.snap',
     ])('INV: bloqueia %s (exit 2, stderr cita eng-testes)', (path) => {
       const { status, stderr } = runWithPath(path);
       expect(status).toBe(2);

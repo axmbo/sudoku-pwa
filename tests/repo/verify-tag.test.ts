@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -71,5 +71,30 @@ describe('scripts/ci/verify-tag.sh', () => {
 
     expect(r.status).not.toBe(0);
     expect(r.stderr).toContain('main');
+  });
+});
+
+describe('gate de tag no pipeline de release (estático)', () => {
+  it('CA-REL-03: release.yml lê allowed_signers_tags e passa 3 argumentos ao script', () => {
+    const yml = readFileSync(`${root}.github/workflows/release.yml`, 'utf8');
+    expect(yml).toMatch(/origin\/main:\.github\/allowed_signers_tags/);
+    expect(yml).not.toMatch(/origin\/main:\.github\/allowed_signers(?!_tags)/);
+    expect(yml).toMatch(
+      /verify-tag\.sh\s+"\$GITHUB_REF_NAME"\s+"\$RUNNER_TEMP\/allowed_signers[^"]*"\s+\S+/,
+    );
+  });
+
+  it('CA-REL-03: .github/allowed_signers_tags existe, não é vazio e só tem chaves sk-', () => {
+    const file = `${root}.github/allowed_signers_tags`;
+    expect(existsSync(file), 'arquivo ausente').toBe(true);
+    const linhas = readFileSync(file, 'utf8')
+      .split('\n')
+      .filter((l) => l.trim() !== '');
+    expect(linhas.length).toBeGreaterThan(0);
+    for (const linha of linhas) {
+      expect(linha, linha.slice(0, 60)).toMatch(
+        /\ssk-(ssh-ed25519|ecdsa-sha2-nistp256)@openssh\.com\s/,
+      );
+    }
   });
 });

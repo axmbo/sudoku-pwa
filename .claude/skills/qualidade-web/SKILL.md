@@ -9,7 +9,7 @@ Fontes: princípios 1–4 e 8 da `docs/constituicao.md`; orçamento e ferramenta
 
 ## Grade acessível
 - Padrão ARIA **grid**: 81 células em 9 linhas; uma célula com `tabindex=0` por vez (roving tabindex).
-- Teclado: setas movem; `1`–`9` preenche; `Backspace`/`Delete`/`0` apaga; uma tecla alterna o modo anotação; `Ctrl+Z`/`Ctrl+Y` desfaz/refaz; `Home`/`End` na linha. Sem armadilha de foco.
+- Teclado: setas movem; `1`–`9` preenche; `Backspace`/`Delete`/`0` apaga; uma tecla alterna o modo anotação; `Ctrl+Z`/`Ctrl+Y` desfaz/refaz; `Home`/`End` na linha, `Ctrl+Home`/`Ctrl+End` na grade; setas sem wrap (ADR 0003). Sem armadilha de foco.
 - Nome acessível da célula em pt-BR: "Linha 3, coluna 5, 7, pista" / "vazia, anotações 2 4 9" / "em conflito".
 - Mudanças relevantes (conflito, vitória, desfazer) anunciadas em `aria-live="polite"`, sem inundar.
 - Foco visível com contraste ≥ 3:1; texto ≥ 4,5:1; não depender só de cor (conflito também com ícone/padrão).
@@ -21,13 +21,13 @@ Fontes: princípios 1–4 e 8 da `docs/constituicao.md`; orçamento e ferramenta
 - Service Worker com precache do app shell; nenhum recurso de terceiros.
 - **Atualização sem perda:** nova versão espera (`waiting`) e pede ao jogador para recarregar; nunca apagar o armazenamento do jogo; migrações de schema rodam antes de ler dados (ADR 0004).
 - E2E: abrir offline após a primeira visita; instalar; atualizar o SW com jogo em andamento e reencontrá-lo.
-- Lighthouse não tem mais categoria PWA: as checagens acima são próprias.
+- A checagem PWA do Lighthouse está descontinuada (ADR 0001): as checagens acima são próprias.
 
 ## Performance (dispositivo de referência: Android classe Moto G, 4G lento)
 - Os números (JS inicial gzip, LCP, TBT, tempo de geração por nível) estão no ADR 0001; não copie aqui.
 - Geração e solver no Web Worker: a UI nunca trava durante a geração.
 - Sem fontes web externas; imagens e ícones otimizados; CSS crítico pequeno.
-- Medir no CI: tamanho do bundle a cada PR; Lighthouse mobile no CI agendado e na tag.
+- Medir no CI: tamanho do bundle e do Worker e teto de nós da geração a cada PR (determinísticos); Lighthouse mobile e tempo real de geração no CI agendado e na tag.
 
 ## Segurança web
 CSP restritiva (`default-src 'self'`, sem `unsafe-inline` em script), sem scripts/analytics de terceiros, sem dados pessoais, dependências mínimas.

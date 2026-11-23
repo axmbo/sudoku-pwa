@@ -24,7 +24,7 @@ Detalhe de algoritmo e PRNG: [ADR 0005](../../../docs/adr/0005-worker-e-gerador-
 | solução | `solution` | grade completa válida consistente com as pistas |
 | puzzle | `Puzzle` | pistas + solução + nível + seed + versão do gerador |
 | nível de dificuldade | `Difficulty` | definido pela técnica mais difícil exigida |
-| desafio diário | `DailyChallenge` | puzzle derivado da data + versão do gerador |
+| desafio diário | `DailyChallenge` | puzzle derivado da data local + nível + versão do gerador (um por nível por dia) |
 | desfazer / refazer | `undo` / `redo` | sobre o histórico de jogadas (`Move`) |
 | semente | `seed` | entrada do PRNG |
 

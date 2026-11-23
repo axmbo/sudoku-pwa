@@ -146,8 +146,8 @@ Procedimento na skill `git-fluxo`.
 |---|---|
 | pre-commit local | formatação, lint, typecheck e testes do que mudou |
 | push em branch | `check`: typecheck + lint + unitários + property-based, com cache |
-| PR para `main` | o acima + cobertura do diff + ordem TDD + E2E em 1 navegador + axe + CodeQL + segredos e dependências |
-| agendado ou label `full-ci` | mutation completo, E2E em matriz, Lighthouse CI, auditoria de dependências |
+| PR para `main` | o acima + cobertura do diff + ordem TDD + E2E em 1 navegador + axe + CodeQL + segredos e dependências + orçamento determinístico (tamanho do bundle e do Worker, teto de nós da geração) |
+| agendado ou label `full-ci` | mutation completo, E2E em matriz, Lighthouse CI, tempo real de geração, auditoria de dependências |
 | tag | verificação da assinatura, build, Lighthouse, atestado de proveniência, deploy no Pages |
 
 Filtros de caminho (só `docs/` não roda testes), cancelamento de execuções antigas da mesma branch, timeouts curtos, cache agressivo. A lógica fica em `scripts/ci/*` e `npm run`; o workflow é casca fina.

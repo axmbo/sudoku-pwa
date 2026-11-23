@@ -25,7 +25,8 @@ Ao fim de cada passo: commit, hash, resumo ≤ 5 linhas, o que conferir no diff,
 
 ## Pendências do Diretor
 
-- Nenhuma.
+1. Preparar já, como proposta, a proteção da `main` + regra de quem cria tags `v*`, para aplicar após o merge da Fase 0?
+2. Registrar como débito: `verify-tag.sh` e `release.yml` vêm do commit da tag (podem ser alterados por ela); fecha com a regra das tags `v*` e o deploy dependendo do job.
 
 ## Débitos e pendências técnicas (viram issues quando houver remoto)
 

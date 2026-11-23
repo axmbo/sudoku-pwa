@@ -137,7 +137,7 @@ describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
     const r = runScript(repo, 'v1.0.0', makeSigners(repo), 'main');
 
     expect(r.status).toBe(1);
-    expect(r.stderr).toContain('assinatura');
+    expect(r.stderr).toContain('não tem assinatura SSH');
   });
 
   it('REL-04: recusa quando o allowed_signers está ausente', () => {

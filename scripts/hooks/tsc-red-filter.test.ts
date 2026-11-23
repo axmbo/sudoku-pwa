@@ -42,4 +42,37 @@ describe('tsc-red-filter', () => {
       expect(run(input).status).toBe(0);
     });
   });
+  describe('erros não toleráveis (falha fechado)', () => {
+    const ts2322 =
+      "src/x.test.ts(3,5): error TS2322: Type 'string' is not assignable to type 'number'.";
+
+    it('INV: rejeita uma linha TS2322 e a imprime no stderr', () => {
+      const result = run(`${ts2322}\n`);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain(ts2322);
+    });
+
+    it('INV: linha tolerada misturada com TS2322 rejeita e imprime só a TS2322', () => {
+      const tolerated =
+        "src/a.test.ts(1,10): error TS2305: Module './a' has no exported member 'foo'.";
+      const result = run(`${tolerated}\n${ts2322}\n`);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain(ts2322);
+      expect(result.stderr).not.toContain('TS2305');
+    });
+
+    it.each([
+      ['vazia', ''],
+      ['sem linha error TS', 'error: something\n'],
+    ])('INV: entrada %s falha fechado', (_nome, input) => {
+      expect(run(input).status).toBe(1);
+    });
+
+    it('INV: continuação indentada de erro não tolerado não conta como erro próprio', () => {
+      const input = `${ts2322}\n  Type 'string' is not assignable to type 'number'.\n`;
+      const result = run(input);
+      expect(result.status).toBe(1);
+      expect(result.stderr.match(/error TS/g)).toHaveLength(1);
+    });
+  });
 });

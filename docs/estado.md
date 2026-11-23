@@ -8,7 +8,7 @@
 - **Passo 4 concluído (estrutura do processo):**
   - `CLAUDE.md`, `PROCESSO.md`, `docs/constituicao.md`, templates em `specs/_templates/`;
   - 8 agentes, 8 skills de atividade + 7 pontos de entrada, `.claude/settings.json` (deny + hook `SessionStart`);
-  - ADRs 0001–0005 com status **Proposto**, aguardando o Diretor;
+  - ADRs 0001–0005 aceitos;
   - README, CONTRIBUTING, SECURITY, LICENSE, visão, backlog; `BOOTSTRAP.md` em `docs/historico/`.
 - **Próximo:** passo 5, esqueleto (Vite + TS 6.0 strict + Preact 11 + Vitest + fast-check + Playwright + axe + Stryker no domínio; commitlint + pre-commit; workflows do GitHub; testes de README único e de versão do Node).
 - **A validar no passo 5:** o hook `SessionStart` e o hook do `dev` rodando de verdade dentro do Claude Code (só simulados no shell até agora).
@@ -30,9 +30,11 @@ Ao fim de cada passo: commit, hash, resumo ≤ 5 linhas, o que conferir no diff,
 
 ## Pendências do Diretor
 
-1. ADRs 0001–0005 aceitos pelo Diretor, condicionados à revisão do `revisor` (em andamento) sobre 0001, 0003, 0004 e 0005; marcar `Aceito` depois de tratar os achados.
+- Nenhuma.
 
 ## Decididos no passo 4 (já aplicados)
 
-- Desafio diário pela data local do aparelho (ADR 0005); exportar/importar JSON no pós-MVP (ADR 0004, backlog).
+- ADRs 0001–0005 **Aceitos** após duas rodadas do `revisor` (r1: 3 major e 9 minor corrigidos; r2: sai).
+- Desafio diário: um por nível por dia, pela data local (ADR 0005); exportar/importar JSON no pós-MVP.
 - Hook do `dev` vira script Node testado em TDD no passo 5, falhando fechado (`PROCESSO.md` §6); até lá vale o comando jq atual.
+- Primeira tarefa do passo 5: validar Stryker + Vitest 5 (plano B: command runner).

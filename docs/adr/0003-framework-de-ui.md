@@ -1,6 +1,6 @@
 # ADR 0003: Framework de UI
 
-- **Status:** Proposto
+- **Status:** Aceito pelo Diretor em 22/11/2026, após duas rodadas do `revisor`.
 - **Data:** 22/11/2026
 - **Autor:** agente `arquiteto`
 

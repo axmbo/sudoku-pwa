@@ -1,12 +1,12 @@
 # ADR 0005: Web Worker e gerador determinístico versionado
 
-- **Status:** Proposto
+- **Status:** Aceito pelo Diretor em 22/11/2026, após duas rodadas do `revisor`.
 - **Data:** 22/11/2026
 - **Autor:** agente `arquiteto`
 
 ## Contexto
 
-Gerar um puzzle com solução única e dificuldade conhecida é custoso e não pode travar a thread principal em Android modesto. O desafio diário exige que o mesmo dia produza o mesmo puzzle, offline e sem servidor. Níveis de dificuldade (MVP) dependem de um solver lógico que avalia técnicas; as dicas do pós-MVP reaproveitam esse solver. O domínio fica em `src/domain/`, sem DOM nem `Math.random`.
+Gerar um puzzle com solução única e dificuldade conhecida é custoso e não pode travar a thread principal em Android modesto. O desafio diário exige que a mesma data local e o mesmo nível produzam o mesmo puzzle, offline e sem servidor. Níveis de dificuldade (MVP) dependem de um solver lógico que avalia técnicas; as dicas do pós-MVP reaproveitam esse solver. O domínio fica em `src/domain/`, sem DOM nem `Math.random`.
 
 ## Opções consideradas
 
@@ -27,7 +27,7 @@ Gerar um puzzle com solução única e dificuldade conhecida é custoso e não p
 
 **3. Algoritmo versionado.** Constante `GENERATOR_VERSION` (inteira). Mudar qualquer coisa que altere a saída para a mesma seed (PRNG, ordem de escavação, critérios de aceite, técnicas) exige incrementar a versão. Um **teste dourado** (seed fixa -> hash do puzzle por versão) falha em mudança silenciosa. O histórico do diário guarda o puzzle e a versão (ADR 0004), então partidas passadas não dependem de regeração. Vale a **data local do aparelho** (decisão do Diretor, 22/11/2026): não há servidor, então o desafio vira à meia-noite local, e não à meia-noite UTC (21h BRT). **Há um desafio por nível por dia** (fácil, médio, difícil e especialista; decisão do Diretor, 22/11/2026): o `{nível}` da seed separa os quatro. "O mesmo puzzle para todos" vale por data local e nível. Consequência aceita: jogadores em fusos diferentes podem estar em dias diferentes no mesmo instante.
 
-**4. Geração.** (a) Preencher grade completa por backtracking com candidatos embaralhados pelo PRNG. (b) Remover células em ordem embaralhada; após cada remoção, **contar soluções com corte em 2** (backtracking com heurística de menor candidato); manter a remoção só se a contagem for 1. (c) Avaliar com o solver lógico; se o nível não for o alvo, tentar de novo com o mesmo fluxo do PRNG, até N tentativas. Esgotadas as N, recomeçar com a sub-seed `{seed}/k+1` (k começa em 0), de forma determinística, até um teto K; passando de K, o gerador falha de forma explícita (erro tipado) e o teste de orçamento acusa. N e K fazem parte da `GENERATOR_VERSION`. Propriedade testada com fast-check: todo puzzle gerado tem exatamente 1 solução.
+**4. Geração.** (a) Preencher grade completa por backtracking com candidatos embaralhados pelo PRNG. (b) Remover células em ordem embaralhada; após cada remoção, **contar soluções com corte em 2** (backtracking com heurística de menor candidato); manter a remoção só se a contagem for 1. (c) Avaliar com o solver lógico; se o nível não for o alvo, tentar de novo com o mesmo fluxo do PRNG, até N tentativas. Esgotadas as N, recomeçar com a sub-seed `{seed}/{k}`, com k = 1, 2, … (a primeira rodada usa a seed sem sufixo), de forma determinística, até um teto K; passando de K, o gerador falha de forma explícita (erro tipado) e o teste de orçamento acusa. N e K fazem parte da `GENERATOR_VERSION`. Propriedade testada com fast-check: todo puzzle gerado tem exatamente 1 solução.
 
 **5. Dificuldade por técnicas (solver lógico, sem tentativa e erro).** Nível = técnica mais difícil necessária. Escala inicial, convenção nossa (não verificada em fonte externa; calibrar na Fase 1):
 

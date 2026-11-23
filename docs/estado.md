@@ -30,5 +30,9 @@ Ao fim de cada passo: commit, hash, resumo ≤ 5 linhas, o que conferir no diff,
 
 ## Pendências do Diretor
 
-1. Aceitar (ou ajustar) os ADRs 0001, 0002, 0003, 0004 e 0005 antes do esqueleto.
-2. Desafio diário: data local do aparelho (proposta do ADR 0005) ou UTC?
+1. ADRs 0001–0005 aceitos pelo Diretor, condicionados à revisão do `revisor` (em andamento) sobre 0001, 0003, 0004 e 0005; marcar `Aceito` depois de tratar os achados.
+
+## Decididos no passo 4 (já aplicados)
+
+- Desafio diário pela data local do aparelho (ADR 0005); exportar/importar JSON no pós-MVP (ADR 0004, backlog).
+- Hook do `dev` vira script Node testado em TDD no passo 5, falhando fechado (`PROCESSO.md` §6); até lá vale o comando jq atual.

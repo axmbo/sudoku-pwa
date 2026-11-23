@@ -21,10 +21,7 @@ export type CreateRefusal = 'malformed-grid' | 'conflicting-givens';
 export function createBoard(input: unknown): Result<Board, CreateRefusal> {
   // A validação da forma da entrada é da T02; por ora confia-se em `Grid`.
   const grid = input as Grid;
-  const cells = Array.from({ length: 81 }, (_, i) => {
-    const value = grid[Math.floor(i / 9)]?.[i % 9] ?? null;
-    return Object.freeze({ value, given: value !== null });
-  });
+  const cells = grid.flat().map((value) => Object.freeze({ value, given: value !== null }));
   return { ok: true, value: Object.freeze({ cells: Object.freeze(cells) }) };
 }
 

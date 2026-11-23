@@ -16,7 +16,7 @@ Todo o jogo depende de um tabuleiro confiável: uma grade 9×9 em que algumas c�
 
 ## Conceitos usados
 
-Linha e coluna são numeradas de 1 a 9 (como o jogador as vê). Bloco é cada uma das nove sub-grades 3×3. Unidade é uma linha, uma coluna ou um bloco. Conflito é o mesmo valor aparecendo duas ou mais vezes na mesma unidade. O conflito é sempre consequência do estado atual da grade.
+Linha e coluna são numeradas de 1 a 9 (como o jogador as vê). No domínio, são índices de 0 a 8, e a interface as apresenta de 1 a 9 ([ADR 0007](../../docs/adr/0007-convencoes-do-dominio.md)); por isso o CA-001-21 é verificado no domínio como "não é inteiro de 0 a 8". Bloco é cada uma das nove sub-grades 3×3. Unidade é uma linha, uma coluna ou um bloco. Conflito é o mesmo valor aparecendo duas ou mais vezes na mesma unidade. O conflito é sempre consequência do estado atual da grade.
 
 ## Critérios de aceite
 
@@ -184,6 +184,8 @@ Estimativa de 5 a 7 tarefas (contrato, criação e validação da entrada, coloc
 2. O conflito marca todas as células envolvidas na repetição (CA-001-14), derivado só do estado.
 3. Grade de entrada com pistas em conflito é recusada na criação (CA-001-23).
 4. Precedência entre motivos de recusa (CA-001-25), aprovada na revisão do PR #1.
+5. Linha e coluna de 0 a 8 no domínio, de 1 a 9 na interface (ADR 0007, 23/11/2026).
+6. Duas células que repetem numa linha e num bloco ao mesmo tempo listam as duas unidades no conflito (23/11/2026).
 
 ## Perguntas em aberto
 

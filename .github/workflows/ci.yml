@@ -7,14 +7,17 @@ on:
       - '**'
       - '!docs/**'
       - '!**/*.md'
-      - 'README.md' # o teste de README único depende do `check`
+      # Entradas dos testes de repo: README em qualquer pasta (o teste ignora maiúsculas) e o agente dev.
+      - '**/[Rr][Ee][Aa][Dd][Mm][Ee].[Mm][Dd]'
+      - '.claude/agents/dev.md'
   pull_request:
     branches: [main]
     paths:
       - '**'
       - '!docs/**'
       - '!**/*.md'
-      - 'README.md'
+      - '**/[Rr][Ee][Aa][Dd][Mm][Ee].[Mm][Dd]'
+      - '.claude/agents/dev.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -2,14 +2,14 @@
 
 > Snapshot vivo para retomada. Máximo de 40 linhas. Só estado; regras ficam em `CLAUDE.md` e `PROCESSO.md`.
 
-- **Fase:** 0 (bootstrap do processo), na branch `chore/fase-0`. Regras vivas: `PROCESSO.md` v0.2.
+- **Fase:** 1 (domínio e primeira UI), na branch `feat/001-tabuleiro-conflitos`. Fase 0 encerrada com o merge do [PR #1](https://github.com/axmbo/sudoku-pwa/pull/1) em 23/11/2026 (`8b5b40e`). Regras vivas: `PROCESSO.md` v0.2.
 - **Passos 0 a 4 concluídos:** Node 26.13.1 via `.nvmrc`; ADR 0006 (GitHub + Renovate, rebase merge); estrutura do processo (agentes, skills, ADRs 0001–0005 aceitos, docs).
 - **Passo 5 (esqueleto) concluído:** tarefas em [passo-5-tarefas.md](process/passo-5-tarefas.md); `check` verde (100 testes, cobertura e Stryker 100% no domínio), E2E + axe verde. Revisão: r1 não saiu (2 major, 3 minor, corrigidos; `PROCESSO.md` v0.2), [r2](process/revisoes/passo-5-r2.md) sai (2 minor, débito abaixo). Tokens: 558k (1,4× o pessimista), ver `metrics.csv`.
-- **Passo 6 (assinatura) concluído, com ressalva:** [runbook](runbooks/assinatura.md) etapas 1–6 feitas (chave de commit em software, chave de tag `ed25519-sk` na Thetis com backup cifrado no Drive, `allowed_signers`, repo público `axmbo/sudoku-pwa`, Signing Keys cadastradas, commits "Verified"). Etapa 7: `release.yml` recusa tag sem assinatura no remoto (provado em 22/11/2026, tag apagada); a prova de que uma tag válida passa é débito pós-merge.
+- **Passo 6 (assinatura) concluído:** [runbook](runbooks/assinatura.md) etapas 1–6 feitas (chave de commit em software, chave de tag `ed25519-sk` na Thetis com backup cifrado no Drive, `allowed_signers`, repo público `axmbo/sudoku-pwa`, Signing Keys cadastradas, commits "Verified"). Etapa 7: `release.yml` recusa tag sem assinatura no remoto (provado em 22/11/2026, tag apagada); tag assinada com a Thetis passa (provado em 23/11/2026, tag apagada).
 - **Passo 7 concluído:** [plano da Fase 1](process/plano-fase-1.md) (specs 001–005 = B-01 a B-05; B-06 a B-10 na Fase 2, aprovado em 22/11/2026) e [spec 001](../specs/001-tabuleiro-conflitos/spec.md) aprovada (25 CA; o CA-001-25 entrou na revisão do PR #1). A spec 001 nasceu na `chore/fase-0`; o ciclo dela (`/planejar 001`) abre a `feat/001-tabuleiro-conflitos` na Fase 1. Tokens: 113k (1,13× o provável), ver `metrics.csv`.
 - **Passo 8 concluído:** depois de `/clear`, o `/retomar` recuperou só pelos arquivos o critério de saída da revisão, o orçamento de contexto e o próximo passo; o Diretor aprovou em 22/11/2026. Tokens: 54k (1,34× o provável), ver `metrics.csv`.
 - **Passo 9 (resumo) entregue em 22/11/2026.** Fase 0 somou 1,73M tokens, 1,75× a estimativa provável de 990k e abaixo da pessimista de 1,9M.
-- **Próximo:** Ciclo 1 aprovado em 22/11/2026. [PR #1](https://github.com/axmbo/sudoku-pwa/pull/1) da Fase 0 em revisão: a r1 não saiu (1 major, 3 minor, 1 nit, em correção). Depois do merge: provar no remoto que tag assinada passa, aplicar a proteção da `main` e das tags `v*` e rodar `/planejar 001`.
+- **Próximo:** `/planejar 001` (o Diretor aciona) na `feat/001-tabuleiro-conflitos`. O PR #1 passou por 3 rodadas do `revisor` e 2 do Copilot, com achados corrigidos ou em débito abaixo.
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o `guard-test-files.mjs` do `dev` bloqueia `src/domain/__arbitraries__/x.ts` (provado em 22/11/2026, numa sessão nova; o arquivo não foi criado).
 
 ## Decisões do Diretor (22/11/2026)
@@ -19,7 +19,7 @@
 3. nvm + `.nvmrc` com a versão exata; o CI usa `node-version-file`. Referência: Android modesto.
 4. Subagentes em sonnet por padrão; opus só com justificativa. Código em inglês; UI e docs em pt-BR.
 5. Desafio diário: um por nível por dia, pela data local (ADR 0005); exportar/importar JSON no pós-MVP.
-6. Minors aceitos ficam como débito aqui até existir remoto no GitHub (aí viram issues `débito`).
+6. Minors aceitos ficam como débito aqui até virarem issues `débito` no GitHub (remoto existe desde o passo 6).
 
 ## Rito da Fase 0
 
@@ -36,5 +36,5 @@ Ao fim de cada passo: commit, hash, resumo ≤ 5 linhas, o que conferir no diff,
 - CSP em `<meta>`: `frame-ancestors` não funciona; `style-src 'self'` barra `style` inline do Preact; testar a CSP quando houver estilo dinâmico (r1, nit 8).
 - Lint do domínio deixa passar alias (`const a = Date; a.now()`), `globalThis.setTimeout`, `import()` dinâmico de `ui/`, `crypto.randomUUID`, `requestAnimationFrame` (r2, minor 1).
 - Commits de T2, T3 e T6 sem o vermelho no corpo (anteriores à regra v0.2; evidência em `passo-5-tarefas.md`) (r2, minor 2). Lista de caminhos de teste duplicada entre `pre-commit.sh` e `guard-test-files.mjs` (r2, nit). O `pre-commit.sh` quebra nomes com espaço nos `xargs`; corrigir com `-z`/`xargs -0` e teste com `npx` falso (Copilot no PR #1).
-- Release: `verify-tag.sh` e `release.yml` vêm do commit da tag (podem ser alterados por ela); fecha com a regra das tags `v*` e o deploy dependendo do job (aceito em 22/11/2026). Prova positiva pós-merge: tag assinada com a Thetis passa no `release.yml`.
+- Release: `verify-tag.sh` e `release.yml` vêm do commit da tag (podem ser alterados por ela); fecha com a regra das tags `v*` e o deploy dependendo do job (aceito em 22/11/2026).
 - `npm audit`: 5 moderadas em dependências de dev (Stryker → minimatch; qs), sem correção disponível; o gate é `high`.

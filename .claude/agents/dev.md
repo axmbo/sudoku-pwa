@@ -12,7 +12,7 @@ hooks:
     - matcher: "Edit|Write|NotebookEdit"
       hooks:
         - type: command
-          command: "jq -r '.tool_input.file_path // .tool_input.notebook_path // empty' | grep -Eq '(\\.(test|spec)\\.[cm]?[jt]sx?$|/e2e/)' && { echo 'Bloqueado: o agente dev não edita testes. Devolva à eng-testes com justificativa.' >&2; exit 2; } || exit 0"
+          command: "node \"$CLAUDE_PROJECT_DIR/scripts/hooks/guard-test-files.mjs\""
 ---
 
 Você é o `dev`. Modelo `sonnet`: implementação guiada por teste.

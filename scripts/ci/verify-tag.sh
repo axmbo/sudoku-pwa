@@ -20,8 +20,11 @@ if [ "$tipo" != "tag" ]; then
   exit 1
 fi
 
+# Lê o objeto uma única vez; here-strings evitam SIGPIPE (141) com anotação grande.
+objeto="$(git cat-file tag "refs/tags/${tag}")"
+
 # Impede replay: objeto de tag antigo reaproveitado sob outro nome v*.
-nome_gravado="$(git cat-file tag "refs/tags/${tag}" | sed -n 's/^tag //p;/^$/q' | head -n 1)"
+nome_gravado="$(sed -n 's/^tag //p;/^$/q' <<<"$objeto" | head -n 1)"
 if [ "$nome_gravado" != "$tag" ]; then
   echo "Erro: o nome gravado na tag ('${nome_gravado:-n/d}') difere do ref '${tag}'." >&2
   exit 1
@@ -32,7 +35,7 @@ if ! git merge-base --is-ancestor "refs/tags/${tag}^{commit}" "$main_ref" 2>/dev
   exit 1
 fi
 
-if ! git cat-file tag "refs/tags/${tag}" | grep -q -- '-----BEGIN SSH SIGNATURE-----'; then
+if ! grep -q -- '-----BEGIN SSH SIGNATURE-----' <<<"$objeto"; then
   echo "Erro: a tag '${tag}' não tem assinatura SSH." >&2
   exit 1
 fi

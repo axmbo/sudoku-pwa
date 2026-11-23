@@ -19,7 +19,13 @@ export type Grid = readonly (readonly (Digit | null)[])[];
 export type CreateRefusal = 'malformed-grid' | 'conflicting-givens';
 
 export function createBoard(input: unknown): Result<Board, CreateRefusal> {
-  // A validação da forma da entrada é da T02; por ora confia-se em `Grid`.
+  // Conteúdo das células (classe b) e conflitos são dos próximos ciclos da T02.
+  if (!Array.isArray(input) || input.length !== 9) {
+    return { ok: false, reason: 'malformed-grid' };
+  }
+  if (input.some((row) => !Array.isArray(row) || row.length !== 9)) {
+    return { ok: false, reason: 'malformed-grid' };
+  }
   const grid = input as Grid;
   const cells = grid.flat().map((value) => Object.freeze({ value, given: value !== null }));
   return { ok: true, value: Object.freeze({ cells: Object.freeze(cells) }) };

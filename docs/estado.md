@@ -32,9 +32,9 @@ Ao fim de cada passo: commit, hash, resumo ≤ 5 linhas, o que conferir no diff,
 ## Débitos e pendências técnicas (viram issues quando houver remoto)
 
 - Fora do passo 5: ordem TDD no CI, cobertura do diff, orçamento de bundle/Worker, Lighthouse CI, matriz E2E no `full-ci`, release por tag.
-- Proteção da `main` (passo 6): PR só de docs não dispara o `check`; se ele for obrigatório, o PR trava (r1, nit 6). Desligar o "default setup" do CodeQL; criar a label `full-ci`.
+- Proteção da `main` (passo 6): PR só de docs não dispara o `check`; se ele for obrigatório, o PR trava (r1, nit 6). A lista de `.md` que alimentam testes no filtro do `ci.yml` é manual e duplicada (PR #1, r3, nit 2). Desligar o "default setup" do CodeQL; criar a label `full-ci`.
 - CSP em `<meta>`: `frame-ancestors` não funciona; `style-src 'self'` barra `style` inline do Preact; testar a CSP quando houver estilo dinâmico (r1, nit 8).
 - Lint do domínio deixa passar alias (`const a = Date; a.now()`), `globalThis.setTimeout`, `import()` dinâmico de `ui/`, `crypto.randomUUID`, `requestAnimationFrame` (r2, minor 1).
-- Commits de T2, T3 e T6 sem o vermelho no corpo (anteriores à regra v0.2; evidência em `passo-5-tarefas.md`) (r2, minor 2). Lista de caminhos de teste duplicada entre `pre-commit.sh` e `guard-test-files.mjs` (r2, nit).
+- Commits de T2, T3 e T6 sem o vermelho no corpo (anteriores à regra v0.2; evidência em `passo-5-tarefas.md`) (r2, minor 2). Lista de caminhos de teste duplicada entre `pre-commit.sh` e `guard-test-files.mjs` (r2, nit). O `pre-commit.sh` quebra nomes com espaço nos `xargs`; corrigir com `-z`/`xargs -0` e teste com `npx` falso (Copilot no PR #1).
 - Release: `verify-tag.sh` e `release.yml` vêm do commit da tag (podem ser alterados por ela); fecha com a regra das tags `v*` e o deploy dependendo do job (aceito em 22/11/2026). Prova positiva pós-merge: tag assinada com a Thetis passa no `release.yml`.
 - `npm audit`: 5 moderadas em dependências de dev (Stryker → minimatch; qs), sem correção disponível; o gate é `high`.

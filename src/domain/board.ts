@@ -1,5 +1,6 @@
 import type { Digit } from './digit';
 import type { Result } from './result';
+import { cellIndex, type Index } from './units';
 
 /** Conteúdo de uma célula: valor (ou vazio) e se é pista. */
 export interface CellState {
@@ -25,4 +26,9 @@ export function createBoard(input: unknown): Result<Board, CreateRefusal> {
     return Object.freeze({ value, given: value !== null });
   });
   return { ok: true, value: Object.freeze({ cells: Object.freeze(cells) }) };
+}
+
+/** Conteúdo da célula na linha `row` e coluna `col` (0–8). */
+export function cellAt(board: Board, row: Index, col: Index): CellState {
+  return board.cells[cellIndex(row, col)] as CellState;
 }

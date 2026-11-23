@@ -164,3 +164,102 @@ describe('board: grade malformada', () => {
     });
   });
 });
+
+// Grade vazia com `value` na célula (2,7): linha ≠ coluna (regra 2).
+const withCell = (value: unknown): unknown[][] => {
+  const grid: unknown[][] = emptyGrid();
+  (grid[2] as unknown[])[7] = value;
+  return grid;
+};
+
+describe('board: grade malformada (conteúdo da célula)', () => {
+  it.each([
+    ['0', 0],
+    ['10', 10],
+    ['-1', -1],
+    ['2.5', 2.5],
+    ['-0', -0],
+    ['NaN', Number.NaN],
+    ['Infinity', Number.POSITIVE_INFINITY],
+    ['-Infinity', Number.NEGATIVE_INFINITY],
+    ["'5' (string)", '5'],
+    ["'' (string vazia)", ''],
+    ['true', true],
+    ['5n (bigint)', 5n],
+    ['undefined', undefined],
+    ['objeto', { value: 5 }],
+    ['array [5]', [5]],
+  ])('CA-001-22: recusa grade com célula %s em (2,7)', (_nome, conteudo) => {
+    const result = create(withCell(conteudo));
+
+    expect(result).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+});
+
+describe('board: grade malformada (buracos)', () => {
+  it('CA-001-22: recusa array de linhas esparso (new Array(9))', () => {
+    expect(create(new Array(9))).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+
+  it('CA-001-22: recusa array de linhas com buraco no meio (índice 4)', () => {
+    const grid = emptyGrid();
+    delete grid[4];
+
+    expect(grid.length).toBe(9);
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+
+  it('CA-001-22: recusa linha esparsa com length 9 (buraco em (6,3))', () => {
+    const grid = emptyGrid();
+    const row = grid[6] as (number | null)[];
+    delete row[3];
+
+    expect(row.length).toBe(9);
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+
+  it('CA-001-22: recusa célula undefined explícita em (5,1)', () => {
+    const grid: unknown[][] = emptyGrid();
+    (grid[5] as unknown[])[1] = undefined;
+
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+});
+
+describe('board: grade malformada (entrada que não é array de arrays)', () => {
+  const nineStrings = (): unknown[] => {
+    const rows: unknown[] = emptyGrid();
+    rows[3] = '123456789';
+    return rows;
+  };
+  const nineArrayLike = (): unknown[] => {
+    const rows: unknown[] = emptyGrid();
+    rows[6] = {
+      length: 9,
+      0: null,
+      1: null,
+      2: null,
+      3: null,
+      4: null,
+      5: null,
+      6: null,
+      7: null,
+      8: null,
+    };
+    return rows;
+  };
+
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['número', 81],
+    ['string de 9 caracteres', '123456789'],
+    ['objeto array-like { length: 9 }', { length: 9 }],
+    ['9 linhas, uma delas string de 9 caracteres', nineStrings()],
+    ['9 linhas, uma delas objeto array-like', nineArrayLike()],
+  ])('CA-001-22: recusa entrada %s', (_nome, entrada) => {
+    const result = create(entrada);
+
+    expect(result).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+});

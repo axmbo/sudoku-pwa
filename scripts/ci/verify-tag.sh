@@ -12,11 +12,6 @@ fi
 tag="$1"
 signers="$2"
 
-if [ ! -s "$signers" ]; then
-  echo "Erro: arquivo allowed_signers ausente ou vazio: $signers" >&2
-  exit 1
-fi
-
 tipo="$(git cat-file -t "refs/tags/${tag}" 2>/dev/null || true)"
 if [ "$tipo" != "tag" ]; then
   echo "Erro: a tag '${tag}' é leve ou não existe (tipo: '${tipo:-n/d}'); release exige tag anotada e assinada." >&2
@@ -25,6 +20,13 @@ fi
 
 if ! git cat-file tag "refs/tags/${tag}" | grep -q -- '-----BEGIN SSH SIGNATURE-----'; then
   echo "Erro: a tag '${tag}' não tem assinatura SSH." >&2
+  exit 1
+fi
+
+# Só depois das checagens que não dependem dele: tag leve ou sem assinatura
+# é recusada mesmo se o allowed_signers da main estiver ausente.
+if [ ! -s "$signers" ]; then
+  echo "Erro: arquivo allowed_signers ausente ou vazio: $signers" >&2
   exit 1
 fi
 

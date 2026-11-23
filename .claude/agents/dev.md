@@ -12,7 +12,7 @@ hooks:
     - matcher: "Edit|Write|NotebookEdit"
       hooks:
         - type: command
-          command: "node \"$CLAUDE_PROJECT_DIR/scripts/hooks/guard-test-files.mjs\""
+          command: "node \"$CLAUDE_PROJECT_DIR/scripts/hooks/guard-test-files.mjs\" || exit 2"
 ---
 
 Você é o `dev`. Modelo `sonnet`: implementação guiada por teste.

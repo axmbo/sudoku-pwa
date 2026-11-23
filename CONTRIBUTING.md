@@ -20,7 +20,7 @@ Obrigado pelo interesse. Este projeto tem um processo de engenharia explícito; 
 - Commits **podem** ser assinados (recomendado: chave SSH dedicada à assinatura). A `main` não exige assinatura, para não travar contribuições.
 - A assinatura de commit atesta a **origem**, não uma revisão humana. A revisão humana é o merge do PR pelo mantenedor.
 - Releases são tags assinadas pelo mantenedor com chave em hardware; o pipeline recusa tag não assinada.
-- Passo a passo de configuração: `docs/runbooks/assinatura.md` (em preparação).
+- Passo a passo de configuração: [docs/runbooks/assinatura.md](docs/runbooks/assinatura.md).
 
 ## Idioma
 

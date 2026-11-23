@@ -186,6 +186,7 @@ Estimativa de 5 a 7 tarefas (contrato, criação e validação da entrada, coloc
 4. Precedência entre motivos de recusa (CA-001-25), aprovada na revisão do PR #1.
 5. Linha e coluna de 0 a 8 no domínio, de 1 a 9 na interface (ADR 0007, 23/11/2026).
 6. Duas células que repetem numa linha e num bloco ao mesmo tempo listam as duas unidades no conflito (23/11/2026).
+7. `-0` como linha ou coluna é aceito como 0; como valor, é recusado (CA-001-20) (23/11/2026).
 
 ## Perguntas em aberto
 

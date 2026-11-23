@@ -47,7 +47,7 @@ afterEach(() => {
 });
 
 describe('scripts/ci/verify-tag.sh', () => {
-  it('CA-REL-01: recusa tag cujo nome gravado no objeto difere do ref e cita o nome', () => {
+  it('REL-01: recusa tag cujo nome gravado no objeto difere do ref e cita o nome', () => {
     const repo = makeRepo();
     git(repo, 'tag', '-a', 'v1.0.0', '-m', 'release antiga');
     // Reaproveita o objeto da tag v1.0.0 sob outro nome v* (ataque de replay).
@@ -60,7 +60,7 @@ describe('scripts/ci/verify-tag.sh', () => {
     expect(r.stderr).toContain('v1.0.0');
   });
 
-  it('CA-REL-02: recusa tag cujo commit alvo não é alcançável da main e cita a main', () => {
+  it('REL-02: recusa tag cujo commit alvo não é alcançável da main e cita a main', () => {
     const repo = makeRepo();
     git(repo, 'switch', '-c', 'feature');
     git(repo, 'commit', '--allow-empty', '-m', 'fora da main');
@@ -75,7 +75,7 @@ describe('scripts/ci/verify-tag.sh', () => {
 });
 
 describe('gate de tag no pipeline de release (estático)', () => {
-  it('CA-REL-03: release.yml lê allowed_signers_tags e passa 3 argumentos ao script', () => {
+  it('REL-03: release.yml lê allowed_signers_tags e passa 3 argumentos ao script', () => {
     const yml = readFileSync(`${root}.github/workflows/release.yml`, 'utf8');
     expect(yml).toMatch(/origin\/main:\.github\/allowed_signers_tags/);
     expect(yml).not.toMatch(/origin\/main:\.github\/allowed_signers(?!_tags)/);
@@ -84,7 +84,7 @@ describe('gate de tag no pipeline de release (estático)', () => {
     );
   });
 
-  it('CA-REL-03: .github/allowed_signers_tags existe, não é vazio e só tem chaves sk-', () => {
+  it('REL-03: .github/allowed_signers_tags existe, não é vazio e só tem chaves sk-', () => {
     const file = `${root}.github/allowed_signers_tags`;
     expect(existsSync(file), 'arquivo ausente').toBe(true);
     const linhas = readFileSync(file, 'utf8')
@@ -99,6 +99,7 @@ describe('gate de tag no pipeline de release (estático)', () => {
   });
 });
 
+// Critérios REL-01 a REL-04: docs/runbooks/assinatura.md, etapa 7.
 describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
   function gravaTagComAssinaturaFalsa(repo: string, nome: string): void {
     const alvo = git(repo, 'rev-parse', 'HEAD');
@@ -119,7 +120,7 @@ describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
     git(repo, 'update-ref', `refs/tags/${nome}`, r.stdout.trim());
   }
 
-  it('INV: recusa tag leve', () => {
+  it('REL-04: recusa tag leve', () => {
     const repo = makeRepo();
     git(repo, 'tag', 'v1.0.0');
 
@@ -129,7 +130,7 @@ describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
     expect(r.stderr).toMatch(/leve|anotada/);
   });
 
-  it('INV: recusa tag anotada sem assinatura', () => {
+  it('REL-04: recusa tag anotada sem assinatura', () => {
     const repo = makeRepo();
     git(repo, 'tag', '-a', 'v1.0.0', '-m', 'sem assinatura');
 
@@ -139,7 +140,7 @@ describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
     expect(r.stderr).toContain('assinatura');
   });
 
-  it('INV: recusa quando o allowed_signers está ausente', () => {
+  it('REL-04: recusa quando o allowed_signers está ausente', () => {
     const repo = makeRepo();
     gravaTagComAssinaturaFalsa(repo, 'v1.0.0');
 
@@ -149,7 +150,7 @@ describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
     expect(r.stderr).toContain('allowed_signers ausente ou vazio');
   });
 
-  it('INV: recusa quando o allowed_signers está vazio', () => {
+  it('REL-04: recusa quando o allowed_signers está vazio', () => {
     const repo = makeRepo();
     gravaTagComAssinaturaFalsa(repo, 'v1.0.0');
     const vazio = join(repo, 'vazio');

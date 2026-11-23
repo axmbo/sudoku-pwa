@@ -5,8 +5,8 @@
 - **Fase:** 0 (bootstrap do processo), na branch `chore/fase-0`. Regras vivas: `PROCESSO.md` v0.2.
 - **Passos 0 a 4 concluídos:** Node 26.13.1 via `.nvmrc`; ADR 0006 (GitHub + Renovate, rebase merge); estrutura do processo (agentes, skills, ADRs 0001–0005 aceitos, docs).
 - **Passo 5 (esqueleto) concluído:** tarefas em [passo-5-tarefas.md](process/passo-5-tarefas.md); `check` verde (100 testes, cobertura e Stryker 100% no domínio), E2E + axe verde. Revisão: r1 não saiu (2 major, 3 minor, corrigidos; `PROCESSO.md` v0.2), [r2](process/revisoes/passo-5-r2.md) sai (2 minor, débito abaixo). Tokens: 558k (1,4× o pessimista), ver `metrics.csv`.
-- **Próximo:** `/clear` + `/retomar`; provar o hook novo do `dev` (abaixo); depois o passo 6 (assinatura, com `devsecops`).
-- **Validado no Claude Code:** hook `SessionStart` injeta o estado; hook do `dev` bloqueia edição de teste. A definição do agente é lida no início da sessão: **na próxima sessão, provar** que o script `guard-test-files.mjs` (não o jq antigo) bloqueia `src/domain/__arbitraries__/x.ts`.
+- **Próximo:** passo 6 (assinatura, com `devsecops`).
+- **Validado no Claude Code:** hook `SessionStart` injeta o estado; o `guard-test-files.mjs` do `dev` bloqueia `src/domain/__arbitraries__/x.ts` (provado em 22/11/2026, numa sessão nova; o arquivo não foi criado).
 - **Depois:** passo 6 (assinatura), 7 (plano da Fase 1 + spec 001), 8 (teste de sobrevivência), 9 (resumo). `/clear` sugerido depois dos passos 5 e 7.
 
 ## Decisões do Diretor (22/11/2026)

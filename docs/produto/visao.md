@@ -16,7 +16,7 @@ Um Sudoku em pt-BR, instalável, que funciona sem internet, roda liso num celula
 2. **Destaque de conflitos** (repetição em linha, coluna ou bloco), sem depender só de cor.
 3. **Anotações** (lápis) e **desfazer/refazer** sem limite prático.
 4. **Timer** (pausa automática ao sair do app) e **estatísticas** por nível: jogos, vitórias, melhor tempo, sequência.
-5. **Desafio diário**: o mesmo puzzle para todos no mesmo dia, gerado no dispositivo, sem servidor.
+5. **Desafio diário**: um puzzle por nível por dia (quatro desafios), o mesmo para todos na mesma data local, gerado no dispositivo, sem servidor.
 6. **PWA**: instalação, offline completo, atualização sem perder o jogo em andamento.
 7. **Persistência local** do jogo em andamento, estatísticas e configurações.
 

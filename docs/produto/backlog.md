@@ -11,7 +11,7 @@ Priorizado de cima para baixo; um item = uma spec = um ciclo. Os critérios aqui
 | B-05 | Grade acessível (primeira UI) | jogar só por teclado e com leitor de tela; conflito sem depender de cor; toque ≥ 44 px | 005 | — |
 | B-06 | Persistência local | retomar o jogo ao reabrir; schema versionado com migração; sobreviver à atualização do SW | — | — |
 | B-07 | Timer e estatísticas | timer com pausa automática; estatísticas por nível (jogos, vitórias, melhor tempo, sequência) | — | — |
-| B-08 | Desafio diário | puzzle do dia igual em todos os dispositivos; histórico dos dias jogados | — | — |
+| B-08 | Desafio diário | um desafio por nível por dia, igual em todos os dispositivos na mesma data local; histórico por dia e nível | — | — |
 | B-09 | PWA: instalação, offline e atualização | instalável; funciona offline após a 1ª visita; atualização pede recarga sem perder jogo | — | — |
 | B-10 | Novo jogo e seleção de nível | escolher nível; geração no Worker sem travar a UI; tempo dentro do orçamento | — | — |
 | — | **Pós-MVP:** exportar/importar estatísticas (JSON) | backup manual contra limpeza de dados do navegador (ADR 0004); importação validada por schema | — | pós-MVP |

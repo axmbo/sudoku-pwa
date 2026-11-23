@@ -24,7 +24,7 @@ Tamanhos de bundlephobia (gzip), 22/11/2026.
 
 **Preact 11 (TSX) com `@preact/preset-vite` e `@testing-library/preact`.**
 
-- Menor atrito entre os três critérios que pesam mais aqui: bundle pequeno e confirmado, testabilidade já empacotada, a11y da grade controlada por estado simples.
+- Menor atrito entre os três critérios que pesam mais aqui: bundle pequeno (medido só para o Preact; o runtime do Svelte e o Lit não foram medidos), testabilidade já empacotada, a11y da grade controlada por estado simples.
 - Estado do jogo vem do domínio (funções puras, undo/redo imutável); a UI só o projeta. Evitar biblioteca de estado extra; `useReducer` sobre o domínio basta.
 - Grade: **roving tabindex** (uma célula com `tabindex=0`, demais `-1`), setas, Home/End, Ctrl+Home/End, sem wrap (recomendação do APG para grades de dados). `aria-label` por célula informa linha, coluna, valor, se é dado fixo, anotações e conflito. Conflito nunca só por cor.
 - Sem `preact/compat` salvo necessidade comprovada (mantém o bundle mínimo).
@@ -33,7 +33,7 @@ Tamanhos de bundlephobia (gzip), 22/11/2026.
 ## Consequências
 
 - Positivas: bundle com folga no orçamento; JSX tipado em TS strict; testes de interação por papel e rótulo.
-- Negativas: Preact 11 é recente (as tags npm ainda mostram `rc` e `beta` do ciclo 11; documentação de guias ainda marca páginas como versão anterior); dependência de uma lib de VDOM onde o vanilla bastaria.
+- Negativas: Preact 11 é recente (a 11.x estável, 11.2.0, é a `latest`; as tags `rc`/`beta` do npm estão defasadas; parte dos guias ainda é da v10); dependência de uma lib de VDOM onde o vanilla bastaria.
 - Reversível: o domínio não depende da UI; trocar de framework custa só a camada `src/ui/`.
 - Revisão deste ADR se o JS inicial ultrapassar o orçamento por causa da UI.
 

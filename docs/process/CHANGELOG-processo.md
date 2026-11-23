@@ -2,6 +2,12 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.4 — 23/11/2026
+
+Aprovado pelo Diretor no vermelho (1) da T01 da spec 001, quando o pre-commit barrou o primeiro commit `test` de símbolo novo (TS2307 no import de `./units`):
+
+- `PROCESSO.md` §6, "Motivo do vermelho", e §7, tabela de pipelines: num commit só de testes, o pre-commit roda o `tsc` e tolera apenas erro de símbolo inexistente (TS2305, TS2307, TS2339, TS2724); qualquer outro erro falha. O Diretor descartou duas alternativas: pular o `tsc` no RED, que deixaria passar erro de tipo real no teste, e `--no-verify` caso a caso.
+
 ## v0.3 — 23/11/2026
 
 Aprovado pelo Diretor na análise de consistência da spec 001 (minor M2 da rodada 3):

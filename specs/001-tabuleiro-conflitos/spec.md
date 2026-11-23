@@ -151,7 +151,7 @@ Linha e coluna são numeradas de 1 a 9 (como o jogador as vê). Bloco é cada um
   - Então o tabuleiro e seus conflitos ficam exatamente como estavam antes da tentativa, e o motivo da recusa é distinguível dos demais motivos
 
 - **CA-001-25** — Precedência entre motivos de recusa
-  - Dado uma tentativa a que se aplica mais de um motivo de recusa
+  - Dado uma tentativa a que se aplica mais de um motivo de recusa, como colocar valor inválido numa pista, colocar valor inválido numa célula inexistente, ou criar o tabuleiro com uma grade malformada que também tem pistas em conflito
   - Quando a recusa ocorre
   - Então vale um único motivo, pela ordem: ao colocar ou apagar, "célula inexistente" antes de "valor inválido" e este antes de "célula é pista"; ao criar o tabuleiro, "grade malformada" antes de "pistas em conflito"
 

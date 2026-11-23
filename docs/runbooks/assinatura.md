@@ -131,6 +131,13 @@ No gatilho `push` de tags `v*`, o job de release, antes de qualquer publicação
 3. Roda `git verify-tag "$GITHUB_REF_NAME"` com `gpg.ssh.allowedSignersFile` apontando para esse arquivo.
 4. Falha o job se alguma checagem falhar: tag leve, nome divergente, commit fora da `main`, tag sem assinatura, assinatura inválida ou chave fora do arquivo.
 
+Critérios do gate, citados pelos testes de `tests/repo/verify-tag.test.ts`:
+
+- **REL-01:** tag cujo nome gravado no objeto difere do ref é recusada, e a mensagem cita o nome gravado.
+- **REL-02:** tag cujo commit alvo não é alcançável da `main` é recusada, e a mensagem cita o ref da `main`.
+- **REL-03:** o `release.yml` lê o `.github/allowed_signers_tags` da `main`, que só tem chaves `sk-`, e faz o checkout com histórico completo (`fetch-depth: 0`), de que a checagem do REL-02 depende.
+- **REL-04:** são recusadas a tag leve, a tag anotada sem assinatura SSH (com mensagem própria) e a verificação com `allowed_signers` ausente ou vazio.
+
 A lógica fica em `scripts/ci/verify-tag.sh <tag> <allowed_signers> <ref-da-main>`, com teste automatizado em `tests/repo/`, e o workflow é `.github/workflows/release.yml` (casca fina; job `verify-tag`, que refaz o fetch da tag anotada porque o checkout pode reescrevê-la como leve). Teste de aceitação: empurrar uma tag sem assinatura deve falhar o job (provado em 22/11/2026). Empurrar uma tag válida, assinada com a chave de hardware, deve passar (prova pendente até o merge na `main`, porque o arquivo é lido de lá).
 
 ## Etapa 8. Rotação, perda e chave reserva (Diretor decide; IA edita o arquivo)

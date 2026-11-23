@@ -100,3 +100,67 @@ describe('board', () => {
     expect(cellAt(result.value, 7, 2)).toEqual({ value: null, given: false });
   });
 });
+
+const emptyRow = (): (number | null)[] => Array.from({ length: 9 }, () => null);
+const emptyGrid = (): (number | null)[][] => Array.from({ length: 9 }, emptyRow);
+const withRowLength = (rowIndex: number, length: number): (number | null)[][] => {
+  const grid = emptyGrid();
+  grid[rowIndex] = Array.from({ length }, () => null);
+  return grid;
+};
+
+// Captura não-lançante (regra 10): a falha esperada é de asserção sobre o Result.
+const create = (value: unknown): ReturnType<typeof createBoard> | undefined => {
+  let result: ReturnType<typeof createBoard> | undefined;
+  expect(() => {
+    result = createBoard(value);
+  }).not.toThrow();
+  return result;
+};
+
+describe('board: grade malformada', () => {
+  describe('CA-001-22: forma da grade', () => {
+    it.each([
+      ['0 linhas', []],
+      ['8 linhas', emptyGrid().slice(0, 8)],
+      ['10 linhas', [...emptyGrid(), emptyRow()]],
+      ['primeira linha com 0 células', withRowLength(0, 0)],
+      ['linha do meio (índice 4) com 0 células', withRowLength(4, 0)],
+      ['última linha com 0 células', withRowLength(8, 0)],
+      ['primeira linha com 8 células', withRowLength(0, 8)],
+      ['linha do meio (índice 5) com 8 células', withRowLength(5, 8)],
+      ['última linha com 8 células', withRowLength(8, 8)],
+      ['primeira linha com 10 células', withRowLength(0, 10)],
+      ['linha do meio (índice 3) com 10 células', withRowLength(3, 10)],
+      ['última linha com 10 células', withRowLength(8, 10)],
+    ])('CA-001-22: recusa grade com %s', (_nome, grade) => {
+      const result = create(grade);
+
+      expect(result).toEqual({ ok: false, reason: 'malformed-grid' });
+    });
+  });
+
+  describe('CA-001-22: limites aceitos', () => {
+    it('CA-001-22: aceita a célula com valor 1', () => {
+      const grid = emptyGrid().map((row, r) => (r === 2 ? row.with(7, 1) : row));
+
+      const result = create(grid);
+
+      expect(result?.ok).toBe(true);
+    });
+
+    it('CA-001-22: aceita a célula com valor 9', () => {
+      const grid = emptyGrid().map((row, r) => (r === 7 ? row.with(2, 9) : row));
+
+      const result = create(grid);
+
+      expect(result?.ok).toBe(true);
+    });
+
+    it('CA-001-22: aceita a célula null (vazia)', () => {
+      const result = create(emptyGrid());
+
+      expect(result?.ok).toBe(true);
+    });
+  });
+});

@@ -139,7 +139,7 @@ Critérios do gate, citados pelos testes de `tests/repo/verify-tag.test.ts`:
 - **REL-04:** são recusadas a tag leve, a tag anotada sem assinatura SSH (com mensagem própria) e a verificação com `allowed_signers` ausente ou vazio.
 - **REL-05:** uma tag com anotação longa, maior que o buffer de um pipe (cerca de 64 KB), passa por todas as checagens até a mensagem própria de cada uma, sem o script abortar por SIGPIPE (código 141).
 
-A lógica fica em `scripts/ci/verify-tag.sh <tag> <allowed_signers> <ref-da-main>`, com teste automatizado em `tests/repo/`, e o workflow é `.github/workflows/release.yml` (casca fina; job `verify-tag`, que refaz o fetch da tag anotada porque o checkout pode reescrevê-la como leve). Teste de aceitação: empurrar uma tag sem assinatura deve falhar o job (provado em 22/11/2026). Empurrar uma tag válida, assinada com a chave de hardware, deve passar (prova pendente até o merge na `main`, porque o arquivo é lido de lá).
+A lógica fica em `scripts/ci/verify-tag.sh <tag> <allowed_signers> <ref-da-main>`, com teste automatizado em `tests/repo/`, e o workflow é `.github/workflows/release.yml` (casca fina; job `verify-tag`, que refaz o fetch da tag anotada porque o checkout pode reescrevê-la como leve). Teste de aceitação: empurrar uma tag sem assinatura deve falhar o job (provado em 22/11/2026). Empurrar uma tag válida, assinada com a chave de hardware, deve passar (provado em 23/11/2026 com `v0.0.0-prova-assinatura` sobre `8b5b40e`: `Good "git" signature … ED25519-SK`; tag apagada).
 
 ## Etapa 8. Rotação, perda e chave reserva (Diretor decide; IA edita o arquivo)
 
@@ -150,5 +150,5 @@ A lógica fica em `scripts/ci/verify-tag.sh <tag> <allowed_signers> <ref-da-main
 ## Pendências não confirmadas
 
 1. A Thetis faz Ed25519 (confirmado em 22/11/2026); seguem sem confirmação o PIN FIDO2 e o `-O verify-required`.
-2. Se o `ssh-keygen -Y verify` do runner aceita chaves `-sk` sem `verify-required` no `allowed_signers_tags`. Fecha com a prova positiva da etapa 7, depois do merge.
+2. ~~Se o `ssh-keygen -Y verify` do runner aceita chaves `-sk` sem `verify-required`~~: aceita (prova positiva da etapa 7, 23/11/2026).
 3. Texto exato das mensagens de erro na versão 8.9p1; as citadas são típicas.

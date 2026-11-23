@@ -27,3 +27,43 @@ describe('board (propriedades de criação)', () => {
     );
   });
 });
+
+const isValidCell = (v: unknown): boolean =>
+  v === null || (typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 9);
+
+describe('board (propriedades de grade malformada)', () => {
+  // Regressão: se falhar, copie a seed e o path impressos para um teste fixo
+  // `fc.assert(prop, { seed, path })` com comentário do caso.
+  it('CA-001-22: grade válida com UMA célula trocada por não-dígito é recusada como malformed-grid', () => {
+    const notACell = fc.anything().filter((v) => !isValidCell(v));
+    fc.assert(
+      fc.property(gridWithoutConflicts, fc.nat(8), fc.nat(8), notACell, (grid, row, col, bad) => {
+        const mutated: unknown[][] = grid.map((line) => [...line]);
+        (mutated[row] as unknown[])[col] = bad;
+        let result: ReturnType<typeof createBoard> | undefined;
+        expect(() => {
+          result = createBoard(mutated);
+        }).not.toThrow();
+        expect(result).toEqual({ ok: false, reason: 'malformed-grid' });
+      }),
+      { seed: 20260022 },
+    );
+  });
+
+  it('CA-001-22: grade válida com uma linha truncada ou estendida é recusada como malformed-grid', () => {
+    const wrongLength = fc.nat(20).filter((n) => n !== 9);
+    fc.assert(
+      fc.property(gridWithoutConflicts, fc.nat(8), wrongLength, (grid, row, length) => {
+        const mutated: unknown[][] = grid.map((line) => [...line]);
+        const original = mutated[row] as unknown[];
+        mutated[row] = Array.from({ length }, (_v, i) => original[i] ?? null);
+        let result: ReturnType<typeof createBoard> | undefined;
+        expect(() => {
+          result = createBoard(mutated);
+        }).not.toThrow();
+        expect(result).toEqual({ ok: false, reason: 'malformed-grid' });
+      }),
+      { seed: 20260023 },
+    );
+  });
+});

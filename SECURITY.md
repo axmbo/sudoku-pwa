@@ -17,7 +17,7 @@ Inclua: versão (ou commit), navegador e sistema, passos para reproduzir e o imp
 | Código de terceiros no navegador | Nenhum script, fonte, analytics ou requisição de terceiros. CSP restritiva (`default-src 'self'`, sem `unsafe-inline` em script). |
 | Dados do jogador | Nenhum dado pessoal coletado; o jogo salvo, as estatísticas e as configurações ficam só no dispositivo (IndexedDB). Nada sai do aparelho. |
 | Service worker | Pré-cache só de assets estáticos do próprio site; não toca nos dados salvos; atualização só com confirmação do jogador. |
-| Entrada do usuário | Apenas números e comandos de jogo; dados importados (exportação JSON) são validados por schema antes do uso. |
+| Entrada do usuário | Apenas números e comandos de jogo. Os dados lidos do armazenamento local são validados por schema antes do uso (e, quando houver importação de JSON no pós-MVP, ela passa pela mesma validação). |
 | Cadeia de suprimentos | Dependências mínimas e fixadas por lockfile; Renovate para atualizações; alertas do Dependabot; CodeQL, secret scanning e push protection do GitHub; ações de CI fixadas por SHA. |
 | Build e release | Tags de release assinadas com chave em hardware do mantenedor; o pipeline recusa tag não assinada; atestado de proveniência do build (GitHub Artifact Attestations), verificável com `gh attestation verify`. |
 

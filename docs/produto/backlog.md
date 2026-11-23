@@ -14,4 +14,5 @@ Priorizado de cima para baixo; um item = uma spec = um ciclo. Os critérios aqui
 | B-08 | Desafio diário | puzzle do dia igual em todos os dispositivos; histórico dos dias jogados | — | — |
 | B-09 | PWA: instalação, offline e atualização | instalável; funciona offline após a 1ª visita; atualização pede recarga sem perder jogo | — | — |
 | B-10 | Novo jogo e seleção de nível | escolher nível; geração no Worker sem travar a UI; tempo dentro do orçamento | — | — |
+| — | **Pós-MVP:** exportar/importar estatísticas (JSON) | backup manual contra limpeza de dados do navegador (ADR 0004); importação validada por schema | — | pós-MVP |
 | — | **Pós-MVP:** dicas | dica indica a técnica e a célula, sem revelar direto | — | pós-MVP |

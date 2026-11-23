@@ -1,6 +1,6 @@
-/** Dígito válido de uma célula de Sudoku: inteiro de 1 a 9. */
-export function isDigit(value: number): boolean {
-  return Number.isInteger(value) && value >= 1 && value <= 9;
+/** Dígito válido de uma célula de Sudoku: inteiro de 1 a 9 (sem coerção de tipo). */
+export function isDigit(value: unknown): value is Digit {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 9;
 }
 
 /** Valor de uma célula preenchida. */

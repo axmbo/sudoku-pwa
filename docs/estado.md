@@ -8,7 +8,8 @@
 - **Passo 6 (assinatura) em andamento:** [runbook](runbooks/assinatura.md) etapas 1–6 feitas (chave de commit em software, chave de tag `ed25519-sk` na Thetis com backup cifrado no Drive, `allowed_signers`, repo público `axmbo/sudoku-pwa`, Signing Keys cadastradas, commits "Verified"). Etapa 7: `release.yml` recusa tag sem assinatura no remoto (provado em 22/11/2026, tag apagada).
 - **Passo 7 concluído:** [plano da Fase 1](process/plano-fase-1.md) (specs 001–005 = B-01 a B-05; B-06 a B-10 na Fase 2, aprovado em 22/11/2026) e [spec 001](../specs/001-tabuleiro-conflitos/spec.md) aprovada (24 CA). A spec 001 nasceu na `chore/fase-0`; o ciclo dela (`/planejar 001`) abre a `feat/001-tabuleiro-conflitos` na Fase 1. Tokens: 113k (1,13× o provável), ver `metrics.csv`.
 - **Passo 8 concluído:** depois de `/clear`, o `/retomar` recuperou só pelos arquivos o critério de saída da revisão, o orçamento de contexto e o próximo passo; o Diretor aprovou em 22/11/2026. Tokens: 54k (1,34× o provável), ver `metrics.csv`.
-- **Próximo:** passo 9 (resumo ≤ 20 linhas e aprovação do Ciclo 1), depois o PR da Fase 0 (decisão do Diretor, 22/11/2026). Depois do merge: provar no remoto que tag assinada passa e aplicar a proteção da `main` e das tags `v*`.
+- **Passo 9 (resumo) entregue em 22/11/2026.** Fase 0 somou 1,73M tokens, 1,75× a estimativa provável de 990k e abaixo da pessimista de 1,9M.
+- **Próximo:** o Diretor aprova o Ciclo 1; depois, o PR da `chore/fase-0` para a `main` (decisão de 22/11/2026) e, após o merge, `/planejar 001`. Depois do merge: provar no remoto que tag assinada passa e aplicar a proteção da `main` e das tags `v*`.
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o `guard-test-files.mjs` do `dev` bloqueia `src/domain/__arbitraries__/x.ts` (provado em 22/11/2026, numa sessão nova; o arquivo não foi criado).
 
 ## Decisões do Diretor (22/11/2026)

@@ -24,12 +24,12 @@ Dados a guardar: jogo em andamento (grade, anotações, pilha de undo/redo, time
 **IndexedDB via `idb-keyval`, com um único object store e chaves fixas**: `game`, `stats`, `daily-history`, `settings`, `meta`.
 
 - Cada valor é um envelope `{ schemaVersion: number, data }`. A migração é **nossa**: funções puras `vN -> vN+1` em módulo testável (property-based: migrar e validar). Não usar `onupgradeneeded` para dados de domínio; o banco fica sempre na versão 1.
-- **Versão desconhecida (maior que a do app):** não sobrescrever nem apagar. Abrir em modo leitura, avisar e oferecer exportar JSON. Cobre rollback de deploy e abas antigas.
+- **Versão desconhecida (maior que a do app):** não sobrescrever nem apagar. Abrir em modo leitura e avisar o jogador para recarregar o app. Cobre rollback de deploy e abas antigas. (Exportar JSON nesse caso fica para o pós-MVP, junto com o item abaixo.)
 - **Falha de validação ao ler:** mover o valor para a chave `corrupt:<chave>:<data>` e começar limpo, nunca descartar em silêncio.
 - Escrita do jogo em andamento a cada jogada (debounce curto), por `set` de chave única; atualizações que tocam duas chaves (fim de partida: `game` + `stats`) usam `setMany`.
 - Histórico diário guarda os `givens` e a versão do algoritmo (ADR 0005), para não depender de regerar.
 - **`navigator.storage.persist()`** chamado da thread principal (indisponível em Workers) após a primeira partida concluída, em contexto seguro. Pode ser negado em silêncio (Chromium decide por interação; Firefox pede consentimento); `false` não significa perda iminente. A UI não depende do resultado.
-- **Safari:** dados de script de origem sem interação por 7 dias podem ser apagados com prevenção de rastreamento ativa (MDN). Se o app instalado é isento: **não confirmado**. Mitigação: exportar/importar JSON de estatísticas nas configurações.
+- **Safari:** dados de script de origem sem interação por 7 dias podem ser apagados com prevenção de rastreamento ativa (MDN). Se o app instalado é isento: **não confirmado**. Mitigação prevista: exportar/importar JSON de estatísticas nas configurações — **pós-MVP** (decisão do Diretor, 22/11/2026); no MVP o risco fica aceito e documentado.
 - **Service Worker:** pré-cache só de assets estáticos; o SW nunca lê nem escreve IndexedDB. Dados e versão do app evoluem de forma independente. Com `vite-plugin-pwa`, usar atualização por aviso (`registerType: 'prompt'`) para nunca recarregar no meio de uma partida; as opções do plugin não foram verificadas nesta consulta.
 - Abstração `Storage` (interface em `src/persistence/`) com implementação em memória para testes; domínio não conhece IndexedDB.
 

@@ -98,3 +98,66 @@ describe('gate de tag no pipeline de release (estático)', () => {
     }
   });
 });
+
+describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
+  function gravaTagComAssinaturaFalsa(repo: string, nome: string): void {
+    const alvo = git(repo, 'rev-parse', 'HEAD');
+    const corpo = [
+      `object ${alvo}`,
+      'type commit',
+      `tag ${nome}`,
+      'tagger Teste <teste@example.com> 1700000000 +0000',
+      '',
+      'release',
+      '-----BEGIN SSH SIGNATURE-----',
+      'AAAA',
+      '-----END SSH SIGNATURE-----',
+      '',
+    ].join('\n');
+    const r = spawnSync('git', ['mktag'], { cwd: repo, input: corpo, encoding: 'utf8' });
+    if (r.status !== 0) throw new Error(`git mktag falhou: ${r.stderr}`);
+    git(repo, 'update-ref', `refs/tags/${nome}`, r.stdout.trim());
+  }
+
+  it('INV: recusa tag leve', () => {
+    const repo = makeRepo();
+    git(repo, 'tag', 'v1.0.0');
+
+    const r = runScript(repo, 'v1.0.0', makeSigners(repo), 'main');
+
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/leve|anotada/);
+  });
+
+  it('INV: recusa tag anotada sem assinatura', () => {
+    const repo = makeRepo();
+    git(repo, 'tag', '-a', 'v1.0.0', '-m', 'sem assinatura');
+
+    const r = runScript(repo, 'v1.0.0', makeSigners(repo), 'main');
+
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('assinatura');
+  });
+
+  it('INV: recusa quando o allowed_signers está ausente', () => {
+    const repo = makeRepo();
+    gravaTagComAssinaturaFalsa(repo, 'v1.0.0');
+
+    const r = runScript(repo, 'v1.0.0', join(repo, 'nao-existe'), 'main');
+
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('allowed_signers ausente ou vazio');
+  });
+
+  it('INV: recusa quando o allowed_signers está vazio', () => {
+    const repo = makeRepo();
+    gravaTagComAssinaturaFalsa(repo, 'v1.0.0');
+    const vazio = join(repo, 'vazio');
+    writeFileSync(vazio, '');
+
+    const r = runScript(repo, 'v1.0.0', vazio, 'main');
+
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('allowed_signers ausente ou vazio');
+  });
+});

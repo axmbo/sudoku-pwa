@@ -14,4 +14,14 @@ Formato:
 
 ## Candidatas
 
-- Nenhuma ainda.
+## M-001 — Typecheck do pre-commit ignora o que está fora do stage (ciclo 01, 23/11/2026)
+- Lição: o `tsc` enxerga arquivos não rastreados e fora do stage; um vermelho guardado barrou outro commit e, no RED, um TS2339 em arquivo fora do stage passaria.
+- Proposta (diff): `tsc-red-filter` / `pre-commit.sh` checam só os arquivos do stage (ou documentar a limitação na skill `tdd`).
+- Lugar de promoção: hook
+- Estado: candidata
+
+## M-002 — Tolerar TS7006 no vermelho (ciclo 01, 23/11/2026)
+- Lição: símbolo inexistente gera TS7006 em cascata; a `eng-testes` anotou o tipo à mão.
+- Proposta (diff): incluir TS7006 na lista tolerada do `tsc-red-filter` ou documentar a anotação manual no agente `eng-testes`.
+- Lugar de promoção: hook
+- Estado: candidata

@@ -1,6 +1,6 @@
 ---
 name: eng-testes
-description: Escreve os testes ANTES da implementação (fase RED do TDD) — unitários, property-based, componentes e E2E — citando o ID do critério de aceite. Use no início de cada tarefa não isenta de /implementar.
+description: Escreve os testes ANTES da implementação (fase RED do TDD) — unitários, property-based, componentes e E2E — citando o ID do critério de aceite. Use no início de cada tarefa não isenta de /implementar e nas tarefas isentas cujo entregável é teste de invariante sobre estado existente.
 tools: Read, Grep, Glob, Edit, Write, Bash
 model: sonnet
 skills:
@@ -26,6 +26,7 @@ Somente arquivos de teste (`*.test.ts`, `*.spec.ts`, `e2e/**`) e fixtures. Nunca
 - E2E só para jornada, nunca para regra de negócio.
 - Rode o teste e confirme que **falha pelo motivo certo** (não por import quebrado).
 - Commit `test(<escopo>): <o que o teste exige>` com o teste vermelho, antes de qualquer `feat`/`fix`.
+- Isenção de teste de invariante (`PROCESSO.md` §6): o teste passa de imediato; prove o vermelho uma vez contra uma cópia sem a proteção (no scratchpad) e descreva a prova e a isenção no corpo do commit.
 - Se o `dev` devolver um teste com justificativa, avalie; mudar o que o teste verifica exige registrar em `notas.md`.
 
 ## Retorno (≤ 15 linhas)

@@ -10,7 +10,12 @@ fase-0,-,4-estrutura-processo,orquestrador,claude-opus-5-5,sim,150000,300000,500
 fase-0,-,4b-revisao-adrs,revisor,claude-sonnet-5-5,nao,,,,,,,10,44824,11825,105092,56659,n/d,,7,,1,0,3,9,,,,rodada 1 sobre ADRs 0001 0003 0004 0005; nao estimada (pedida pelo Diretor depois do passo 4); numeros de linha do parecer errados
 fase-0,-,4b-revisao-adrs,revisor,claude-sonnet-5-5,nao,,,,,,,8,29791,2985,67846,32784,n/d,,1,,2,0,0,0,,,,rodada 2 so no delta; 2 nits corrigidos; veredito sai
 fase-0,-,4b-revisao-adrs,orquestrador,claude-opus-5-5,nao,,,,,,,50,37067,22097,3551072,59214,n/d,,47,,,,,,,,,triagem + correcoes + decisoes do Diretor (diario por nivel; data local; export pos-MVP; hook em script); total da revisao 148657 sem estimativa; relogio 21:01-21:48 BRT com espera do Diretor
-fase-0,-,5-esqueleto,orquestrador,claude-opus-5-5,,100000,200000,400000,30,60,120,,,,,,,,,,,,,,,,,
+fase-0,-,5-esqueleto,orquestrador,claude-opus-5-5,sim,100000,200000,400000,30,60,120,164,133447,50503,7835198,184114,n/d,,54,0,2,0,2,5,100,100,100,estimativa cobria o passo inteiro; real so da sessao principal (subagentes nas linhas seguintes); total do passo 558024 = 1.4x o pessimista; relogio 21:50-22:44 BRT com espera do Diretor; achados somam r1 (2 major 3 minor) e r2 (2 minor); fonte log jsonl
+fase-0,-,5-esqueleto,eng-testes,claude-sonnet-5-5,nao,,,,,,,42,65410,12619,490333,78071,n/d,15000,,0,,,,,,,,2 execucoes (RED T2-T6; RED dos majors r1)
+fase-0,-,5-esqueleto,dev,claude-sonnet-5-5,nao,,,,,,,22,43240,5358,200600,48620,n/d,15000,,0,,,,,,,,2 execucoes (GREEN T4/T5; GREEN dos majors r1)
+fase-0,-,5-esqueleto,dev,claude-haiku-5-5,nao,,,,,,,8,34343,854,37383,35205,n/d,15000,,0,,,,,,,,2 provas do hook PreToolUse no Claude Code
+fase-0,-,5-esqueleto,devsecops,claude-sonnet-5-5,nao,,,,,,,12,53356,6134,91465,59502,n/d,15000,,0,,,,,,,,workflows T8
+fase-0,-,5-esqueleto,revisor,claude-sonnet-5-5,nao,,,,,,,28,131413,21071,356472,152512,n/d,15000,,0,2,,,,,,,r1 (102296) e r2 (50216)
 fase-0,-,6-assinatura,devsecops,sonnet,,60000,120000,250000,30,60,120,,,,,,,,,,,,,,,,,o Diretor executa tudo que envolve chave privada
 fase-0,-,7-plano-fase-1-spec-001,orquestrador,claude-opus-5-5,,50000,100000,200000,15,30,60,,,,,,,,,,,,,,,,,
 fase-0,-,8-teste-sobrevivencia,orquestrador,claude-opus-5-5,,20000,40000,80000,5,10,20,,,,,,,,,,,,,,,,,

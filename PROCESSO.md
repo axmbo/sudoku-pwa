@@ -114,7 +114,7 @@ E2E só para jornadas, nunca para regra de negócio. Teste instável é **major*
 - Não fazer TDD exige isenção declarada na tarefa: `tdd: isento — <motivo>`. **Lista fechada:** spike descartável (branch `spike/*`, nunca mergeada), configuração de build/CI, ajuste puramente visual/CSS, código gerado. O `revisor` valida o motivo.
 - **Guardrails**, do mais barato ao mais caro:
   1. **Ordem dos commits:** `test(...)` com o teste falhando antes de `feat(...)`/`fix(...)`. Script de CI, só no PR e só nas tarefas não isentas (lidas de `tasks.md`), roda os testes no commit de teste esperando falha.
-  2. **Separação de papéis:** o hook `PreToolUse` do agente `dev` bloqueia edição de `*.test.*`/`*.spec.*`; alteração de teste volta à `eng-testes` com justificativa.
+  2. **Separação de papéis:** o hook `PreToolUse` do agente `dev` bloqueia edição de `*.test.*`/`*.spec.*` e de `e2e/`; alteração de teste volta à `eng-testes` com justificativa. O hook é um script Node testado (`scripts/hooks/`) que **falha fechado**: entrada ilegível bloqueia. **Limitação:** cobre só as ferramentas de edição de arquivo (Edit, Write, NotebookEdit), não escrita pelo Bash; essa brecha é coberta pelos guardrails 1 e 5.
   3. **Cobertura do diff** em `src/domain/`.
   4. **Mutation testing:** mutante sobrevivente em código novo do domínio é **major**.
   5. **Revisão** CA ↔ teste ↔ código.

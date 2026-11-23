@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBoard } from './board';
+import { cellAt, createBoard } from './board';
 
 const _ = null;
 
@@ -81,5 +81,22 @@ describe('board', () => {
     expect(result.value.cells[0]).toEqual({ value: 3, given: true });
     expect(result.value.cells[25]).toEqual({ value: 5, given: true });
     expect(result.value.cells[40]).toEqual({ value: null, given: false });
+  });
+
+  it('CA-001-01: cellAt(linha, coluna) devolve a célula do índice literal, nos cantos e em posições assimétricas', () => {
+    const result = createBoard(input);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { cells } = result.value;
+    expect(cellAt(result.value, 0, 0)).toBe(cells[0]);
+    expect(cellAt(result.value, 0, 8)).toBe(cells[8]);
+    expect(cellAt(result.value, 2, 7)).toBe(cells[25]);
+    expect(cellAt(result.value, 8, 0)).toBe(cells[72]);
+    expect(cellAt(result.value, 8, 8)).toBe(cells[80]);
+    expect(cellAt(result.value, 2, 7)).toEqual({ value: 5, given: true });
+    // célula vazia assimétrica: (7,2) = cells[65]
+    expect(cellAt(result.value, 7, 2)).toBe(cells[65]);
+    expect(cellAt(result.value, 7, 2)).toEqual({ value: null, given: false });
   });
 });

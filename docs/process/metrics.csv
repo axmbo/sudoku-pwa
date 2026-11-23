@@ -18,6 +18,12 @@ fase-0,-,5-esqueleto,devsecops,claude-sonnet-5-5,nao,,,,,,,12,53356,6134,91465,5
 fase-0,-,5-esqueleto,revisor,claude-sonnet-5-5,nao,,,,,,,28,131413,21071,356472,152512,n/d,15000,,0,2,,,,,,,r1 (102296) e r2 (50216)
 fase-0,-,6-assinatura,devsecops,claude-sonnet-5-5,nao,60000,120000,250000,30,60,120,24,85864,17590,195287,103478,n/d,15000,,,,,,,,,,o Diretor executa tudo que envolve chave privada; real soma 3 execucoes (entrevista de assinatura; runbook; workflow de verificacao de tag); estimativa cobria o passo inteiro; min_real de relogio na linha do orquestrador; fonte log jsonl
 fase-0,-,6-assinatura,orquestrador,claude-opus-5-5,nao,,,,,,,128,39967,27490,4402389,67585,n/d,,40,,,,,,,,,real so da sessao principal; total do passo 171063 contra 120000 provavel (1.43x); relogio 22:45-23:25 BRT com espera do Diretor (comandos com chave privada); recorte 2daa8ca-247584b; fonte log jsonl
-fase-0,-,7-plano-fase-1-spec-001,orquestrador,claude-opus-5-5,,50000,100000,200000,15,30,60,,,,,,,,,,,,,,,,,
+fase-0,-,7-plano-fase-1-spec-001,orquestrador,claude-opus-5-5,sim,50000,100000,200000,15,30,60,,,,,,,,,,,,,,,,,
+fase-0,-,7-plano-fase-1-spec-001,produto-ux,claude-sonnet-5-5,nao,,,,,,,,,,,,,15000,,,,,,,,,,spec 001 em rascunho; estimativa coberta pela linha do orquestrador
 fase-0,-,8-teste-sobrevivencia,orquestrador,claude-opus-5-5,,20000,40000,80000,5,10,20,,,,,,,,,,,,,,,,,
 fase-0,-,9-resumo,orquestrador,claude-opus-5-5,,5000,10000,20000,2,5,10,,,,,,,,,,,,,,,,,
+fase-1,001,ciclo-completo,todos,claude-sonnet-5-5,,250000,500000,1000000,60,120,240,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra por tarefa x agente no /planejar; ancora passo 5
+fase-1,002,ciclo-completo,todos,claude-sonnet-5-5,,200000,400000,800000,45,90,180,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra no /planejar
+fase-1,003,ciclo-completo,todos,claude-sonnet-5-5,,400000,800000,1600000,90,180,360,,,,,,,15000,,,,,,,,,,risco alto; provavel divisao em 003a e 003b
+fase-1,004,ciclo-completo,todos,claude-sonnet-5-5,,250000,500000,1000000,60,120,240,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra no /planejar
+fase-1,005,ciclo-completo,todos,claude-sonnet-5-5,,350000,700000,1400000,90,180,360,,,,,,,15000,,,,,,,,,,inclui qa-auditor; quebra no /planejar

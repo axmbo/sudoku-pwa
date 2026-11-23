@@ -4,7 +4,7 @@ Priorizado de cima para baixo; um item = uma spec = um ciclo. Os critérios aqui
 
 | # | Item | Critérios de alto nível | Spec | Estado |
 |---|---|---|---|---|
-| B-01 | Tabuleiro e validação de conflitos | representar grade 9×9 com pistas; colocar/apagar valor; detectar conflitos em linha, coluna e bloco; pista imutável | 001 | a especificar |
+| B-01 | Tabuleiro e validação de conflitos | representar grade 9×9 com pistas; colocar/apagar valor; detectar conflitos em linha, coluna e bloco; pista imutável | 001 | spec aprovada |
 | B-02 | Solver | resolver por backtracking; contar soluções com corte em 2; devolver grade válida | 002 | — |
 | B-03 | Gerador com seed e dificuldade | mesma seed + versão ⇒ mesmo puzzle; solução única; nível pela técnica mais difícil exigida | 003 | — |
 | B-04 | Estado de jogo | anotações; desfazer/refazer; detectar vitória; serialização versionada | 004 | — |

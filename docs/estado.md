@@ -6,9 +6,9 @@
 - **Passos 0 a 4 concluídos:** Node 26.13.1 via `.nvmrc`; ADR 0006 (GitHub + Renovate, rebase merge); estrutura do processo (agentes, skills, ADRs 0001–0005 aceitos, docs).
 - **Passo 5 (esqueleto) concluído:** tarefas em [passo-5-tarefas.md](process/passo-5-tarefas.md); `check` verde (100 testes, cobertura e Stryker 100% no domínio), E2E + axe verde. Revisão: r1 não saiu (2 major, 3 minor, corrigidos; `PROCESSO.md` v0.2), [r2](process/revisoes/passo-5-r2.md) sai (2 minor, débito abaixo). Tokens: 558k (1,4× o pessimista), ver `metrics.csv`.
 - **Passo 6 (assinatura) em andamento:** [runbook](runbooks/assinatura.md) etapas 1–6 feitas (chave de commit em software, chave de tag `ed25519-sk` na Thetis com backup cifrado no Drive, `allowed_signers`, repo público `axmbo/sudoku-pwa`, Signing Keys cadastradas, commits "Verified"). Etapa 7: `release.yml` recusa tag sem assinatura no remoto (provado em 22/11/2026, tag apagada).
-- **Próximo:** passo 7 (plano da Fase 1 + spec 001). O PR da Fase 0 fica para o fim da fase (decisão do Diretor, 22/11/2026); depois do merge: provar no remoto que tag assinada passa e aplicar a proteção da `main` e das tags `v*`.
+- **Passo 7 concluído:** [plano da Fase 1](process/plano-fase-1.md) (specs 001–005 = B-01 a B-05; B-06 a B-10 na Fase 2, aprovado em 22/11/2026) e [spec 001](../specs/001-tabuleiro-conflitos/spec.md) aprovada (24 CA). A spec 001 nasceu na `chore/fase-0`; o ciclo dela (`/planejar 001`) abre a `feat/001-tabuleiro-conflitos` na Fase 1.
+- **Próximo:** `/clear` + passo 8 (teste de sobrevivência: `/retomar` só pelos arquivos), depois passo 9 (resumo) e o PR da Fase 0 (decisão do Diretor, 22/11/2026). Depois do merge: provar no remoto que tag assinada passa e aplicar a proteção da `main` e das tags `v*`.
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o `guard-test-files.mjs` do `dev` bloqueia `src/domain/__arbitraries__/x.ts` (provado em 22/11/2026, numa sessão nova; o arquivo não foi criado).
-- **Depois:** passo 6 (assinatura), 7 (plano da Fase 1 + spec 001), 8 (teste de sobrevivência), 9 (resumo). `/clear` sugerido depois dos passos 5 e 7.
 
 ## Decisões do Diretor (22/11/2026)
 

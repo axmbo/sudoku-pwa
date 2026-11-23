@@ -37,4 +37,4 @@ Ao fim de cada passo: commit, hash, resumo ≤ 5 linhas, o que conferir no diff,
 - ADRs 0001–0005 **Aceitos** após duas rodadas do `revisor` (r1: 3 major e 9 minor corrigidos; r2: sai).
 - Desafio diário: um por nível por dia, pela data local (ADR 0005); exportar/importar JSON no pós-MVP.
 - Hook do `dev` vira script Node testado em TDD no passo 5, falhando fechado (`PROCESSO.md` §6); até lá vale o comando jq atual.
-- Primeira tarefa do passo 5: validar Stryker + Vitest 5 (plano B: command runner).
+- **Passo 5, Stryker + Vitest 5 validado (22/11/2026, spike fora do repo):** `@stryker-mutator/core` e `vitest-runner` 10.1.1 + vitest 5.1.1 + Node 26.13.1, `coverageAnalysis: perTest`. Teste forte: 12/12 mutantes mortos (100%), exit 0. Teste enfraquecido: 50% < `break` 70, exit 1. Plano B (command runner) descartado.

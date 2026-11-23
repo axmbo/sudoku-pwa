@@ -8,7 +8,7 @@ description: Como testar o Sudoku PWA em TDD — ciclo red/green/refactor com co
 Fonte das metas e isenções: `PROCESSO.md` §6. Princípios 5–7 da `docs/constituicao.md`.
 
 ## Ciclo e commits
-1. **RED** (`eng-testes`): um teste por vez; rode e confirme a falha **pelo motivo certo** (asserção, não erro de import/sintaxe). Commit `test(<escopo>): <comportamento exigido>`.
+1. **RED** (`eng-testes`): um teste por vez; rode e confirme a falha **pelo motivo certo** (asserção; a exceção do símbolo novo está em `PROCESSO.md` §6, "Motivo do vermelho"). Commit `test(<escopo>): <comportamento exigido>`.
 2. **GREEN** (`dev`): o mínimo para passar — fake it no primeiro caso, triangule com o próximo teste. Nunca editar teste nesta fase. Tipo do commit pela semântica real (`feat`, `fix`, `refactor`).
 3. **REFACTOR** (`dev`): sem comportamento novo, tudo verde o tempo todo. Sem melhoria real, sem commit (diga isso no retorno).
 - Teste errado descoberto no GREEN: desfaça a produção não commitada e volte ao RED.

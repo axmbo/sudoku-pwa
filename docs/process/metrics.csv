@@ -39,6 +39,6 @@ fase-1,001,T05,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,18,36,,,,,,,
 fase-1,001,T05,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,12,24,,,,,,,8500,,,,,,,,,,
 fase-1,001,T06,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,9,15,30,,,,,,,11700,,,,,,,,,,manifesto >10k; avaliar divisao T06a/T06b se board.test.ts passar de ~7k tokens
 fase-1,001,T06,dev,claude-sonnet-5-5,nao,24000,40000,80000,6,10,20,,,,,,,11700,,,,,,,,,,
-fase-1,001,T07,eng-testes,claude-sonnet-5-5,nao,33000,55000,110000,15,25,50,,,,,,,8700,,,,,,,,,,tdd isento; dev so se propriedade achar bug (sem linha); inclui npm run mutation local
+fase-1,001,T07,eng-testes,claude-sonnet-5-5,nao,33000,55000,110000,15,25,50,,,,,,,9100,,,,,,,,,,tdd isento; dev so se propriedade achar bug (sem linha); inclui npm run mutation local
 fase-1,001,revisao-ciclo,revisor,claude-sonnet-5-5,nao,60000,120000,250000,10,20,40,,,,,,,15000,,,,,,,,,,revisao so do diff; 2 rodadas; ancora passo 5 (revisor 152k em 2 rodadas)
 fase-1,001,retro-ciclo,curador-pdca,claude-sonnet-5-5,nao,15000,30000,60000,5,10,20,,,,,,,10000,,,,,,,,,,retro + estado + RESUMO; excluidas orquestrador (opus) e espera do Diretor

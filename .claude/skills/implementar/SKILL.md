@@ -11,7 +11,7 @@ Pré-requisito: análise de consistência `ok` em `tasks.md`.
 
 1. Leia só a tarefa em `tasks.md`. Passe o **manifesto** dela a cada agente, nunca o conteúdo.
 2. Tarefa com `tdd: sim`:
-   1. `eng-testes` escreve o(s) teste(s), confirma a falha certa, commita `test(...)`.
+   1. `eng-testes` escreve o(s) teste(s), confirma a falha certa (`PROCESSO.md` §6, "Motivo do vermelho"), commita `test(...)`.
    2. `dev` implementa até o verde, commita; refatora se houver o que melhorar.
 3. Tarefa isenta (a isenção precisa estar declarada em `tasks.md`): se o entregável é teste (teste de invariante sobre estado existente), só a `eng-testes`, porque o hook do `dev` bloqueia teste; nas demais isenções (build/CI, visual, código gerado), só o `dev`.
 4. `npm run check` verde antes de seguir (gate de máquina).

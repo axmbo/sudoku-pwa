@@ -77,6 +77,10 @@ describe('scripts/ci/verify-tag.sh', () => {
 describe('gate de tag no pipeline de release (estático)', () => {
   it('REL-03: release.yml lê allowed_signers_tags e passa 3 argumentos ao script', () => {
     const yml = readFileSync(`${root}.github/workflows/release.yml`, 'utf8');
+    // O merge-base do REL-02 precisa do histórico: o checkout do job verify-tag exige fetch-depth: 0.
+    expect(yml).toMatch(
+      /actions\/checkout@.*\n {8}with:\n(?: {10}(?!fetch-depth).*\n)* {10}fetch-depth: 0\n/,
+    );
     expect(yml).toMatch(/origin\/main:\.github\/allowed_signers_tags/);
     expect(yml).not.toMatch(/origin\/main:\.github\/allowed_signers(?!_tags)/);
     expect(yml).toMatch(

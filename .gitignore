@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+reports/
+.stryker-tmp/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.env*
+.claude/settings.local.json

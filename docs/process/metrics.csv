@@ -27,8 +27,10 @@ fase-1,002,ciclo-completo,todos,claude-sonnet-5-5,,200000,400000,800000,45,90,18
 fase-1,003,ciclo-completo,todos,claude-sonnet-5-5,,400000,800000,1600000,90,180,360,,,,,,,15000,,,,,,,,,,risco alto; provavel divisao em 003a e 003b
 fase-1,004,ciclo-completo,todos,claude-sonnet-5-5,,250000,500000,1000000,60,120,240,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra no /planejar
 fase-1,005,ciclo-completo,todos,claude-sonnet-5-5,,350000,700000,1400000,90,180,360,,,,,,,15000,,,,,,,,,,inclui qa-auditor; quebra no /planejar
-fase-1,001,T01,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,15,30,,,,,,,7300,,,,,,,,,,1 execucao; ancora passo 5 da Fase 0 (eng-testes ~39k/execucao); inclui ctx inicial
-fase-1,001,T01,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,10,20,,,,,,,7300,,,,,,,,,,ancora passo 5 (dev ~24k/execucao)
+fase-1,001,T01,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,15,30,54,71044,13998,735017,85096,n/d,7300,10.5,1,,,,,,100,100,4 vermelhos; min_real = intervalo do log (05:14-05:24 UTC) intercalado com o dev; 1.9x o provavel; fonte log jsonl
+fase-1,001,T01,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,10,20,56,38749,9438,778134,48243,n/d,7300,5.7,5,,,,,,100,100,4 GREENs + 1 REFACTOR; leituras: package.json plan.md tasks.md board.test.ts log do Stryker; 1.6x o provavel; total T01 133339 contra 75000 provavel (1.78x); fonte log jsonl
+fase-1,-,extra-pre-commit-v0.4,eng-testes,claude-sonnet-5-5,nao,,,,,,,24,25220,6156,221250,31400,n/d,,2.0,0,,,,,,,,fora da T01 (aprovado pelo Diretor; PROCESSO v0.4); sem estimativa; vermelho (1) de tsc-red-filter; fonte log jsonl
+fase-1,-,extra-pre-commit-v0.4,dev,claude-sonnet-5-5,nao,,,,,,,26,26442,5442,271033,31910,n/d,,2.0,0,,,,,,,,fora da T01; sem estimativa; GREEN de tsc-red-filter; total do extra 63310; fonte log jsonl
 fase-1,001,T02,eng-testes,claude-sonnet-5-5,nao,24000,40000,80000,6,12,24,,,,,,,6500,,,,,,,,,,tabelas it.each em 5 classes; 1 execucao
 fase-1,001,T02,dev,claude-sonnet-5-5,nao,15000,25000,50000,4,8,16,,,,,,,6500,,,,,,,,,,
 fase-1,001,T03,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,12,21,42,,,,,,,5500,,,,,,,,,,maior volume de casos (7 CA + P2a)

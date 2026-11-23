@@ -20,13 +20,14 @@ jobs:
       # O checkout pode reescrever a tag anotada como leve: busca a tag original.
       - name: Busca a tag anotada original
         run: git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
-      # allowed_signers vem da main, nunca do commit da tag (a tag não se autoriza).
-      - name: Obtém allowed_signers da main
+      # Só chaves de hardware (sk-) assinam release; a lista vem da main, nunca do commit da tag.
+      - name: Obtém allowed_signers_tags da main
         # Se faltar, o script ainda recusa tag leve ou sem assinatura e depois falha pela ausência.
         run: |
-          git show origin/main:.github/allowed_signers > "$RUNNER_TEMP/allowed_signers" \
-            || echo "Aviso: .github/allowed_signers ausente na main." >&2
-      - name: Verifica a assinatura da tag
-        run: bash scripts/ci/verify-tag.sh "$GITHUB_REF_NAME" "$RUNNER_TEMP/allowed_signers"
+          git show origin/main:.github/allowed_signers_tags > "$RUNNER_TEMP/allowed_signers_tags" \
+            || echo "Aviso: .github/allowed_signers_tags ausente na main." >&2
+      # O histórico completo (fetch-depth: 0) permite o merge-base contra origin/main.
+      - name: Verifica nome, origem e assinatura da tag
+        run: bash scripts/ci/verify-tag.sh "$GITHUB_REF_NAME" "$RUNNER_TEMP/allowed_signers_tags" origin/main
 
   # Build, proveniência e deploy entram com o primeiro release; dependerão de `verify-tag`.

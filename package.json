@@ -16,7 +16,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint . --max-warnings 0 && prettier --check .",
     "format": "prettier --write .",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:prop": "vitest run .prop.test.",
     "test:mut": "stryker run",
     "e2e": "playwright test",

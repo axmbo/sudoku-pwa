@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Gate local barato (PROCESSO.md §7): formatação, lint, typecheck e testes do que mudou.
+exec sh "$(git rev-parse --show-toplevel)/scripts/hooks/run-node.sh" sh "$(git rev-parse --show-toplevel)/scripts/hooks/pre-commit.sh"

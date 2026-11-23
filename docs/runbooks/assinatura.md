@@ -127,7 +127,7 @@ No gatilho `push` de tags `v*`, o job de release, antes de qualquer publicação
 2. Roda `git verify-tag "$GITHUB_REF_NAME"` com `gpg.ssh.allowedSignersFile` apontando para esse arquivo.
 3. Falha o job se a tag for leve (sem assinatura), a assinatura for inválida ou a chave não estiver no arquivo.
 
-A lógica fica em `scripts/ci/` (workflow como casca fina). Teste de aceitação: empurrar uma tag sem assinatura deve falhar o job.
+A lógica fica em `scripts/ci/verify-tag.sh <tag> <allowed_signers>` e o workflow é `.github/workflows/release.yml` (casca fina; job `verify-tag`, que refaz o fetch da tag anotada porque o checkout pode reescrevê-la como leve). Teste de aceitação: empurrar uma tag sem assinatura deve falhar o job.
 
 ## Etapa 8. Rotação, perda e chave reserva (Diretor decide; IA edita o arquivo)
 

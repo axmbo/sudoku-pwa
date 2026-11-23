@@ -1,0 +1,29 @@
+# Casca fina: a lógica vive em `scripts/ci/*` (ADR 0006, runbook de assinatura, etapa 7).
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  verify-tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: true # necessário para o fetch abaixo; o token é só leitura
+      # O checkout pode reescrever a tag anotada como leve: busca a tag original.
+      - name: Busca a tag anotada original
+        run: git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
+      # allowed_signers vem da main, nunca do commit da tag (a tag não se autoriza).
+      - name: Obtém allowed_signers da main
+        run: git show origin/main:.github/allowed_signers > "$RUNNER_TEMP/allowed_signers"
+      - name: Verifica a assinatura da tag
+        run: bash scripts/ci/verify-tag.sh "$GITHUB_REF_NAME" "$RUNNER_TEMP/allowed_signers"
+
+  # Build, proveniência e deploy entram com o primeiro release; dependerão de `verify-tag`.

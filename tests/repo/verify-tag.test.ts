@@ -144,6 +144,21 @@ describe('scripts/ci/verify-tag.sh: comportamento já existente', () => {
     expect(r.stderr).toContain('não tem assinatura SSH');
   });
 
+  it('REL-05: tag anotada sem assinatura com anotação de ~200 KB chega à mensagem própria, sem SIGPIPE', () => {
+    const repo = makeRepo();
+    // Bem acima do buffer de pipe (64 KB): o leitor (sed/grep -q) fecha o pipe antes de o git terminar.
+    const anotacao = `${'linha de anotação longa para encher o pipe\n'.repeat(5000)}`;
+    const arquivo = join(repo, 'anotacao.txt');
+    writeFileSync(arquivo, anotacao);
+    expect(anotacao.length).toBeGreaterThan(200_000);
+    git(repo, 'tag', '-a', 'v1.0.0', '-F', arquivo);
+
+    const r = runScript(repo, 'v1.0.0', makeSigners(repo), 'main');
+
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('não tem assinatura SSH');
+  });
+
   it('REL-04: recusa quando o allowed_signers está ausente', () => {
     const repo = makeRepo();
     gravaTagComAssinaturaFalsa(repo, 'v1.0.0');

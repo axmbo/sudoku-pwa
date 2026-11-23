@@ -73,7 +73,7 @@ Desfazer: reverter o commit do arquivo. Commits antigos continuam sem assinatura
 
 ## Etapa 5. Chave de hardware Thetis para tags (Diretor)
 
-Modelo desconhecido. Tente `ed25519-sk` (exige FIDO2); se o dispositivo recusar, use `ecdsa-sk` (aceito por chaves só U2F). Plugue a chave e rode:
+A Thetis aceitou `ed25519-sk` (22/11/2026). Com outra chave, tente `ed25519-sk` (exige FIDO2) e, se o dispositivo recusar, use `ecdsa-sk` (aceito por chaves só U2F). Plugue a chave e rode:
 
 ```bash
 ssh-keygen -t ed25519-sk -f ~/.ssh/id_ed25519_sk_tag -C "sudoku-pwa release tags (Thetis)"
@@ -98,7 +98,10 @@ ssh-add ~/.ssh/id_ed25519_sk_tag
 git -c user.signingkey=$HOME/.ssh/id_ed25519_sk_tag.pub tag -s v0.0.0-assinatura-teste -m "teste de assinatura"
 ```
 
-Depois a IA acrescenta a pública ao `.github/allowed_signers`, com `sk-ssh-ed25519@openssh.com` (ou `sk-ecdsa-sha2-nistp256@openssh.com`) no lugar de `ssh-ed25519`, mesmo e-mail e `namespaces="git"`.
+Depois a IA acrescenta a pública, com `sk-ssh-ed25519@openssh.com` (ou `sk-ecdsa-sha2-nistp256@openssh.com`) no lugar de `ssh-ed25519`, mesmo e-mail e `namespaces="git"`, a dois arquivos:
+
+- `.github/allowed_signers`, para a verificação local de commits e tags;
+- `.github/allowed_signers_tags`, **só com chaves de hardware**, que é o arquivo usado pelo pipeline de tag. O `namespaces` não separa commit de tag (o git usa `"git"` nos dois), então só um arquivo separado impede que a chave de commit em software libere uma release.
 
 Verificação: `git verify-tag v0.0.0-assinatura-teste` imprime `Good "git" signature for contact@axmbo.dev with ED25519-SK key SHA256:...`.
 
@@ -123,20 +126,21 @@ Desfazer: `gh ssh-key delete <id>`; opcional `gh auth refresh -h github.com -r a
 ## Etapa 7. Pipeline de tag (mecanismo; implementação no workflow de release)
 
 No gatilho `push` de tags `v*`, o job de release, antes de qualquer publicação:
-1. Obtém `.github/allowed_signers` **da `main`** (nunca da própria tag, para um PR não se autorizar).
-2. Roda `git verify-tag "$GITHUB_REF_NAME"` com `gpg.ssh.allowedSignersFile` apontando para esse arquivo.
-3. Falha o job se a tag for leve (sem assinatura), a assinatura for inválida ou a chave não estiver no arquivo.
+1. Obtém `.github/allowed_signers_tags` **da `main`** (nunca da própria tag, para um PR não se autorizar). Esse arquivo só tem chaves de hardware.
+2. Confere que a tag é anotada, que o nome gravado no objeto da tag é igual ao ref (impede reaproveitar uma tag assinada antiga com outro nome `v*`) e que o commit alvo é alcançável da `main`.
+3. Roda `git verify-tag "$GITHUB_REF_NAME"` com `gpg.ssh.allowedSignersFile` apontando para esse arquivo.
+4. Falha o job se alguma checagem falhar: tag leve, nome divergente, commit fora da `main`, tag sem assinatura, assinatura inválida ou chave fora do arquivo.
 
-A lógica fica em `scripts/ci/verify-tag.sh <tag> <allowed_signers>` e o workflow é `.github/workflows/release.yml` (casca fina; job `verify-tag`, que refaz o fetch da tag anotada porque o checkout pode reescrevê-la como leve). Teste de aceitação: empurrar uma tag sem assinatura deve falhar o job.
+A lógica fica em `scripts/ci/verify-tag.sh <tag> <allowed_signers> <ref-da-main>`, com teste automatizado em `tests/repo/`, e o workflow é `.github/workflows/release.yml` (casca fina; job `verify-tag`, que refaz o fetch da tag anotada porque o checkout pode reescrevê-la como leve). Teste de aceitação: empurrar uma tag sem assinatura deve falhar o job (provado em 22/11/2026). Empurrar uma tag válida, assinada com a chave de hardware, deve passar (prova pendente até o merge na `main`, porque o arquivo é lido de lá).
 
 ## Etapa 8. Rotação, perda e chave reserva (Diretor decide; IA edita o arquivo)
 
-- **Perda ou suspeita da chave de commit:** gere outra (etapa 1), troque `user.signingkey`, cadastre a nova, adicione-a ao `allowed_signers`, remova a antiga do GitHub e do arquivo. Commits antigos permanecem verificáveis só se a linha antiga ficar no arquivo (decida; se a perda foi por vazamento, retire).
-- **Perda da chave de tag:** sem reserva, nenhuma release nova passa no pipeline. Registre outra chave Thetis (ou de outro fabricante) pelas etapas 5 e 6 e acrescente-a ao `allowed_signers` por commit na `main` (o merge é do Diretor). Retire a perdida do arquivo e do GitHub; tags já publicadas continuam válidas como histórico.
+- **Perda ou suspeita da chave de commit:** gere outra (etapa 1), troque `user.signingkey`, cadastre a nova, adicione-a ao `allowed_signers` (nunca ao `allowed_signers_tags`), remova a antiga do GitHub e do arquivo. Commits antigos permanecem verificáveis só se a linha antiga ficar no arquivo (decida; se a perda foi por vazamento, retire).
+- **Perda da chave de tag:** sem reserva, nenhuma release nova passa no pipeline. Registre outra chave Thetis (ou de outro fabricante) pelas etapas 5 e 6 e acrescente-a ao `allowed_signers` e ao `allowed_signers_tags` por commit na `main` (o merge é do Diretor). Retire a perdida do arquivo e do GitHub; tags já publicadas continuam válidas como histórico.
 - **Chave reserva (decisão do Diretor: só uma agora):** quando adquirir a segunda, repita as etapas 5 e 6 e guarde-a fora do notebook. Registre-a no arquivo e crie uma nota em `docs/estado.md`.
 
 ## Pendências não confirmadas
 
-1. Modelo da Thetis e suporte a Ed25519, PIN FIDO2 e `-O verify-required`.
-2. Se o `ssh-keygen -Y verify` do runner aceita chaves `-sk` sem `verify-required` no `allowed_signers` (testar na etapa 7).
+1. A Thetis faz Ed25519 (confirmado em 22/11/2026); seguem sem confirmação o PIN FIDO2 e o `-O verify-required`.
+2. Se o `ssh-keygen -Y verify` do runner aceita chaves `-sk` sem `verify-required` no `allowed_signers_tags`. Fecha com a prova positiva da etapa 7, depois do merge.
 3. Texto exato das mensagens de erro na versão 8.9p1; as citadas são típicas.

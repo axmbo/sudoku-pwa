@@ -14,3 +14,7 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 24/11 · T02 · TS7006 em cascata no primeiro vermelho barrou o pre-commit de novo; a `eng-testes` tipou à mão. Reforça a M-002.
 - 24/11 · T02 · Os `it.each` de CA-004-05 passam as entradas com `as never`: não falhariam se a assinatura continuasse estreita, e a troca para `unknown` veio por instrução, não por teste. Candidato a minor na revisão.
 - 24/11 · T02 · O REFACTOR (46859de) alargou `col` de `gameClearNotes` para `unknown`, que tinha ficado para trás no GREEN.
+- 24/11 · T03 · A `eng-testes` errou a contagem absoluta do histórico no CA-004-08 (3 entradas num arranjo de 3 toggles mais o place, que dão 4); o `dev` pegou no GREEN, desfez a produção com `git checkout` e devolveu (correção em d4a3943). Lição: contagem relativa (`before + 1`, como no CA-004-10) em arranjo com várias jogadas.
+- 24/11 · T03 · Sem `gameUndo`, os testes montam o refazível à mão (`{...game, cursor: 0}`, via 7b); só é verificado de verdade na T04 e na T06. Nova ocorrência de M-010.
+- 24/11 · T03 · No CA-004-10 a fixture não tinha vizinho de bloco vazio, e o teste esvazia (0,6) nas pistas. Reforça o comentário de células vazias na fixture (nota da T02).
+- 24/11 · T03 · `history.ts` não mudou: os tipos `place`/`erase`/`CellMemo` já existiam. Real pelo log 85,1k (eng-testes 47,8k, dev 37,3k) contra 154k prováveis (0,55x); avisos de uso (39,9k e 35,6k) ficam abaixo do log.

@@ -10,3 +10,4 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 23/11 · T01 · Em `board.test.ts`, a mutação da entrada usa `mutable[0]?.splice(...)` porque o lint barra `!`; se a linha não existir, o `?.` vira no-op silencioso.
 - 23/11 · T01 · Aviso para a T02: `createBoard` usa `grid.flat()`; a validação de forma precisa vir antes, senão uma linha curta gera menos de 81 células.
 - 23/11 · T02 · Mutante sobrevivente equivalente em `digit.ts:3`: `typeof value === 'number'` → `true`. `Number.isInteger` já devolve `false` para não numéricos; o `typeof` fica só para estreitar o tipo (`unknown` → `number`) no type guard. Casos `unknown` de `isDigit` vão para a T07.
+- 23/11 · T02 · Decisão do Diretor: o mutante equivalente acima fica marcado com `// Stryker disable next-line ConditionalExpression` justificado; `digit.ts` volta a 100%.

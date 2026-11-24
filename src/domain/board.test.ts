@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { cellAt, createBoard } from './board';
+import { cellAt, createBoard, getConflicts, type Board } from './board';
+import type { Digit } from './digit';
 
 const _ = null;
 
@@ -261,5 +262,46 @@ describe('board: grade malformada (entrada que não é array de arrays)', () => 
     const result = create(entrada);
 
     expect(result).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+});
+
+/** Board literal (sem passar por `createBoard`) a partir de 81 caracteres (`.` = vazio). */
+function boardFrom(grid: string): Board {
+  return {
+    cells: [...grid].map((ch) =>
+      ch === '.' ? { value: null, given: false } : { value: Number(ch) as Digit, given: false },
+    ),
+  };
+}
+
+describe('board: getConflicts', () => {
+  it('CA-001-09: getConflicts aponta a repetição em linha de um Board literal que createBoard recusaria', () => {
+    // 4 em (4,2) e (4,8): mesma linha 4, colunas distintas, blocos 4 e 5.
+    const board = boardFrom(
+      [
+        '.........',
+        '.........',
+        '.........',
+        '.........',
+        '..4.....4',
+        '.........',
+        '.........',
+        '.........',
+        '.........',
+      ].join(''),
+    );
+
+    expect(getConflicts(board)).toEqual([
+      { row: 4, col: 2, value: 4, units: [{ kind: 'row', index: 4 }] },
+      { row: 4, col: 8, value: 4, units: [{ kind: 'row', index: 4 }] },
+    ]);
+  });
+
+  it('CA-001-09: tabuleiro criado sem conflito não tem conflitos', () => {
+    const result = createBoard(input);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(getConflicts(result.value)).toEqual([]);
   });
 });

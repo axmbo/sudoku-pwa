@@ -20,10 +20,12 @@ export type Grid = readonly (readonly (Digit | null)[])[];
 export type CreateRefusal = 'malformed-grid' | 'conflicting-givens';
 
 export function createBoard(input: unknown): Result<Board, CreateRefusal> {
-  // Conflitos entre pistas são do ciclo da T04.
   const values = flattenGrid(input);
   if (values === null) {
     return { ok: false, reason: 'malformed-grid' };
+  }
+  if (findConflicts(values).length > 0) {
+    return { ok: false, reason: 'conflicting-givens' };
   }
   const cells = values.map((value) => Object.freeze({ value, given: value !== null }));
   return { ok: true, value: Object.freeze({ cells: Object.freeze(cells) }) };

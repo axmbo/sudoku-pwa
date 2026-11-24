@@ -53,11 +53,12 @@ export interface Board { readonly cells: readonly CellState[] } // 81, índice r
 export type Grid = readonly (readonly (Digit | null)[])[];  // forma esperada da entrada (9x9, null = vazio)
 
 export type CreateRefusal = 'malformed-grid' | 'conflicting-givens';
-export type MoveRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given';
+export type PlaceRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given';
+export type EraseRefusal = 'cell-not-found' | 'cell-is-given'; // apagar não valida valor
 
 export function createBoard(input: unknown): Result<Board, CreateRefusal>;
-export function placeValue(board: Board, row: unknown, col: unknown, value: unknown): Result<Board, MoveRefusal>;
-export function eraseValue(board: Board, row: unknown, col: unknown): Result<Board, MoveRefusal>;
+export function placeValue(board: Board, row: unknown, col: unknown, value: unknown): Result<Board, PlaceRefusal>;
+export function eraseValue(board: Board, row: unknown, col: unknown): Result<Board, EraseRefusal>;
 export function cellAt(board: Board, row: Index, col: Index): CellState;
 export function getConflicts(board: Board): readonly CellConflict[]; // vazio = sem conflito; ordenado por índice de célula
 ```

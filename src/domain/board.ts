@@ -1,3 +1,4 @@
+import { findConflicts, type CellConflict } from './conflicts';
 import { isDigit, type Digit } from './digit';
 import type { Result } from './result';
 import { cellIndex, type Index } from './units';
@@ -53,4 +54,9 @@ function flattenGrid(input: unknown): (Digit | null)[] | null {
 /** Conteúdo da célula na linha `row` e coluna `col` (0–8). */
 export function cellAt(board: Board, row: Index, col: Index): CellState {
   return board.cells[cellIndex(row, col)] as CellState;
+}
+
+/** Conflitos do tabuleiro, derivados dos valores (nunca armazenados). */
+export function getConflicts(board: Board): readonly CellConflict[] {
+  return findConflicts(board.cells.map((cell) => cell.value));
 }

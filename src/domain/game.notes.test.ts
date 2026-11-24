@@ -215,4 +215,60 @@ describe('game (anotações)', () => {
     // em gameClearNotes, posição inválida vence também
     expect(gameClearNotes(game, 9, 0)).toEqual({ ok: false, reason: 'cell-not-found' });
   });
+  it('INV: a entrada de histórico de gameToggleNote guarda a jogada e o estado anterior da célula (CA-004-01, 07)', () => {
+    const first = gameToggleNote(newGame(), 2, 7, 2);
+    if (!first.ok) throw new Error('fixture inválida');
+
+    const second = gameToggleNote(first.value, 2, 7, 4);
+
+    expect(first.value.history).toEqual([
+      {
+        move: { kind: 'toggle-note', index: 2 * 9 + 7, digit: 2 },
+        before: { value: null, notes: [] },
+      },
+    ]);
+    if (!second.ok) throw new Error('fixture inválida');
+    expect(second.value.history[1]).toEqual({
+      move: { kind: 'toggle-note', index: 2 * 9 + 7, digit: 4 },
+      before: { value: null, notes: [2] },
+    });
+  });
+
+  it('INV: a entrada de histórico de gameClearNotes guarda as anotações que havia antes (CA-004-07)', () => {
+    let game = newGame();
+    for (const digit of [7, 2] as const) {
+      const toggled = gameToggleNote(game, 2, 7, digit);
+      if (!toggled.ok) throw new Error('fixture inválida');
+      game = toggled.value;
+    }
+
+    const result = gameClearNotes(game, 2, 7);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.history[2]).toEqual({
+      move: { kind: 'clear-notes', index: 2 * 9 + 7 },
+      before: { value: null, notes: [2, 7] },
+    });
+  });
+
+  it('INV: jogada nova com o cursor atrás do fim descarta o refazível antes de acrescentar (CA-004-01)', () => {
+    // Estado pós-desfazer montado à mão: troca por `gameUndo` na T04.
+    const first = gameToggleNote(newGame(), 2, 7, 2);
+    if (!first.ok) throw new Error('fixture inválida');
+    const second = gameToggleNote(first.value, 2, 7, 4);
+    if (!second.ok) throw new Error('fixture inválida');
+    const rewound: Game = { ...second.value, cursor: 1 };
+
+    const result = gameToggleNote(rewound, 0, 0, 9);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.history).toHaveLength(2);
+    expect(result.value.history[1]).toEqual({
+      move: { kind: 'toggle-note', index: 0, digit: 9 },
+      before: { value: null, notes: [] },
+    });
+    expect(result.value.cursor).toBe(2);
+  });
 });

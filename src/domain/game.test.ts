@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createBoard } from './board';
 import { givensGrid, validPuzzleInput } from './__arbitraries__/puzzle';
-import { canRedo, canUndo, createGame, getGameConflicts, type Game } from './game';
+import { canRedo, canUndo, createGame, getGameConflicts, notesAt, type Game } from './game';
 import type { Notes } from './notes';
 
 describe('game (criação)', () => {
@@ -50,5 +50,13 @@ describe('game (criação)', () => {
       ok: false,
       reason: 'malformed-puzzle',
     });
+  });
+
+  it.each([
+    [2, 7],
+    [7, 2],
+  ] as const)('INV: notesAt(%i, %i) devolve anotações vazias na partida nova', (row, col) => {
+    // [símbolo novo: `notesAt`]
+    expect(notesAt(newGame(), row, col)).toEqual([]);
   });
 });

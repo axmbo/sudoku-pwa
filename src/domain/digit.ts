@@ -1,5 +1,6 @@
 /** Dígito válido de uma célula de Sudoku: inteiro de 1 a 9 (sem coerção de tipo). */
 export function isDigit(value: unknown): value is Digit {
+  // Stryker disable next-line ConditionalExpression: mutante equivalente; Number.isInteger já recusa não numéricos, o typeof só estreita o tipo.
   return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 9;
 }
 

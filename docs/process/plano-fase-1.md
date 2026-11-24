@@ -14,6 +14,8 @@ Proposta do passo 7 do [plano da Fase 0](plano-fase-0.md). A Fase 1 entrega o n�
 
 A 004 não depende de 002 nem de 003; pode vir antes da 003 se a 003 travar.
 
+**Ordem decidida pelo Diretor em 24/11/2026:** 001 → 004 → 005 → 002 → 003, para chegar antes à primeira UI. Até o gerador (003) existir, a 005 usa um **puzzle fixo**, embutido e com solução única (aceito pelo Diretor em 24/11/2026); a 003 o substitui.
+
 ## Estimativa por ciclo
 
 Âncora: o passo 5 (esqueleto, 6 tarefas de domínio com TDD e 2 rodadas de revisão) custou 558k tokens, 1,4× o pessimista dele. Faixas otimista / provável / pessimista; tokens = in + cache write + out ([métricas](metricas.md)).

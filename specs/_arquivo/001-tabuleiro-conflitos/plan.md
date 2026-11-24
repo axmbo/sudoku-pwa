@@ -1,7 +1,7 @@
 # Plano 001 — Tabuleiro e validação de conflitos
 
 - **Spec:** [spec.md](spec.md) · **Autor:** `arquiteto`
-- **ADRs:** [0001](../../docs/adr/0001-stack-e-ferramentas.md) (stack, orçamento), [0005](../../docs/adr/0005-worker-e-gerador-deterministico.md) (domínio puro), [0007](../../docs/adr/0007-convencoes-do-dominio.md) (**Aceito**, 23/11/2026: recusa como valor, `unknown` na fronteira, índices 0–8, imutabilidade). Constituição: princípios 5, 9, 10.
+- **ADRs:** [0001](../../../docs/adr/0001-stack-e-ferramentas.md) (stack, orçamento), [0005](../../../docs/adr/0005-worker-e-gerador-deterministico.md) (domínio puro), [0007](../../../docs/adr/0007-convencoes-do-dominio.md) (**Aceito**, 23/11/2026: recusa como valor, `unknown` na fronteira, índices 0–8, imutabilidade). Constituição: princípios 5, 9, 10.
 
 ## Módulos e fronteiras
 

@@ -785,3 +785,182 @@ describe('board: valor inválido ao colocar (invalid-value)', () => {
     expect(getConflicts(board)).toEqual(conflictsBefore);
   });
 });
+
+describe('board: célula fora da grade (cell-not-found)', () => {
+  const invalidCoords: readonly [string, unknown][] = [
+    ['-1', -1],
+    ['9', 9],
+    ['1.5', 1.5],
+    ['NaN', NaN],
+    ['Infinity', Infinity],
+    ['-Infinity', -Infinity],
+    ["'3'", '3'],
+    ['null', null],
+    ['undefined', undefined],
+    ['{}', {}],
+    ['[]', []],
+    ['true', true],
+    ['3n', 3n],
+  ];
+  const notFound = { ok: false, reason: 'cell-not-found' };
+
+  // Coluna 6 e linha 4 válidas; (4,6) = cells[42] vazia. Ver `input`.
+  it.each(invalidCoords)(
+    'CA-001-21: linha %s é recusada com cell-not-found em placeValue',
+    (_nome, row) => {
+      const result = tryPlace(mustCreate(input), dirty(row), 6, 7);
+
+      expect(result).toStrictEqual(notFound);
+    },
+  );
+
+  it.each(invalidCoords)(
+    'CA-001-21: coluna %s é recusada com cell-not-found em placeValue',
+    (_nome, col) => {
+      const result = tryPlace(mustCreate(input), 4, dirty(col), 7);
+
+      expect(result).toStrictEqual(notFound);
+    },
+  );
+
+  it.each(invalidCoords)(
+    'CA-001-21: linha %s é recusada com cell-not-found em eraseValue',
+    (_nome, row) => {
+      const result = tryErase(mustCreate(input), dirty(row), 6);
+
+      expect(result).toStrictEqual(notFound);
+    },
+  );
+
+  it.each(invalidCoords)(
+    'CA-001-21: coluna %s é recusada com cell-not-found em eraseValue',
+    (_nome, col) => {
+      const result = tryErase(mustCreate(input), 4, dirty(col));
+
+      expect(result).toStrictEqual(notFound);
+    },
+  );
+
+  it.each([
+    ['0', 0, 0, 0],
+    ['8', 8, 8, 80],
+  ])('CA-001-21: fronteira %s da grade é aceita em placeValue e eraseValue', (_n, r, c, idx) => {
+    // Cantos (0,0) e (8,8) são pistas em `input`; usa tabuleiro vazio de pistas nesses cantos.
+    const grid = emptyGrid();
+    const board = mustCreate(grid);
+
+    const placed = mustPlace(board, r, c, 6);
+    expect(placed.cells[idx]).toEqual({ value: 6, given: false });
+    const erased = tryErase(placed, r, c);
+    expect(erased?.ok).toBe(true);
+  });
+
+  it('CA-001-21: -0 como linha e como coluna equivale a 0 e é aceito', () => {
+    const board = mustCreate(emptyGrid());
+
+    const placed = tryPlace(board, -0, -0, 6);
+
+    expect(placed?.ok).toBe(true);
+    if (!placed?.ok) return;
+    expect(placed.value.cells[0]).toEqual({ value: 6, given: false });
+    expect(tryErase(placed.value, -0, -0)?.ok).toBe(true);
+  });
+
+  describe('aliasing de índice (pistas em (0,0), (0,8) e (1,0))', () => {
+    const aliasGrid = (): (number | null)[][] =>
+      emptyGrid().map((row, r) =>
+        row.map((_cell, c) =>
+          r === 0 && c === 0 ? 3 : r === 0 && c === 8 ? 1 : r === 1 && c === 0 ? 4 : null,
+        ),
+      );
+
+    // Com índice ingênuo row*9+col: (0,9)->9, (1,-1)->8, (-1,9)->0, (8,9)->81 (fora do array).
+    it.each([
+      [0, 9],
+      [1, -1],
+      [-1, 9],
+      [8, 9],
+    ])('CA-001-21: (%i,%i) é cell-not-found em placeValue, não cell-is-given', (row, col) => {
+      const result = tryPlace(mustCreate(aliasGrid()), row, col, 6);
+
+      expect(result).toStrictEqual(notFound);
+    });
+
+    it.each([
+      [0, 9],
+      [1, -1],
+      [-1, 9],
+      [8, 9],
+    ])('CA-001-21: (%i,%i) é cell-not-found em eraseValue, não cell-is-given', (row, col) => {
+      const result = tryErase(mustCreate(aliasGrid()), row, col);
+
+      expect(result).toStrictEqual(notFound);
+    });
+  });
+
+  it('CA-001-24: colocar em célula inexistente deixa tabuleiro e conflitos intactos, sem value', () => {
+    const board = mustPlace(mustCreate(input), 2, 1, 5);
+    const boardBefore = structuredClone(board);
+    const conflictsBefore = structuredClone(getConflicts(board));
+    expect(conflictsBefore).toEqual([
+      { row: 2, col: 1, value: 5, units: [{ kind: 'row', index: 2 }] },
+      { row: 2, col: 7, value: 5, units: [{ kind: 'row', index: 2 }] },
+    ]);
+
+    const result = tryPlace(board, 2, 9, 8);
+
+    expect(result).toStrictEqual(notFound);
+    expect(board).toEqual(boardBefore);
+    expect(getConflicts(board)).toEqual(conflictsBefore);
+  });
+
+  it('CA-001-24: apagar em célula inexistente deixa tabuleiro e conflitos intactos, sem value', () => {
+    const board = mustPlace(mustCreate(input), 2, 1, 5);
+    const boardBefore = structuredClone(board);
+    const conflictsBefore = structuredClone(getConflicts(board));
+
+    const result = tryErase(board, 9, 7);
+
+    expect(result).toStrictEqual(notFound);
+    expect(board).toEqual(boardBefore);
+    expect(getConflicts(board)).toEqual(conflictsBefore);
+  });
+
+  it('robustez: coordenada fora da grade num tabuleiro com pistas não lança', () => {
+    const board = mustCreate(input);
+
+    expect(() => placeValue(board, 8, 9, 6)).not.toThrow();
+    expect(() => eraseValue(board, 8, 9)).not.toThrow();
+    expect(() => placeValue(board, dirty({}), dirty(null), 6)).not.toThrow();
+  });
+});
+
+describe('board: precedência entre motivos de recusa ao colocar (CA-001-25)', () => {
+  it('CA-001-25: coordenada inexistente (linha) + valor inválido ⇒ cell-not-found', () => {
+    const result = tryPlace(mustCreate(input), 9, 6, 0);
+
+    expect(result).toStrictEqual({ ok: false, reason: 'cell-not-found' });
+  });
+
+  it('CA-001-25: coordenada inexistente (coluna) + valor inválido ⇒ cell-not-found', () => {
+    const result = tryPlace(mustCreate(input), 4, -1, 10);
+
+    expect(result).toStrictEqual({ ok: false, reason: 'cell-not-found' });
+  });
+
+  it('CA-001-25: pista + valor inválido ⇒ invalid-value', () => {
+    // (2,7) é pista 5.
+    const result = tryPlace(mustCreate(input), 2, 7, 0);
+
+    expect(result).toStrictEqual({ ok: false, reason: 'invalid-value' });
+  });
+
+  it.each([
+    ['igual', 5],
+    ['diferente', 8],
+  ])('CA-001-25: pista + valor válido %s ⇒ cell-is-given', (_nome, value) => {
+    const result = tryPlace(mustCreate(input), 2, 7, value);
+
+    expect(result).toStrictEqual({ ok: false, reason: 'cell-is-given' });
+  });
+});

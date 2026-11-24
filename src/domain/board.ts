@@ -70,9 +70,19 @@ export function placeValue(
   col: number,
   value: number,
 ): Result<Board, never> {
+  return { ok: true, value: replaceCell(board, row, col, value as Digit) };
+}
+
+/** Apaga o valor da célula (`row`, `col`); só o caminho feliz (recusas: T06). */
+export function eraseValue(board: Board, row: number, col: number): Result<Board, never> {
+  return { ok: true, value: replaceCell(board, row, col, null) };
+}
+
+/** Novo `Board` congelado com só a célula alvo trocada por uma do jogador. */
+function replaceCell(board: Board, row: number, col: number, value: Digit | null): Board {
   const target = row * 9 + col;
   const cells = board.cells.map((cell, i) =>
-    i === target ? Object.freeze({ value: value as Digit, given: false }) : cell,
+    i === target ? Object.freeze({ value, given: false }) : cell,
   );
-  return { ok: true, value: Object.freeze({ cells: Object.freeze(cells) }) };
+  return Object.freeze({ cells: Object.freeze(cells) });
 }

@@ -34,14 +34,14 @@ fase-1,-,extra-pre-commit-v0.4,dev,claude-sonnet-5-5,nao,,,,,,,26,26442,5442,271
 fase-1,001,T02,eng-testes,claude-sonnet-5-5,nao,24000,40000,80000,6,12,24,,,,,81818,n/d,6500,1.75,1,,,,,43,100,94.12,"2 vermelhos (classe a: 12 falham/9 passam; classe b+c/d+propriedade: 50 testes, 20 falham/30 passam, os 7 da classe d ja passavam); 2.05x o provavel; testes_novos = delta do projeto (133 para 176); leitura fora do manifesto: __arbitraries__/grid.ts; duracao 44s+61s; fonte tokens: harness (total por agente, sem quebra in/cw/out)"
 fase-1,001,T02,dev,claude-sonnet-5-5,nao,15000,25000,50000,4,8,16,,,,,59159,n/d,6500,1.6,3,,,,,,100,94.12,"2 GREENs sem REFACTOR (sem melhoria real); 2.37x o provavel; leituras: stryker.config.json package.json notas.md; mutation 94.12 em digit.ts por 1 sobrevivente equivalente (typeof) registrado em notas.md; duracao 33s+63s; total T02 subagentes 140977 contra 65000 provavel (2.17x); fonte tokens: harness"
 fase-1,001,T02,orquestrador,claude-opus-5-5,nao,,,,,,,38,17250,8904,991060,26192,n/d,,4,,,,,,,,,"real so da sessao principal; recorte 14:23-14:29 UTC (arquivo da sessao inteiro); total T02 167169 contra 65000 provavel (2.57x); relogio 11:24-11:28 BRT; inclui amend de mensagem do commit 269450c; fonte log jsonl"
-fase-1,001,T03,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,12,21,42,,,,,,,5500,,,,,,,,,,maior volume de casos (7 CA + P2a)
-fase-1,001,T03,dev,claude-sonnet-5-5,nao,24000,40000,80000,8,14,28,,,,,,,5500,,,,,,,,,,
-fase-1,001,T04,eng-testes,claude-sonnet-5-5,nao,18000,30000,60000,6,12,24,,,,,,,6800,,,,,,,,,,
-fase-1,001,T04,dev,claude-sonnet-5-5,nao,12000,20000,40000,4,8,16,,,,,,,6800,,,,,,,,,,
-fase-1,001,T05,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,18,36,,,,,,,8500,,,,,,,,,,
-fase-1,001,T05,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,12,24,,,,,,,8500,,,,,,,,,,
-fase-1,001,T06,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,9,15,30,,,,,,,11700,,,,,,,,,,manifesto >10k; avaliar divisao T06a/T06b se board.test.ts passar de ~7k tokens
-fase-1,001,T06,dev,claude-sonnet-5-5,nao,24000,40000,80000,6,10,20,,,,,,,11700,,,,,,,,,,
-fase-1,001,T07,eng-testes,claude-sonnet-5-5,nao,33000,55000,110000,15,25,50,,,,,,,9100,,,,,,,,,,tdd isento; dev so se propriedade achar bug (sem linha); inclui npm run mutation local
+fase-1,001,T03,eng-testes,claude-sonnet-5-5,nao,72000,120000,240000,12,21,42,,,,,,,5500,,,,,,,,,,maior volume de casos (7 CA + P2a); reestimado 23/11 x2 (Diretor); original 36000/60000/120000
+fase-1,001,T03,dev,claude-sonnet-5-5,nao,48000,80000,160000,8,14,28,,,,,,,5500,,,,,,,,,,reestimado 23/11 x2 (Diretor); original 24000/40000/80000
+fase-1,001,T04,eng-testes,claude-sonnet-5-5,nao,36000,60000,120000,6,12,24,,,,,,,6800,,,,,,,,,,reestimado 23/11 x2 (Diretor); original 18000/30000/60000
+fase-1,001,T04,dev,claude-sonnet-5-5,nao,24000,40000,80000,4,8,16,,,,,,,6800,,,,,,,,,,reestimado 23/11 x2 (Diretor); original 12000/20000/40000
+fase-1,001,T05,eng-testes,claude-sonnet-5-5,nao,54000,90000,180000,9,18,36,,,,,,,8500,,,,,,,,,,reestimado 23/11 x2 (Diretor); original 27000/45000/90000
+fase-1,001,T05,dev,claude-sonnet-5-5,nao,36000,60000,120000,6,12,24,,,,,,,8500,,,,,,,,,,reestimado 23/11 x2 (Diretor); original 18000/30000/60000
+fase-1,001,T06,eng-testes,claude-sonnet-5-5,nao,72000,120000,240000,9,15,30,,,,,,,11700,,,,,,,,,,manifesto >10k; avaliar divisao T06a/T06b se board.test.ts passar de ~7k tokens; reestimado 23/11 x2 (Diretor); original 36000/60000/120000
+fase-1,001,T06,dev,claude-sonnet-5-5,nao,48000,80000,160000,6,10,20,,,,,,,11700,,,,,,,,,,reestimado 23/11 x2 (Diretor); original 24000/40000/80000
+fase-1,001,T07,eng-testes,claude-sonnet-5-5,nao,66000,110000,220000,15,25,50,,,,,,,9100,,,,,,,,,,tdd isento; dev so se propriedade achar bug (sem linha); inclui npm run mutation local; reestimado 23/11 x2 (Diretor); original 33000/55000/110000
 fase-1,001,revisao-ciclo,revisor,claude-sonnet-5-5,nao,60000,120000,250000,10,20,40,,,,,,,15000,,,,,,,,,,revisao so do diff; 2 rodadas; ancora passo 5 (revisor 152k em 2 rodadas)
 fase-1,001,retro-ciclo,curador-pdca,claude-sonnet-5-5,nao,15000,30000,60000,5,10,20,,,,,,,10000,,,,,,,,,,retro + estado + RESUMO; excluidas orquestrador (opus) e espera do Diretor

@@ -2,7 +2,8 @@ import { createBoard, getConflicts, type Board } from './board';
 import type { CellConflict } from './conflicts';
 import type { HistoryEntry } from './history';
 import { cellIndex, type Index } from './units';
-import { emptyNotes, type Notes } from './notes';
+import type { Digit } from './digit';
+import { emptyNotes, toggleNote, type Notes } from './notes';
 import { createPuzzle, type Puzzle, type PuzzleRefusal } from './puzzle';
 import type { Result } from './result';
 
@@ -57,11 +58,11 @@ export function gameToggleNote(
   game: Game,
   row: Index,
   col: Index,
-  digit: number,
+  digit: Digit,
 ): Result<Game, never> {
   const index = cellIndex(row, col);
   const notes = game.notes.map((current, i) =>
-    i === index ? ([digit] as unknown as Notes) : current,
+    i === index ? toggleNote(current, digit) : current,
   );
   return { ok: true, value: Object.freeze({ ...game, notes: Object.freeze(notes) }) };
 }

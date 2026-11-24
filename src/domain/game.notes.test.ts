@@ -125,4 +125,17 @@ describe('game (anotações)', () => {
     expect(result).toEqual({ ok: false, reason: 'cell-is-given' });
     expect(game.history).toHaveLength(0);
   });
+  it('CA-004-04: alternar anotação em célula com valor (2,7) é recusado com cell-has-value e a partida não muda', () => {
+    // Helper provisório: troca por `gamePlace` na T03.
+    const placed = placeValue(newGame().board, 2, 7, solutionGrid[2]?.[7]);
+    if (!placed.ok) throw new Error('fixture inválida');
+    const game: Game = { ...newGame(), board: placed.value };
+    const snapshot = structuredClone(game);
+
+    const result = gameToggleNote(game, 2, 7, 4);
+
+    expect(result).toEqual({ ok: false, reason: 'cell-has-value' });
+    expect(game).toEqual(snapshot);
+    expect(game.history).toHaveLength(0);
+  });
 });

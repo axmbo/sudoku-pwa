@@ -22,6 +22,7 @@
 7. `board.test.ts` (~8,2k tokens) será dividido por operação antes de crescer, tarefa futura.
 8. Depois da 001, segue 004 e depois 005 (primeiro rodável), com puzzle fixo até a 003; 002 e 003 depois (24/11/2026; [plano](process/plano-fase-1.md)).
 9. Spec 004 (24/11/2026): anotações dos vizinhos ficam ao colocar valor; desfazer é por ação; após a vitória tudo é recusado; sem conferir contra a solução antes da grade cheia; o jogo gravado leva o histórico completo, como texto JSON no envelope do ADR 0004; limpar anotações em célula com valor é no-op e jogada sem efeito devolve o mesmo `Game` (sem CA novo); ciclo único, sem dividir.
+10. T01 da 004 (24/11/2026): via 7b aceita para matar mutante em estado que a API ainda não alcança (commit `51b359e`); proposta de template na M-010.
 
 ## Pendências do Diretor
 

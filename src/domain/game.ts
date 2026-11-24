@@ -61,10 +61,12 @@ export function gameToggleNote(
   digit: Digit,
 ): Result<Game, never> {
   const index = cellIndex(row, col);
-  const notes = game.notes.map((current, i) =>
-    i === index ? toggleNote(current, digit) : current,
-  );
-  return { ok: true, value: Object.freeze({ ...game, notes: Object.freeze(notes) }) };
+  const current = game.notes[index] as Notes;
+  const entry: HistoryEntry = {
+    move: { kind: 'toggle-note', index, digit },
+    before: { value: cellAt(game.board, row, col).value, notes: current },
+  };
+  return { ok: true, value: commit(game, entry, toggleNote(current, digit)) };
 }
 
 /** Esvazia as anotações da célula (row, col); sem anotações, não há efeito. */
@@ -78,14 +80,16 @@ export function gameClearNotes(game: Game, row: Index, col: Index): Result<Game,
     move: { kind: 'clear-notes', index },
     before: { value: cellAt(game.board, row, col).value, notes: current },
   };
-  const notes = game.notes.map((existing, i) => (i === index ? emptyNotes : existing));
-  return {
-    ok: true,
-    value: Object.freeze({
-      ...game,
-      notes: Object.freeze(notes),
-      history: Object.freeze([...game.history.slice(0, game.cursor), entry]),
-      cursor: game.cursor + 1,
-    }),
-  };
+  return { ok: true, value: commit(game, entry, emptyNotes) };
+}
+
+/** Jogada nova: grava as anotações da célula, trunca o histórico em `cursor` e acrescenta a entrada. */
+function commit(game: Game, entry: HistoryEntry, cellNotes: Notes): Game {
+  const notes = game.notes.map((existing, i) => (i === entry.move.index ? cellNotes : existing));
+  return Object.freeze({
+    ...game,
+    notes: Object.freeze(notes),
+    history: Object.freeze([...game.history.slice(0, game.cursor), entry]),
+    cursor: game.cursor + 1,
+  });
 }

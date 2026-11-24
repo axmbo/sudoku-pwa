@@ -16,7 +16,7 @@ export interface Game {
   readonly cursor: number;
 }
 
-export type NoteRefusal = 'cell-is-given';
+export type NoteRefusal = 'cell-is-given' | 'cell-has-value';
 export type ClearNotesRefusal = 'cell-is-given';
 
 export type GameStatus = 'incomplete' | 'full-incorrect' | 'won';
@@ -65,6 +65,9 @@ export function gameToggleNote(
 ): Result<Game, NoteRefusal> {
   if (cellAt(game.board, row, col).given) {
     return { ok: false, reason: 'cell-is-given' };
+  }
+  if (cellAt(game.board, row, col).value !== null) {
+    return { ok: false, reason: 'cell-has-value' };
   }
   const index = cellIndex(row, col);
   const current = game.notes[index] as Notes;

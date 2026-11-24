@@ -91,4 +91,32 @@ describe('puzzle', () => {
       reason: 'conflicting-givens',
     });
   });
+
+  const swapOneAndTwo = (grid: readonly (readonly (number | null)[])[]) =>
+    grid.map((row) => row.map((cell) => (cell === 1 ? 2 : cell === 2 ? 1 : cell)));
+
+  it.each([
+    [
+      'incompleta (vazio em (2,7))',
+      (rows: (number | null)[][]) => {
+        rows[2]?.splice(7, 1, null);
+        return rows;
+      },
+    ],
+    [
+      'com conflito (7 repetido na linha 2, em (2,7); não contradiz pista)',
+      (rows: (number | null)[][]) => {
+        rows[2]?.splice(7, 1, 7);
+        return rows;
+      },
+    ],
+    ['válida mas que contradiz as pistas (1 e 2 trocados)', swapOneAndTwo],
+  ])('INV: recusa invalid-solution quando a solução é %s', (_name, edit) => {
+    const solution = edit(validPuzzleInput().solution.map((row) => [...row]));
+
+    expect(createPuzzle({ ...validPuzzleInput(), solution })).toEqual({
+      ok: false,
+      reason: 'invalid-solution',
+    });
+  });
 });

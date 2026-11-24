@@ -23,3 +23,5 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 23/11 · T07 · P4 (igualdade entre caminhos) não matava o mutante "getConflicts ignora pistas", porque os dois caminhos erram igual; a propriedade ganhou comparação com o oráculo de P2.
 - 23/11 · T07 · `numRuns` reduzidos (P2 100, P3 150, P4 100): com P3 em 500, o dry-run do Stryker estourou 5 s.
 - 23/11 · T07 · Nit/débito: o script de mutação é `npm run test:mut`, mas `tasks.md` diz `npm run mutation`; registrado aqui, sem editar `tasks.md`.
+- 24/11 · revisão r1 · R1-02: o código separa `PlaceRefusal` e `EraseRefusal` (apagar nunca recusa por `'invalid-value'`), em vez do `MoveRefusal` único do plano; o Diretor manteve o código e o plan.md foi ajustado.
+- 24/11 · revisão r1 · R1-04 (nit aceito): os geradores de `__arbitraries__` foram isentos por "nascerem verdes", justificativa fora da lista fechada do `PROCESSO.md` §6; a `tasks.md` já cobre o caso.

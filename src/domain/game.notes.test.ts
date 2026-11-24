@@ -88,4 +88,20 @@ describe('game (anotações)', () => {
     expect(result.value).toBe(game);
     expect(result.value.history).toEqual(game.history);
   });
+  it('CA-004-01: cada alternância com efeito soma uma entrada ao histórico e avança o cursor', () => {
+    const game = newGame();
+
+    const first = gameToggleNote(game, 2, 7, 4);
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    expect(first.value.history).toHaveLength(1);
+    expect(first.value.cursor).toBe(1);
+
+    const second = gameToggleNote(first.value, 2, 7, 4);
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+    expect(second.value.history).toHaveLength(2);
+    expect(second.value.cursor).toBe(2);
+    expect(game.history).toHaveLength(0);
+  });
 });

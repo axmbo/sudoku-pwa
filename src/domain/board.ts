@@ -104,12 +104,12 @@ function isCoordinate(n: unknown): n is number {
 }
 
 function isGivenAt(board: Board, row: number, col: number): boolean {
-  return (board.cells[row * 9 + col] as CellState).given;
+  return (board.cells[cellIndex(row, col)] as CellState).given;
 }
 
 /** Novo `Board` congelado com só a célula alvo trocada por uma do jogador. */
 function replaceCell(board: Board, row: number, col: number, value: Digit | null): Board {
-  const target = row * 9 + col;
+  const target = cellIndex(row, col);
   const cells = board.cells.map((cell, i) =>
     i === target ? Object.freeze({ value, given: false }) : cell,
   );

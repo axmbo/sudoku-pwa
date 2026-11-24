@@ -1,4 +1,4 @@
-import type { Grid } from './board';
+import { flattenGrid, type Grid } from './board';
 import type { Result } from './result';
 
 /** Puzzle: pistas, solução e metadados de geração; `difficulty` e `seed` são opacos aqui. */
@@ -21,10 +21,13 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 export function createPuzzle(input: unknown): Result<Puzzle, PuzzleRefusal> {
+  if (typeof input !== 'object' || input === null) {
+    return { ok: false, reason: 'malformed-puzzle' };
+  }
   const { givens, solution, difficulty, seed, generatorVersion } = input as Record<string, unknown>;
   if (
-    !Array.isArray(givens) ||
-    !Array.isArray(solution) ||
+    flattenGrid(givens) === null ||
+    flattenGrid(solution) === null ||
     !isNonEmptyString(difficulty) ||
     !isNonEmptyString(seed) ||
     !Number.isInteger(generatorVersion) ||

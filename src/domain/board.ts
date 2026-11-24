@@ -32,7 +32,7 @@ export function createBoard(input: unknown): Result<Board, CreateRefusal> {
 }
 
 /** Achata a entrada em 81 valores; `null` se não for 9x9 de dígitos ou `null` (buracos incluídos). */
-function flattenGrid(input: unknown): (Digit | null)[] | null {
+export function flattenGrid(input: unknown): (Digit | null)[] | null {
   if (!Array.isArray(input) || input.length !== 9) {
     return null;
   }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createBoard } from './board';
 import { givensGrid, validPuzzleInput } from './__arbitraries__/puzzle';
-import { createGame } from './game';
+import { canRedo, canUndo, createGame, getGameConflicts, type Game } from './game';
 import type { Notes } from './notes';
 
 describe('game (criação)', () => {
@@ -24,5 +24,31 @@ describe('game (criação)', () => {
     expect(game.board.cells[2 * 9 + 0]).toEqual({ value: 7, given: true });
     expect(game.board.cells[2 * 9 + 7]).toEqual({ value: null, given: false });
     expect(game.puzzle).toEqual(validPuzzleInput());
+  });
+
+  const newGame = (): Game => {
+    const result = createGame(validPuzzleInput());
+    if (!result.ok) throw new Error('fixture inválida');
+    return result.value;
+  };
+
+  it('INV: na partida nova canUndo e canRedo são falsos', () => {
+    // [símbolo novo: `canUndo`, `canRedo`]
+    const game = newGame();
+
+    expect(canUndo(game)).toBe(false);
+    expect(canRedo(game)).toBe(false);
+  });
+
+  it('INV: na partida nova getGameConflicts é vazio', () => {
+    // [símbolo novo: `getGameConflicts`]
+    expect(getGameConflicts(newGame())).toEqual([]);
+  });
+
+  it('INV: createGame com entrada inválida devolve a recusa de createPuzzle inteira', () => {
+    expect(createGame({ ...validPuzzleInput(), seed: '' })).toEqual({
+      ok: false,
+      reason: 'malformed-puzzle',
+    });
   });
 });

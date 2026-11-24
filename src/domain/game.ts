@@ -69,17 +69,18 @@ export function gameToggleNote(
   if (!isDigit(digit)) {
     return { ok: false, reason: 'invalid-value' };
   }
-  if (cellAt(game.board, row, col).given) {
+  const cell = cellAt(game.board, row, col);
+  if (cell.given) {
     return { ok: false, reason: 'cell-is-given' };
   }
-  if (cellAt(game.board, row, col).value !== null) {
+  if (cell.value !== null) {
     return { ok: false, reason: 'cell-has-value' };
   }
   const index = cellIndex(row, col);
   const current = game.notes[index] as Notes;
   const entry: HistoryEntry = {
     move: { kind: 'toggle-note', index, digit },
-    before: { value: cellAt(game.board, row, col).value, notes: current },
+    before: { value: cell.value, notes: current },
   };
   return { ok: true, value: commit(game, entry, toggleNote(current, digit)) };
 }
@@ -88,12 +89,13 @@ export function gameToggleNote(
 export function gameClearNotes(
   game: Game,
   row: unknown,
-  col: Index,
+  col: unknown,
 ): Result<Game, ClearNotesRefusal> {
   if (!isCoordinate(row) || !isCoordinate(col)) {
     return { ok: false, reason: 'cell-not-found' };
   }
-  if (cellAt(game.board, row, col).given) {
+  const cell = cellAt(game.board, row, col);
+  if (cell.given) {
     return { ok: false, reason: 'cell-is-given' };
   }
   const index = cellIndex(row, col);
@@ -103,7 +105,7 @@ export function gameClearNotes(
   }
   const entry: HistoryEntry = {
     move: { kind: 'clear-notes', index },
-    before: { value: cellAt(game.board, row, col).value, notes: current },
+    before: { value: cell.value, notes: current },
   };
   return { ok: true, value: commit(game, entry, emptyNotes) };
 }

@@ -1,4 +1,5 @@
-import { createBoard, type Board } from './board';
+import { createBoard, getConflicts, type Board } from './board';
+import type { CellConflict } from './conflicts';
 import type { HistoryEntry } from './history';
 import { emptyNotes, type Notes } from './notes';
 import { createPuzzle, type Puzzle, type PuzzleRefusal } from './puzzle';
@@ -31,4 +32,17 @@ export function createGame(input: unknown): Result<Game, PuzzleRefusal> {
       cursor: 0,
     }),
   };
+}
+
+/** Conflitos da partida, derivados do tabuleiro atual. */
+export function getGameConflicts(game: Game): readonly CellConflict[] {
+  return getConflicts(game.board);
+}
+
+export function canUndo(game: Game): boolean {
+  return game.cursor > 0;
+}
+
+export function canRedo(game: Game): boolean {
+  return game.cursor < game.history.length;
 }

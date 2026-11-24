@@ -62,3 +62,17 @@ export function cellAt(board: Board, row: Index, col: Index): CellState {
 export function getConflicts(board: Board): readonly CellConflict[] {
   return findConflicts(board.cells.map((cell) => cell.value));
 }
+
+/** Coloca `value` na célula (`row`, `col`); só o caminho feliz (recusas: T06). */
+export function placeValue(
+  board: Board,
+  row: number,
+  col: number,
+  value: number,
+): Result<Board, never> {
+  const target = row * 9 + col;
+  const cells = board.cells.map((cell, i) =>
+    i === target ? Object.freeze({ value: value as Digit, given: false }) : cell,
+  );
+  return { ok: true, value: Object.freeze({ cells: Object.freeze(cells) }) };
+}

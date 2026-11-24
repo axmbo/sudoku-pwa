@@ -16,7 +16,7 @@ Todo o jogo depende de um tabuleiro confiável: uma grade 9×9 em que algumas c�
 
 ## Conceitos usados
 
-Linha e coluna são numeradas de 1 a 9 (como o jogador as vê). No domínio, são índices de 0 a 8, e a interface as apresenta de 1 a 9 ([ADR 0007](../../docs/adr/0007-convencoes-do-dominio.md)); por isso o CA-001-21 é verificado no domínio como "não é inteiro de 0 a 8". Bloco é cada uma das nove sub-grades 3×3. Unidade é uma linha, uma coluna ou um bloco. Conflito é o mesmo valor aparecendo duas ou mais vezes na mesma unidade. O conflito é sempre consequência do estado atual da grade.
+Linha e coluna são numeradas de 1 a 9 (como o jogador as vê). No domínio, são índices de 0 a 8, e a interface as apresenta de 1 a 9 ([ADR 0007](../../../docs/adr/0007-convencoes-do-dominio.md)); por isso o CA-001-21 é verificado no domínio como "não é inteiro de 0 a 8". Bloco é cada uma das nove sub-grades 3×3. Unidade é uma linha, uma coluna ou um bloco. Conflito é o mesmo valor aparecendo duas ou mais vezes na mesma unidade. O conflito é sempre consequência do estado atual da grade.
 
 ## Critérios de aceite
 

@@ -32,5 +32,5 @@ A spec 001 é a primeira a definir API pública em `src/domain/`; as specs 002 a
 
 ## Fontes
 
-- `specs/001-tabuleiro-conflitos/spec.md` (CA-001-20 a 25), consultada em 23/11/2026.
+- `specs/_arquivo/001-tabuleiro-conflitos/spec.md` (CA-001-20 a 25), consultada em 23/11/2026.
 - `docs/constituicao.md`, princípio 5; skill `dominio-sudoku` (glossário). Sem fonte externa: decisão de convenção de projeto.

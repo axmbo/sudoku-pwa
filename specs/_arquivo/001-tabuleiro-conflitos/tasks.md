@@ -20,8 +20,8 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
 - **Manifesto de contexto** (lista fechada; seção/linhas quando possível):
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md`
-  - `specs/001-tabuleiro-conflitos/spec.md#CA-001-01` e `#CA-001-02` (~0,4k)
-  - `specs/001-tabuleiro-conflitos/plan.md#Tipos públicos` e `#Contrato das operações` (~2,5k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/spec.md#CA-001-01` e `#CA-001-02` (~0,4k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/plan.md#Tipos públicos` e `#Contrato das operações` (~2,5k)
   - `docs/adr/0007-convencoes-do-dominio.md#Decisão` (~0,6k)
   - `src/domain/digit.ts` (~0,1k); `src/domain/digit.test.ts` (estilo, ~0,3k)
   - `src/domain/digit.prop.test.ts` (estilo das propriedades, ~0,4k)
@@ -38,8 +38,8 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
 - **Manifesto de contexto:**
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md`
-  - `specs/001-tabuleiro-conflitos/spec.md#CA-001-22` (~0,2k)
-  - `specs/001-tabuleiro-conflitos/plan.md#Contrato das operações` (createBoard, ~0,5k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/spec.md#CA-001-22` (~0,2k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/plan.md#Contrato das operações` (createBoard, ~0,5k)
   - `src/domain/board.ts` e `src/domain/board.test.ts` (resultado da T01, ~2k)
   - `src/domain/digit.ts`, `digit.test.ts`, `digit.prop.test.ts` (~0,8k)
   - Total estimado: ~6,5k tokens (inclui `docs/estado.md` ~1,3k)
@@ -55,8 +55,8 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
 - **Manifesto de contexto:**
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md`
-  - `specs/001-tabuleiro-conflitos/spec.md#CA-001-09` a `#CA-001-14`, `#CA-001-19` (~1,2k)
-  - `specs/001-tabuleiro-conflitos/plan.md#Tipos públicos` (units, conflicts) e `#Contrato das operações` (getConflicts) (~1,5k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/spec.md#CA-001-09` a `#CA-001-14`, `#CA-001-19` (~1,2k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/plan.md#Tipos públicos` (units, conflicts) e `#Contrato das operações` (getConflicts) (~1,5k)
   - `src/domain/units.ts` e `units.test.ts` (T01, ~0,4k); `src/domain/digit.ts` (~0,1k)
   - Total estimado: ~5,5k tokens (inclui `docs/estado.md` ~1,3k)
 - **Estimativa:** tokens 120k/200k/400k · minutos 20/35/70
@@ -71,8 +71,8 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
 - **Manifesto de contexto:**
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md`
-  - `specs/001-tabuleiro-conflitos/spec.md#CA-001-23`, `#CA-001-25` (~0,6k)
-  - `specs/001-tabuleiro-conflitos/plan.md#Contrato das operações` (createBoard, getConflicts) (~0,8k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/spec.md#CA-001-23`, `#CA-001-25` (~0,6k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/plan.md#Contrato das operações` (createBoard, getConflicts) (~0,8k)
   - `src/domain/board.ts`, `src/domain/board.test.ts` (T01–T02, ~3k); assinatura de `src/domain/conflicts.ts` (~0,5k)
   - Total estimado: ~6,8k tokens (inclui `docs/estado.md` ~1,3k)
 - **Estimativa:** tokens 60k/100k/200k · minutos 10/20/40
@@ -87,8 +87,8 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
 - **Manifesto de contexto:**
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md`
-  - `specs/001-tabuleiro-conflitos/spec.md#CA-001-03` a `#CA-001-06`, `#CA-001-15`, `#CA-001-16` (~1,0k)
-  - `specs/001-tabuleiro-conflitos/plan.md#Contrato das operações` (placeValue, eraseValue, imutabilidade) (~0,9k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/spec.md#CA-001-03` a `#CA-001-06`, `#CA-001-15`, `#CA-001-16` (~1,0k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/plan.md#Contrato das operações` (placeValue, eraseValue, imutabilidade) (~0,9k)
   - `src/domain/board.ts`, `src/domain/board.test.ts` (T01–T04, ~5,3k)
   - Total estimado: ~8,5k tokens (inclui `docs/estado.md` ~1,3k; `board.ts` + `board.test.ts` já com T01–T04, ~5,3k)
 - **Estimativa:** tokens 90k/150k/300k · minutos 15/30/60
@@ -104,8 +104,8 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
 - **Manifesto de contexto:**
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md`
-  - `specs/001-tabuleiro-conflitos/spec.md#CA-001-07`, `#CA-001-08`, `#CA-001-20` a `#CA-001-21`, `#CA-001-24`, `#CA-001-25` (~1,3k)
-  - `specs/001-tabuleiro-conflitos/plan.md#Contrato das operações` (ordem de validação) (~0,8k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/spec.md#CA-001-07`, `#CA-001-08`, `#CA-001-20` a `#CA-001-21`, `#CA-001-24`, `#CA-001-25` (~1,3k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/plan.md#Contrato das operações` (ordem de validação) (~0,8k)
   - `src/domain/board.ts` e `src/domain/board.test.ts` (T01–T05, ~8,3k)
   - Total estimado: ~11,7k tokens (inclui `docs/estado.md` ~1,3k; `board.ts` + `board.test.ts` já com T01–T05, ~8,3k). Acima de 10k: ler só os blocos `describe` de `placeValue`/`eraseValue` e a tabela de precedência por linhas; se o `board.test.ts` passar de ~7k tokens ao chegar aqui, dividir em T06a (CA-07, 08, 16, 20, com o CA-24 desses motivos) e T06b (CA-21, CA-24 de `cell-not-found` e CA-25, cuja tabela fica no vermelho do 21)
 - **Estimativa:** tokens 120k/200k/400k · minutos 15/25/50
@@ -120,8 +120,8 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
 - **Manifesto de contexto:**
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md`
-  - `specs/001-tabuleiro-conflitos/plan.md#Estratégia de teste` (propriedades P1–P4, ~1,5k) e `#Contrato das operações` (motivos de recusa, ~0,4k)
-  - `specs/001-tabuleiro-conflitos/spec.md#CA-001-17`, `#CA-001-18`, `#CA-001-24` (~0,6k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/plan.md#Estratégia de teste` (propriedades P1–P4, ~1,5k) e `#Contrato das operações` (motivos de recusa, ~0,4k)
+  - `specs/_arquivo/001-tabuleiro-conflitos/spec.md#CA-001-17`, `#CA-001-18`, `#CA-001-24` (~0,6k)
   - `src/domain/board.ts` (~3k, só a API); `src/domain/digit.prop.test.ts` (estilo, ~0,4k)
   - `src/domain/__arbitraries__/grid.ts` (T01, ~0,5k); `src/domain/board.prop.test.ts` (bloco da T01, ~1k)
   - `src/domain/digit.ts` e `digit.test.ts` (~0,4k)

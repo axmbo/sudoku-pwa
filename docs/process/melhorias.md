@@ -37,3 +37,4 @@ Formato:
 - Proposta (diff): `/implementar` (skill) manda cada vermelho/GREEN seguinte da mesma tarefa por SendMessage ao agente já aberto; agente novo só ao trocar de tarefa.
 - Lugar de promoção: skill `implementar`
 - Estado: aprovada pelo Diretor em 23/11/2026 para teste na T04; promover à skill `implementar` se o ganho se confirmar
+- Segunda amostra (T04, 23/11/2026): mesmo padrão (spawn + 1 SendMessage por agente). Tokens reais (log jsonl, dedup por `message.id`): eng-testes 49,1k (24,6k por vermelho), dev 26,5k (13,2k por GREEN); total 75,6k = 0,76× o provável (100k). Sem leitura fora do manifesto. Dois vermelhos por tarefa diluem pouco o custo fixo do spawn, então o por-ciclo sobe contra a T03 (12,8k e 9,5k), mas segue abaixo do provável. Duas amostras abaixo do provável (0,56× e 0,76×), confundidas com o tamanho da tarefa. Recomendação: promover à skill `implementar`; decisão do Diretor.

@@ -709,3 +709,79 @@ describe('board: recusa em pista (cell-is-given)', () => {
     expect(getConflicts(board)).toEqual(conflictsBefore);
   });
 });
+
+/** Valor fora do tipo `number`, só para exercitar a entrada suja em runtime. */
+const dirty = (value: unknown): number => value as number;
+
+describe('board: valor inválido ao colocar (invalid-value)', () => {
+  const invalidValues: readonly [string, unknown][] = [
+    ['0', 0],
+    ['10', 10],
+    ['-1', -1],
+    ['2.5', 2.5],
+    ['-0', -0],
+    ['NaN', NaN],
+    ['Infinity', Infinity],
+    ["'5'", '5'],
+    ["''", ''],
+    ['null', null],
+    ['undefined', undefined],
+    ['{}', {}],
+    ['[5]', [5]],
+    ['true', true],
+    ['5n', 5n],
+  ];
+
+  // (4,6) = cells[42], vazia e sem pista; ver `input`.
+  it.each(invalidValues)(
+    'CA-001-20: valor %s em célula vazia é recusado com invalid-value',
+    (_nome, value) => {
+      const board = mustCreate(input);
+
+      const result = tryPlace(board, 4, 6, dirty(value));
+
+      expect(result).toStrictEqual({ ok: false, reason: 'invalid-value' });
+      expect(board.cells[42]).toEqual({ value: null, given: false });
+    },
+  );
+
+  it.each(invalidValues)(
+    'CA-001-20: valor %s em célula do jogador já preenchida é recusado e preserva o valor',
+    (_nome, value) => {
+      // (2,1) = cells[19] com 5 do jogador.
+      const board = mustPlace(mustCreate(input), 2, 1, 5);
+
+      const result = tryPlace(board, 2, 1, dirty(value));
+
+      expect(result).toStrictEqual({ ok: false, reason: 'invalid-value' });
+      expect(board.cells[19]).toEqual({ value: 5, given: false });
+    },
+  );
+
+  it.each([
+    ['1', 1],
+    ['9', 9],
+  ])('CA-001-20: fronteira %s é aceita', (_nome, value) => {
+    const board = mustCreate(input);
+
+    const next = mustPlace(board, 4, 6, value);
+
+    expect(next.cells[42]).toEqual({ value, given: false });
+  });
+
+  it('CA-001-24: valor inválido recusado deixa tabuleiro e conflitos intactos, sem value', () => {
+    const board = mustPlace(mustCreate(input), 2, 1, 5);
+    const boardBefore = structuredClone(board);
+    const conflictsBefore = structuredClone(getConflicts(board));
+    expect(conflictsBefore).toEqual([
+      { row: 2, col: 1, value: 5, units: [{ kind: 'row', index: 2 }] },
+      { row: 2, col: 7, value: 5, units: [{ kind: 'row', index: 2 }] },
+    ]);
+
+    const result = tryPlace(board, 2, 1, 10);
+
+    expect(result).toStrictEqual({ ok: false, reason: 'invalid-value' });
+    expect(board).toEqual(boardBefore);
+    expect(getConflicts(board)).toEqual(conflictsBefore);
+  });
+});

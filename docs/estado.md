@@ -8,7 +8,8 @@
 - **Spec 001 implementada, todas as 7 tarefas concluídas (23/11/2026):** `check` verde com 390 testes, cobertura 100% e Stryker 100% no domínio. T06 e T07 em `metrics.csv`; notas da execução em [notas.md](../specs/001-tabuleiro-conflitos/notas.md).
 - **T07 (invariantes e propriedades, isenta de TDD):** 4 commits `test(domain)` (`0094691`, `4494ebc`, `855ff1c`, `c679816`), sem commit `dev` (nenhuma propriedade achou bug). Real do log: 83,5k tokens contra 110k prováveis (0,76×).
 - **Tokens da 001 até a T07:** real de tarefas e agentes em `metrics.csv`; o harness reporta valores diferentes do log, e prevalece o log.
-- **Próximo:** fechamento da T07 commitado. Depois `/clear` + `/retomar` e `/revisar 001`, revisão só do diff da spec 001.
+- **Revisão da spec 001 concluída (24/11/2026):** r1 (1 major, 2 minor, 1 nit) e r2 (sai). [PR #2](https://github.com/axmbo/sudoku-pwa/pull/2) aberto em 24/11/2026, aguardando o merge do Diretor. Melhoria M-005 candidata para a `/retro 001`.
+- **Próximo:** merge do PR #2 pelo Diretor; issues `débito` depois do PR; `/retro 001`.
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o hook do `dev` bloqueia arquivo de teste (provado em 22/11/2026).
 
 ## Decisões do Diretor (22/11/2026 e 23/11/2026)
@@ -34,4 +35,4 @@
 - Commits de T2, T3 e T6 sem o vermelho no corpo; `pre-commit.sh` quebra nomes com espaço (`-z`/`xargs -0`, teste com `npx` falso); lista de caminhos de teste duplicada entre `pre-commit.sh` e `guard-test-files.mjs`.
 - Release: `verify-tag.sh` e `release.yml` vêm do commit da tag (aceito em 22/11/2026).
 - `npm audit`: 5 moderadas em dependências de dev, sem correção; o gate é `high`.
-- Spec 001, aceitos pelo Diretor em 23/11/2026: nit N6; `ALL_UNITS`/`unitCells` sem `Object.freeze` (ADR 0007 pede congelado); `Stryker disable` em `digit.ts:3`; T05, GREEN do vermelho 2 generaliza `placeValue` e cria `eraseValue` de uma vez; regra 9 repete parte da exceção; T02, "tende a generalizá-las" vaga; T07, `tasks.md` cita `npm run mutation`, o script é `test:mut` ([notas.md](../specs/001-tabuleiro-conflitos/notas.md)).
+- Spec 001, aceitos pelo Diretor em 23/11/2026: nit N6; `ALL_UNITS`/`unitCells` sem `Object.freeze` (ADR 0007 pede congelado); `Stryker disable` em `digit.ts:3`; T05, GREEN do vermelho 2 generaliza `placeValue` e cria `eraseValue` de uma vez; regra 9 repete parte da exceção; T02, "tende a generalizá-las" vaga; T07, `tasks.md` cita `npm run mutation`, o script é `test:mut` ([notas.md](../specs/001-tabuleiro-conflitos/notas.md)); `CellConflict`/`units` em `conflicts.ts` sem `Object.freeze` (PR-05, junto ao de `ALL_UNITS`); novo `Stryker disable` em `isCoordinate` (`board.ts`, aceito pelo Diretor em 24/11/2026).

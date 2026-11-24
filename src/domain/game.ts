@@ -1,8 +1,8 @@
-import { cellAt, createBoard, getConflicts, type Board } from './board';
+import { cellAt, createBoard, getConflicts, isCoordinate, type Board } from './board';
 import type { CellConflict } from './conflicts';
 import type { HistoryEntry } from './history';
 import { cellIndex, type Index } from './units';
-import type { Digit } from './digit';
+import { isDigit } from './digit';
 import { emptyNotes, toggleNote, type Notes } from './notes';
 import { createPuzzle, type Puzzle, type PuzzleRefusal } from './puzzle';
 import type { Result } from './result';
@@ -16,8 +16,8 @@ export interface Game {
   readonly cursor: number;
 }
 
-export type NoteRefusal = 'cell-is-given' | 'cell-has-value';
-export type ClearNotesRefusal = 'cell-is-given';
+export type NoteRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given' | 'cell-has-value';
+export type ClearNotesRefusal = 'cell-not-found' | 'cell-is-given';
 
 export type GameStatus = 'incomplete' | 'full-incorrect' | 'won';
 
@@ -59,10 +59,16 @@ export function notesAt(game: Game, row: Index, col: Index): Notes {
 /** Alterna a anotação `digit` na célula (row, col). */
 export function gameToggleNote(
   game: Game,
-  row: Index,
-  col: Index,
-  digit: Digit,
+  row: unknown,
+  col: unknown,
+  digit: unknown,
 ): Result<Game, NoteRefusal> {
+  if (!isCoordinate(row) || !isCoordinate(col)) {
+    return { ok: false, reason: 'cell-not-found' };
+  }
+  if (!isDigit(digit)) {
+    return { ok: false, reason: 'invalid-value' };
+  }
   if (cellAt(game.board, row, col).given) {
     return { ok: false, reason: 'cell-is-given' };
   }
@@ -81,9 +87,12 @@ export function gameToggleNote(
 /** Esvazia as anotações da célula (row, col); sem anotações, não há efeito. */
 export function gameClearNotes(
   game: Game,
-  row: Index,
+  row: unknown,
   col: Index,
 ): Result<Game, ClearNotesRefusal> {
+  if (!isCoordinate(row) || !isCoordinate(col)) {
+    return { ok: false, reason: 'cell-not-found' };
+  }
   if (cellAt(game.board, row, col).given) {
     return { ok: false, reason: 'cell-is-given' };
   }

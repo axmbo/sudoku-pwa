@@ -98,7 +98,7 @@ export function eraseValue(board: Board, row: unknown, col: unknown): Result<Boa
 }
 
 /** Coordenada válida: inteiro de 0 a 8 (`-0` equivale a 0); não lança para `bigint` ou objetos. */
-function isCoordinate(n: unknown): n is number {
+export function isCoordinate(n: unknown): n is Index {
   // Stryker disable next-line ConditionalExpression: mutante equivalente; Number.isInteger já recusa não numéricos, o typeof só estreita o tipo.
   return typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 8;
 }

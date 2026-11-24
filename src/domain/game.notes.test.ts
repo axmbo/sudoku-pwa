@@ -138,4 +138,44 @@ describe('game (anotações)', () => {
     expect(game).toEqual(snapshot);
     expect(game.history).toHaveLength(0);
   });
+  // Entradas de fora entram como `unknown` (plan.md#Tipos públicos); o cast `never` mantém o
+  // typecheck passando enquanto a assinatura ainda é estreita e continua válido com `unknown`.
+  const raw = (value: unknown): never => value as never;
+
+  it.each([[0], [10], [2.5], ['5'], [undefined], [-0]])(
+    'CA-004-05: dígito %o é recusado com invalid-value e a partida não muda',
+    (digit) => {
+      const game = newGame();
+
+      const result = gameToggleNote(game, 2, 7, raw(digit));
+
+      expect(result).toEqual({ ok: false, reason: 'invalid-value' });
+      expect(game.history).toHaveLength(0);
+      expect(notesAt(game, 2, 7)).toEqual([]);
+    },
+  );
+
+  it.each([[-1], [9], [2.5], ['2'], [undefined]])(
+    'CA-004-05: linha ou coluna %o é recusada com cell-not-found, em gameToggleNote e gameClearNotes',
+    (bad) => {
+      const game = newGame();
+
+      expect(gameToggleNote(game, raw(bad), 7, 4)).toEqual({ ok: false, reason: 'cell-not-found' });
+      expect(gameToggleNote(game, 2, raw(bad), 4)).toEqual({ ok: false, reason: 'cell-not-found' });
+      expect(gameClearNotes(game, raw(bad), 7)).toEqual({ ok: false, reason: 'cell-not-found' });
+      expect(gameClearNotes(game, 2, raw(bad))).toEqual({ ok: false, reason: 'cell-not-found' });
+      expect(game.history).toHaveLength(0);
+    },
+  );
+
+  it('CA-004-05: -0 é aceito como linha e coluna (célula (0,0)), mas recusado como dígito', () => {
+    const game = newGame();
+
+    const accepted = gameToggleNote(game, -0, -0, 4);
+
+    expect(accepted.ok).toBe(true);
+    if (!accepted.ok) return;
+    expect(notesAt(accepted.value, 0, 0)).toEqual([4]);
+    expect(gameToggleNote(game, 0, 0, raw(-0))).toEqual({ ok: false, reason: 'invalid-value' });
+  });
 });

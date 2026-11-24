@@ -68,9 +68,9 @@ export type PlaceRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given';
 /** Coloca `value` na célula (`row`, `col`); recusa célula inexistente, valor inválido e pista (nessa ordem). */
 export function placeValue(
   board: Board,
-  row: number,
-  col: number,
-  value: number,
+  row: unknown,
+  col: unknown,
+  value: unknown,
 ): Result<Board, PlaceRefusal> {
   if (!isCoordinate(row) || !isCoordinate(col)) {
     return { ok: false, reason: 'cell-not-found' };
@@ -81,13 +81,13 @@ export function placeValue(
   if (isGivenAt(board, row, col)) {
     return { ok: false, reason: 'cell-is-given' };
   }
-  return { ok: true, value: replaceCell(board, row, col, value as Digit) };
+  return { ok: true, value: replaceCell(board, row, col, value) };
 }
 
 export type EraseRefusal = 'cell-not-found' | 'cell-is-given';
 
 /** Apaga o valor da célula (`row`, `col`); recusa célula inexistente e pista (nessa ordem). */
-export function eraseValue(board: Board, row: number, col: number): Result<Board, EraseRefusal> {
+export function eraseValue(board: Board, row: unknown, col: unknown): Result<Board, EraseRefusal> {
   if (!isCoordinate(row) || !isCoordinate(col)) {
     return { ok: false, reason: 'cell-not-found' };
   }
@@ -98,8 +98,9 @@ export function eraseValue(board: Board, row: number, col: number): Result<Board
 }
 
 /** Coordenada válida: inteiro de 0 a 8 (`-0` equivale a 0); não lança para `bigint` ou objetos. */
-function isCoordinate(n: unknown): boolean {
-  return Number.isInteger(n) && (n as number) >= 0 && (n as number) <= 8;
+function isCoordinate(n: unknown): n is number {
+  // Stryker disable next-line ConditionalExpression: mutante equivalente; Number.isInteger já recusa não numéricos, o typeof só estreita o tipo.
+  return typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 8;
 }
 
 function isGivenAt(board: Board, row: number, col: number): boolean {

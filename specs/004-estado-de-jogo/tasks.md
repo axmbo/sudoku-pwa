@@ -5,7 +5,7 @@
 
 Rascunho do `arquiteto` (passo 1 do `/planejar`, 24/11/2026). Passo 2 feito (`eng-testes` revisou as colunas de teste, 24/11/2026); análise do `revisor` ok na r2 (24/11/2026). 8 tarefas em ciclo único (decidido pelo Diretor em 24/11/2026; sem divisão em 004a/004b). Ordem: contrato e criação, anotações, valor×anotação, histórico, vitória, invariantes, serialização, leitura. Depende de ADR 0007 e 0004 (Aceitos) e das decisões 1 a 5 do Diretor (seção da spec).
 
-Estimativas: hipótese, calibrada pelas reestimativas da 001 (tokens ×2 sobre o primeiro palpite); sem medição própria. Manifestos fechados em 24/11/2026 (`curador-pdca`): tamanho de arquivo existente medido com `wc -c`/4 (seção/linhas por `sed -n | wc -c`; `estado.md` real 3,9 KB ≈ 1,0k, sem L0); arquivo que é saída de tarefa anterior (`game.ts`, `history.ts`, `notes.ts`, `puzzle.ts`, `moves.ts`, `serialize.ts`) segue a projeção do arquiteto. Totais 4,1k a 9,9k, todos abaixo de 15k; o maior (T08) tem folga de ~5k para o crescimento de `game.ts`/`history.ts`. O arquiteto superestimou plan/spec/ADR em ~40% (ex.: plan Tipos+Regras 1,2k medido contra 2,0k); `plan.md#Estratégia de teste` (~1,1k) não está nos manifestos: a `eng-testes` lê sob demanda (`leituras_fora_manifesto`).
+Estimativas: hipótese, calibrada pelas reestimativas da 001 (tokens ×2 sobre o primeiro palpite); sem medição própria. **Reancoragem de 24/11/2026 (Diretor):** T01 saiu 1,43× e T02 1,36× o provável; tokens de T03 a T08 ×1,4 (minutos inalterados); âncora do ciclo 1,62M provável (era 1,25M). Manifestos fechados em 24/11/2026 (`curador-pdca`): tamanho de arquivo existente medido com `wc -c`/4 (seção/linhas por `sed -n | wc -c`; `estado.md` real 3,9 KB ≈ 1,0k, sem L0); arquivo que é saída de tarefa anterior (`game.ts`, `history.ts`, `notes.ts`, `puzzle.ts`, `moves.ts`, `serialize.ts`) segue a projeção do arquiteto. Totais 4,1k a 9,9k, todos abaixo de 15k; o maior (T08) tem folga de ~5k para o crescimento de `game.ts`/`history.ts`. O arquiteto superestimou plan/spec/ADR em ~40% (ex.: plan Tipos+Regras 1,2k medido contra 2,0k); `plan.md#Estratégia de teste` (~1,1k) não está nos manifestos: a `eng-testes` lê sob demanda (`leituras_fora_manifesto`).
 
 Matriz CA → tarefa: 01 T02 · 02 T01 · 03 T02 · 04 T02 · 05 T02 · 06 T02 · 07 T02 (+T04) · 08 T03 (+T04) · 09 T03 (+T04) · 10 T03 · 11 T04 · 12 T04 · 13 T04 · 14 T04 · 15 T04 · 16 T06 · 17 T04 (+T06) · 18 T03 (+T06) · 19 T05 · 20 T05 · 21 T05 (+T06) · 22 T06 · 23 T05 · 24 T06 · 25 T08 (+prop) · 26 T07 (+prop) · 27 T08 · 28 T08 · 29 T08 · 30 T07 + T08 · 31 T07 + T08 · 32 T04 · 33 T05. Cobertura: 33 de 33.
 
@@ -66,7 +66,7 @@ Matriz CA → tarefa: 01 T02 · 02 T01 · 03 T02 · 04 T02 · 05 T02 · 06 T02 �
   - `src/domain/board.ts#L56-98` (assinaturas e recusas de `placeValue`/`eraseValue`, ~0,4k); `src/domain/result.ts` (~0,06k)
   - `src/domain/__arbitraries__/puzzle.ts` (~0,4k); `src/domain/game.notes.test.ts#L1-40` (estilo, ~0,5k)
   - Total estimado: ~6,4k tokens (medido onde o arquivo existe; projetado onde é saída de tarefa anterior)
-- **Estimativa:** tokens 60k/110k/220k · minutos 20/35/70
+- **Estimativa:** tokens 84k/154k/308k (antes: 60k/110k/220k; ×1,4 em 24/11/2026 após T01 e T02) · minutos 20/35/70
 - **Agentes:** `eng-testes` → `dev`
 
 ## T04 — Desfazer e refazer
@@ -83,7 +83,7 @@ Matriz CA → tarefa: 01 T02 · 02 T01 · 03 T02 · 04 T02 · 05 T02 · 06 T02 �
   - `src/domain/game.ts` (saída de T01 a T03, ~2,2k); `src/domain/history.ts` (~0,8k); `src/domain/result.ts` (~0,06k)
   - `src/domain/__arbitraries__/puzzle.ts` (~0,4k); `src/domain/game.values.test.ts#L1-40` (estilo, ~0,5k)
   - Total estimado: ~6,9k tokens (medido onde o arquivo existe; projetado onde é saída de tarefa anterior)
-- **Estimativa:** tokens 70k/140k/280k · minutos 25/45/90
+- **Estimativa:** tokens 98k/196k/392k (antes: 70k/140k/280k; ×1,4 em 24/11/2026 após T01 e T02) · minutos 25/45/90
 - **Agentes:** `eng-testes` → `dev`
 
 ## T05 — Estado derivado e vitória
@@ -100,7 +100,7 @@ Matriz CA → tarefa: 01 T02 · 02 T01 · 03 T02 · 04 T02 · 05 T02 · 06 T02 �
   - `src/domain/game.ts` (saída de T01 a T04, ~2,6k); `src/domain/conflicts.ts#L1-20` (~0,2k); `src/domain/result.ts` (~0,06k)
   - `src/domain/__arbitraries__/puzzle.ts` (~0,4k); `src/domain/game.history.test.ts#L1-40` (estilo, ~0,5k)
   - Total estimado: ~6,4k tokens (medido onde o arquivo existe; projetado onde é saída de tarefa anterior)
-- **Estimativa:** tokens 50k/100k/200k · minutos 20/35/70
+- **Estimativa:** tokens 70k/140k/280k (antes: 50k/100k/200k; ×1,4 em 24/11/2026 após T01 e T02) · minutos 20/35/70
 - **Agentes:** `eng-testes` → `dev`
 
 ## T06 — Propriedades e invariantes do jogo
@@ -118,7 +118,7 @@ Matriz CA → tarefa: 01 T02 · 02 T01 · 03 T02 · 04 T02 · 05 T02 · 06 T02 �
   - Assinaturas exportadas de `src/domain/game.ts`, `notes.ts` e `puzzle.ts` (`grep -n "^export"`, ~0,6k); `src/domain/__arbitraries__/board.ts#L1-30` (~0,6k) e `grid.ts` (~0,2k); `src/domain/__arbitraries__/puzzle.ts` (~0,4k)
   - `src/domain/digit.prop.test.ts` (estilo, ~0,15k)
   - Total estimado: ~4,1k tokens (medido onde o arquivo existe; projetado onde é saída de tarefa anterior)
-- **Estimativa:** tokens 40k/80k/160k · minutos 20/40/80
+- **Estimativa:** tokens 56k/112k/224k (antes: 40k/80k/160k; ×1,4 em 24/11/2026 após T01 e T02) · minutos 20/40/80
 - **Agentes:** `eng-testes` (o `dev` só entra se a propriedade achar defeito: aí a tarefa volta ao ciclo RED→GREEN do caso, com `notas.md`)
 
 ## T07 — Serializar a partida
@@ -136,7 +136,7 @@ Matriz CA → tarefa: 01 T02 · 02 T01 · 03 T02 · 04 T02 · 05 T02 · 06 T02 �
   - Assinaturas exportadas de `src/domain/game.ts`, `history.ts` e `puzzle.ts` (~0,9k)
   - `src/domain/__arbitraries__/puzzle.ts` e `moves.ts` (~0,9k); `src/domain/game.status.test.ts#L1-40` (estilo, ~0,5k)
   - Total estimado: ~5,5k tokens (medido onde o arquivo existe; projetado onde é saída de tarefa anterior)
-- **Estimativa:** tokens 40k/80k/160k · minutos 15/30/60
+- **Estimativa:** tokens 56k/112k/224k (antes: 40k/80k/160k; ×1,4 em 24/11/2026 após T01 e T02) · minutos 15/30/60
 - **Agentes:** `eng-testes` → `dev`
 
 ## T08 — Ler a partida: recusas, coerência e ida e volta
@@ -154,5 +154,5 @@ Matriz CA → tarefa: 01 T02 · 02 T01 · 03 T02 · 04 T02 · 05 T02 · 06 T02 �
   - `src/domain/serialize.ts` (saída da T07, ~0,6k); `src/domain/game.ts` (~2,6k); `src/domain/history.ts` (~0,9k); `src/domain/puzzle.ts` (~0,5k)
   - `src/domain/__arbitraries__/puzzle.ts` e `moves.ts` (~0,9k); `src/domain/serialize.test.ts#L1-40` (estilo, ~0,5k)
   - Total estimado: ~9,9k tokens (medido onde o arquivo existe; projetado onde é saída de tarefa anterior)
-- **Estimativa:** tokens 100k/200k/400k · minutos 35/60/120
+- **Estimativa:** tokens 140k/280k/560k (antes: 100k/200k/400k; ×1,4 em 24/11/2026 após T01 e T02) · minutos 35/60/120
 - **Agentes:** `eng-testes` → `dev`

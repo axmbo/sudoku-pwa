@@ -2,6 +2,12 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.5 — 23/11/2026
+
+Aprovado pelo Diretor ao fechar a T06 da spec 001 ([M-004](melhorias.md)):
+
+- Skill `implementar`, passo 2.3: um contexto por agente por tarefa. A `eng-testes` e o `dev` abrem uma vez cada e recebem os vermelhos e GREENs seguintes da mesma tarefa por `SendMessage`. Três amostras com a regra (T03–T05) fecharam entre 0,54× e 0,76× do provável; a T06, em que o orquestrador não a seguiu, fechou em 1,05×.
+
 ## v0.4 — 23/11/2026
 
 Aprovado pelo Diretor no vermelho (1) da T01 da spec 001, quando o pre-commit barrou o primeiro commit `test` de símbolo novo (TS2307 no import de `./units`):

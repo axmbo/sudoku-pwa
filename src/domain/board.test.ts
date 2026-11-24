@@ -305,3 +305,112 @@ describe('board: getConflicts', () => {
     expect(getConflicts(result.value)).toEqual([]);
   });
 });
+
+/** Grade vazia com `value` em cada `[linha, coluna]` dada. */
+const gridWith = (value: number, cells: readonly (readonly [number, number])[]): unknown[][] => {
+  const grid: unknown[][] = emptyGrid();
+  for (const [r, c] of cells) (grid[r] as unknown[])[c] = value;
+  return grid;
+};
+
+describe('board: pistas em conflito na criação', () => {
+  it('CA-001-23: recusa pistas repetidas na mesma linha, sem criar tabuleiro', () => {
+    // 5 em (4,2) e (4,8): mesma linha, colunas e blocos distintos.
+    const result = create(
+      gridWith(5, [
+        [4, 2],
+        [4, 8],
+      ]),
+    );
+
+    expect(result).toEqual({ ok: false, reason: 'conflicting-givens' });
+  });
+
+  it('CA-001-23: recusa pistas repetidas na mesma coluna, sem criar tabuleiro', () => {
+    // 7 em (1,6) e (7,6): mesma coluna, linhas e blocos distintos.
+    const result = create(
+      gridWith(7, [
+        [1, 6],
+        [7, 6],
+      ]),
+    );
+
+    expect(result).toEqual({ ok: false, reason: 'conflicting-givens' });
+  });
+
+  it('CA-001-23: recusa pistas repetidas no mesmo bloco, fora do canto e sem linha ou coluna em comum', () => {
+    // 6 em (4,3) e (5,5): bloco 4, linhas e colunas distintas, nenhuma no canto.
+    const result = create(
+      gridWith(6, [
+        [4, 3],
+        [5, 5],
+      ]),
+    );
+
+    expect(result).toEqual({ ok: false, reason: 'conflicting-givens' });
+  });
+
+  it('CA-001-23: aceita grade sem valor repetido numa unidade', () => {
+    const result = create(input);
+
+    expect(result?.ok).toBe(true);
+  });
+
+  it('CA-001-23: aceita o mesmo valor em células sem unidade em comum', () => {
+    // 4 em (0,0) e (4,4) e (8,8): linhas, colunas e blocos distintos.
+    const result = create(
+      gridWith(4, [
+        [0, 0],
+        [4, 4],
+        [8, 8],
+      ]),
+    );
+
+    expect(result?.ok).toBe(true);
+  });
+});
+
+describe('board: precedência na criação (CA-001-25)', () => {
+  const repeated = [
+    [1, 0],
+    [1, 4],
+  ] as const;
+
+  it('CA-001-25: forma errada antes das pistas repetidas ⇒ malformed-grid', () => {
+    const grid = gridWith(5, repeated);
+    grid[0] = Array.from({ length: 8 }, () => null);
+
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+
+  it('CA-001-25: forma errada depois das pistas repetidas ⇒ malformed-grid', () => {
+    const grid = gridWith(5, repeated);
+    grid[8] = Array.from({ length: 8 }, () => null);
+
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+
+  it('CA-001-25: linhas a mais depois das pistas repetidas ⇒ malformed-grid', () => {
+    const grid = gridWith(5, repeated);
+    grid.push(emptyRow());
+
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+
+  it('CA-001-25: célula de tipo inválido antes das pistas repetidas ⇒ malformed-grid', () => {
+    const grid = gridWith(5, [
+      [4, 2],
+      [4, 8],
+    ]);
+    (grid[0] as unknown[])[0] = '5';
+
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+
+  it('CA-001-25: célula de tipo inválido depois das pistas repetidas ⇒ malformed-grid', () => {
+    const grid = gridWith(5, repeated);
+    (grid[8] as unknown[])[8] = 0;
+
+    expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+});

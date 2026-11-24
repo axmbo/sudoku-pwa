@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cellAt, createBoard, getConflicts, type Board } from './board';
+import { cellAt, createBoard, getConflicts, placeValue, type Board } from './board';
 import type { Digit } from './digit';
 
 const _ = null;
@@ -412,5 +412,96 @@ describe('board: precedência na criação (CA-001-25)', () => {
     (grid[8] as unknown[])[8] = 0;
 
     expect(create(grid)).toEqual({ ok: false, reason: 'malformed-grid' });
+  });
+});
+
+/** Cria um Board a partir de uma entrada válida; falha o teste se createBoard recusar. */
+function mustCreate(grid: unknown): Board {
+  const result = createBoard(grid);
+  expect(result.ok).toBe(true);
+  if (!result.ok) throw new Error('createBoard recusou entrada válida');
+  return result.value;
+}
+
+/** Aplica `placeValue` esperando aceite; falha o teste se recusar. */
+function mustPlace(board: Board, row: number, col: number, value: number): Board {
+  const result = placeValue(board, row, col, value);
+  expect(result.ok).toBe(true);
+  if (!result.ok) throw new Error('placeValue recusou jogada válida');
+  return result.value;
+}
+
+describe('board: placeValue (caminho feliz)', () => {
+  it('CA-001-03: coloca o valor na célula vazia; só ela muda e vira célula do jogador', () => {
+    const board = mustCreate(input);
+    const snapshot = structuredClone(board);
+
+    // (4,2) = cells[38]: vazia, não é pista, sem pista na linha 4, coluna 2 nem bloco 4.
+    const next = mustPlace(board, 4, 2, 6);
+
+    expect(next.cells[38]).toEqual({ value: 6, given: false });
+    next.cells.forEach((cell, i) => {
+      if (i !== 38) expect(cell).toEqual(board.cells[i]);
+    });
+    expect(board).toEqual(snapshot);
+    expect(board.cells[38]).toEqual({ value: null, given: false });
+  });
+
+  it('CA-001-04: substitui o valor do jogador; o anterior deixa de existir', () => {
+    const board = mustCreate(input);
+    const placed = mustPlace(board, 4, 2, 6);
+    const snapshot = structuredClone(placed);
+
+    const next = mustPlace(placed, 4, 2, 2);
+
+    expect(next.cells[38]).toEqual({ value: 2, given: false });
+    expect(next.cells.some((cell) => cell.value === 6)).toBe(false);
+    next.cells.forEach((cell, i) => {
+      if (i !== 38) expect(cell).toEqual(placed.cells[i]);
+    });
+    expect(placed).toEqual(snapshot);
+  });
+
+  it.each([
+    ['linha 0, coluna 0', 0, 0, 0],
+    ['linha 0, coluna 8', 0, 8, 8],
+    ['linha 8, coluna 0', 8, 0, 72],
+    ['linha 8, coluna 8', 8, 8, 80],
+  ])('CA-001-03: aceita %s (limites da grade)', (_nome, row, col, index) => {
+    const board = mustCreate(emptyGrid());
+
+    const next = mustPlace(board, row, col, 5);
+
+    expect(next.cells[index]).toEqual({ value: 5, given: false });
+    expect(next.cells.filter((cell) => cell.value !== null).length).toBe(1);
+  });
+
+  it.each([1, 9])('CA-001-03: aceita o valor %i (limites do valor)', (value) => {
+    const board = mustCreate(emptyGrid());
+
+    const next = mustPlace(board, 3, 5, value);
+
+    // (3,5) = cells[32]
+    expect(next.cells[32]).toEqual({ value, given: false });
+    expect(next.cells.filter((cell) => cell.value !== null).length).toBe(1);
+  });
+
+  it('CA-001-03: aceita -0 como linha e como coluna (índice 0)', () => {
+    const board = mustCreate(emptyGrid());
+
+    const next = mustPlace(board, -0, -0, 5);
+
+    expect(next.cells[0]).toEqual({ value: 5, given: false });
+    expect(next.cells.filter((cell) => cell.value !== null).length).toBe(1);
+  });
+
+  it('CA-001-03: o resultado é congelado (Board, cells e cada CellState)', () => {
+    const board = mustCreate(input);
+
+    const next = mustPlace(board, 4, 2, 6);
+
+    expect(Object.isFrozen(next)).toBe(true);
+    expect(Object.isFrozen(next.cells)).toBe(true);
+    expect(next.cells.every((cell) => Object.isFrozen(cell))).toBe(true);
   });
 });

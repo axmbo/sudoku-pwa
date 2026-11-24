@@ -18,3 +18,7 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 24/11 · T03 · Sem `gameUndo`, os testes montam o refazível à mão (`{...game, cursor: 0}`, via 7b); só é verificado de verdade na T04 e na T06. Nova ocorrência de M-010.
 - 24/11 · T03 · No CA-004-10 a fixture não tinha vizinho de bloco vazio, e o teste esvazia (0,6) nas pistas. Reforça o comentário de células vazias na fixture (nota da T02).
 - 24/11 · T03 · `history.ts` não mudou: os tipos `place`/`erase`/`CellMemo` já existiam. Real pelo log 85,1k (eng-testes 47,8k, dev 37,3k) contra 154k prováveis (0,55x); avisos de uso (39,9k e 35,6k) ficam abaixo do log.
+- 24/11 · T04 · `redo` reaplica a jogada (via `placeValue`/`eraseValue`/`toggleNote`/limpar anotações); o histórico guarda só `before`, sem `after`.
+- 24/11 · T04 · M-010 de outro tipo: o RED não pediu refazer de cada tipo de jogada (só desfazer, CA-004-17); a lacuna só apareceu no Stryker (3 sobreviventes e 1 NoCoverage no `redo` de `history.ts`) e exigiu a via 7b (01276a9). Candidata a reforçar "Testes esperados" com refazer por tipo. O M-010 original (refazível montado à mão) não ocorreu: a API alcançou tudo.
+- 24/11 · T04 · A `eng-testes` incluiu teste de CA-004-18 fora da lista da T04; aceito pelo orquestrador, está no escopo do CA.
+- 24/11 · T04 · Real pelo log 88,9k (eng-testes 55,4k, dev 33,5k) contra 196k prováveis (0,45x); 3 min de relógio contra 45; Stryker `history.ts` 90,24% para 100%, `game.ts` 100%; 507 testes, branches 100%.

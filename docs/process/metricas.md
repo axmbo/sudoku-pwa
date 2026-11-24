@@ -31,4 +31,4 @@ Fonte única das definições das colunas de [metrics.csv](metrics.csv). A estim
 
 ## Qualidade
 
-`rodadas_revisao`, `achados_blocker|major|minor`, `testes_novos`, `cobertura_dominio` (% de branches em `src/domain/`) e `mutation_score` (% em `src/domain/`). Em branco quando não se aplicam.
+`rodadas_revisao`, `achados_blocker|major|minor`, `testes_novos` (delta de testes do projeto na tarefa: total depois menos total antes), `cobertura_dominio` (% de branches em `src/domain/`) e `mutation_score` (% em `src/domain/`). Em branco quando não se aplicam.

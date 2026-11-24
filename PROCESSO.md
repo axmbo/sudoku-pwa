@@ -1,6 +1,6 @@
 # Processo de engenharia — Sudoku PWA
 
-Fonte única do processo (versão **v0.5**, ver [CHANGELOG-processo](docs/process/CHANGELOG-processo.md)). Agentes, skills, `CLAUDE.md` e `CONTRIBUTING.md` detalham ou resumem e apontam para cá; não copiam. Mudança neste arquivo só via PDCA (seção 9) com aprovação do Diretor.
+Fonte única do processo (versão **v0.6**, ver [CHANGELOG-processo](docs/process/CHANGELOG-processo.md)). Agentes, skills, `CLAUDE.md` e `CONTRIBUTING.md` detalham ou resumem e apontam para cá; não copiam. Mudança neste arquivo só via PDCA (seção 9) com aprovação do Diretor.
 
 ## 1. Papéis
 
@@ -111,7 +111,7 @@ E2E só para jornadas, nunca para regra de negócio. Teste instável é **major*
 
 ### TDD (padrão) e isenções
 
-- Não fazer TDD exige isenção declarada na tarefa: `tdd: isento — <motivo>`. **Lista fechada:** spike descartável (branch `spike/*`, nunca mergeada), configuração de build/CI, ajuste puramente visual/CSS, código gerado, teste de invariante sobre estado existente sem código de produção novo (o vermelho é provado uma vez e descrito no corpo do commit). O `revisor` valida o motivo.
+- Não fazer TDD exige isenção declarada na tarefa: `tdd: isento — <motivo>`. **Lista fechada:** spike descartável (branch `spike/*`, nunca mergeada), configuração de build/CI, ajuste puramente visual/CSS, código gerado, teste de invariante sobre estado existente sem código de produção novo (o vermelho é provado uma vez e descrito no corpo do commit) e mudança só de contrato de tipo, com comportamento já coberto (vermelho do `tsc` colado no corpo; teste e produção no mesmo commit; registrada em `notas.md`). A isenção vale por tarefa, nunca pontual dentro de tarefa `tdd: sim`; a única exceção pontual é essa mudança só de contrato de tipo. O `revisor` valida o motivo.
 - **Motivo do vermelho.** O teste falha por asserção. Única exceção: o primeiro teste de um símbolo novo (função, tipo ou módulo que ainda não existe) pode falhar porque o símbolo não existe (`is not a function`, módulo não encontrado ou erro de tipo). O corpo do commit `test` declara essa exceção e cola a falha. Não há stub antes do teste: o primeiro GREEN do `dev` cria o símbolo. O pre-commit aceita esse vermelho: num commit só de testes, o `tsc` passa se todos os erros forem de símbolo inexistente (TS2305, TS2307, TS2339, TS2724) e falha em qualquer outro.
 - **Guardrails**, do mais barato ao mais caro:
   1. **Ordem dos commits:** `test(...)` com o teste falhando antes de `feat(...)`/`fix(...)`. Script de CI, só no PR e só nas tarefas não isentas (lidas de `tasks.md`), roda os testes no commit de teste esperando falha.

@@ -17,7 +17,7 @@ Fonte das regras: `PROCESSO.md` §4.
 
 ## Montar um manifesto
 1. Comece pelo que a tarefa altera (arquivos listados) e pelos testes da tarefa.
-2. Acrescente só os tipos/contratos importados, por arquivo e, se possível, por linhas (`src/domain/board.ts#L1-40`).
+2. Liste todos os tipos/contratos importados pela tarefa (ex.: `Result`, `Unit`, `CellConflict`), por arquivo e por linhas (`src/domain/board.ts#L1-40`), para o agente não ler fora do manifesto (M-009a).
 3. Da spec, só os CA cobertos (`spec.md#CA-001-02`); do plano, só a seção do módulo.
 4. Estime: ~4 caracteres por token; some e compare com **15k tokens** (sem contar L0). Passou? Corte ou divida a tarefa.
 5. Registre `ctx_inicial_est` em `metrics.csv`.

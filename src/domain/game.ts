@@ -10,7 +10,7 @@ import {
   type PlaceRefusal,
 } from './board';
 import type { CellConflict } from './conflicts';
-import type { HistoryEntry } from './history';
+import { redo, undo, type HistoryEntry } from './history';
 import { cellIndex, type Index } from './units';
 import { isDigit, type Digit } from './digit';
 import { emptyNotes, toggleNote, type Notes } from './notes';
@@ -28,6 +28,9 @@ export interface Game {
 
 export type NoteRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given' | 'cell-has-value';
 export type ClearNotesRefusal = 'cell-not-found' | 'cell-is-given';
+
+export type UndoRefusal = 'nothing-to-undo';
+export type RedoRefusal = 'nothing-to-redo';
 
 export type GameStatus = 'incomplete' | 'full-incorrect' | 'won';
 
@@ -163,6 +166,18 @@ export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, 
     before: { value: cell.value, notes: game.notes[index] as Notes },
   };
   return { ok: true, value: commit(game, entry, emptyNotes, erased.value) };
+}
+
+/** Desfaz a última jogada, restaurando valor e anotações da célula. */
+export function gameUndo(game: Game): Result<Game, UndoRefusal> {
+  const undone = undo(game);
+  return undone === null ? { ok: false, reason: 'nothing-to-undo' } : { ok: true, value: undone };
+}
+
+/** Refaz a jogada desfeita mais recentemente. */
+export function gameRedo(game: Game): Result<Game, RedoRefusal> {
+  const redone = redo(game);
+  return redone === null ? { ok: false, reason: 'nothing-to-redo' } : { ok: true, value: redone };
 }
 
 /** Jogada nova: grava tabuleiro e anotações da célula, trunca o histórico em `cursor` e acrescenta a entrada. */

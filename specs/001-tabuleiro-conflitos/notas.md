@@ -16,3 +16,4 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 23/11 · T03 · Decisão do Diretor: `ALL_UNITS`/`unitCells` sem `Object.freeze` em runtime (constante de módulo); fica como débito, pois o ADR 0007 pede estado congelado.
 - 23/11 · T03 · P2a com seed fixa 20260003 e 300 execuções.
 - 23/11 · T03 · Novidade de processo: eng-testes e dev ficaram cada um num único contexto, retomado por SendMessage entre vermelhos. Custo por vermelho caiu (eng-testes 21k na T01, 41k na T02, 12,8k na T03) → M-004. Os `subagent_tokens` do harness (29k a 51k) são o tamanho do contexto no turno, não o acumulado.
+- 23/11 · T04 · A fachada `getConflicts` não tem CA próprio: o vermelho 1 cita o CA-001-09 (conflito em linha), que a T03 cobre em `conflicts.ts`. Rastreabilidade só indireta; o plan.md já lista a fachada, sem ação.

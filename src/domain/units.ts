@@ -12,3 +12,10 @@ export interface Unit {
 export function cellIndex(row: number, col: number): number {
   return row * 9 + col;
 }
+
+const INDEXES: readonly Index[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+/** As 27 unidades em ordem fixa: 9 linhas, 9 colunas, 9 blocos. */
+export const ALL_UNITS: readonly Unit[] = (['row', 'column', 'box'] as const).flatMap((kind) =>
+  INDEXES.map((index) => ({ kind, index })),
+);

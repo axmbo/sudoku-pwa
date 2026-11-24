@@ -1,6 +1,7 @@
 import { createBoard, getConflicts, type Board } from './board';
 import type { CellConflict } from './conflicts';
 import type { HistoryEntry } from './history';
+import { cellIndex, type Index } from './units';
 import { emptyNotes, type Notes } from './notes';
 import { createPuzzle, type Puzzle, type PuzzleRefusal } from './puzzle';
 import type { Result } from './result';
@@ -45,4 +46,8 @@ export function canUndo(game: Game): boolean {
 
 export function canRedo(game: Game): boolean {
   return game.cursor < game.history.length;
+}
+
+export function notesAt(game: Game, row: Index, col: Index): Notes {
+  return game.notes[cellIndex(row, col)] as Notes;
 }

@@ -36,12 +36,12 @@ describe('game (valores)', () => {
     expect(cellAt(result.value.board, 2, 7)).toEqual({ value: 9, given: false });
     expect(notesAt(result.value, 2, 7)).toEqual([]);
     expect(notesAt(result.value, 3, 3)).toEqual([4]);
-    expect(result.value.history).toHaveLength(3);
-    expect(result.value.history[2]).toEqual({
+    expect(result.value.history).toHaveLength(4);
+    expect(result.value.history[3]).toEqual({
       move: { kind: 'place', index: 2 * 9 + 7, digit: 9 },
       before: { value: null, notes: [2, 9] },
     });
-    expect(result.value.cursor).toBe(3);
+    expect(result.value.cursor).toBe(4);
   });
 
   it('CA-004-09: apagar o valor de (2,7), colocado após limpar as anotações, deixa a célula vazia e sem anotações', () => {

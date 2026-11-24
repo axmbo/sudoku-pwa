@@ -63,15 +63,18 @@ export function getConflicts(board: Board): readonly CellConflict[] {
   return findConflicts(board.cells.map((cell) => cell.value));
 }
 
-export type PlaceRefusal = 'cell-is-given';
+export type PlaceRefusal = 'invalid-value' | 'cell-is-given';
 
-/** Coloca `value` na célula (`row`, `col`); recusa pista (demais recusas: T06 seguintes). */
+/** Coloca `value` na célula (`row`, `col`); recusa valor inválido e pista (demais recusas: T06 seguintes). */
 export function placeValue(
   board: Board,
   row: number,
   col: number,
   value: number,
 ): Result<Board, PlaceRefusal> {
+  if (!isDigit(value)) {
+    return { ok: false, reason: 'invalid-value' };
+  }
   if (isGivenAt(board, row, col)) {
     return { ok: false, reason: 'cell-is-given' };
   }

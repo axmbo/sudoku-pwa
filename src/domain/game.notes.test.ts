@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { placeValue } from './board';
 import { solutionGrid, validPuzzleInput } from './__arbitraries__/puzzle';
-import { createGame, gameClearNotes, gameToggleNote, notesAt, type Game } from './game';
+import {
+  createGame,
+  gameClearNotes,
+  gameToggleNote,
+  getGameConflicts,
+  notesAt,
+  type Game,
+} from './game';
 import type { Notes } from './notes';
 
 const newGame = (): Game => {
@@ -177,5 +184,35 @@ describe('game (anotações)', () => {
     if (!accepted.ok) return;
     expect(notesAt(accepted.value, 0, 0)).toEqual([4]);
     expect(gameToggleNote(game, 0, 0, raw(-0))).toEqual({ ok: false, reason: 'invalid-value' });
+  });
+  it('CA-004-06: anotar o 5 em (0,0) com o 5 já na linha (0,4) é aceito e getGameConflicts não muda', () => {
+    const game = newGame();
+    expect(game.board.cells[0 * 9 + 4]).toEqual({ value: 5, given: true });
+    const conflictsBefore = getGameConflicts(game);
+
+    const result = gameToggleNote(game, 0, 0, 5);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(notesAt(result.value, 0, 0)).toEqual([5]);
+    expect(getGameConflicts(result.value)).toEqual(conflictsBefore);
+  });
+
+  it('INV: precedência de recusas cell-not-found > invalid-value > cell-is-given > cell-has-value (CA-004-03, 04, 05)', () => {
+    const game = newGame();
+    const placed = placeValue(game.board, 2, 7, solutionGrid[2]?.[7]);
+    if (!placed.ok) throw new Error('fixture inválida');
+    const withValue: Game = { ...game, board: placed.value };
+
+    // posição inválida e dígito inválido: vence cell-not-found
+    expect(gameToggleNote(game, 9, 7, 0)).toEqual({ ok: false, reason: 'cell-not-found' });
+    // pista e dígito inválido: vence invalid-value
+    expect(gameToggleNote(game, 2, 0, 0)).toEqual({ ok: false, reason: 'invalid-value' });
+    // célula com valor e dígito inválido: vence invalid-value
+    expect(gameToggleNote(withValue, 2, 7, 0)).toEqual({ ok: false, reason: 'invalid-value' });
+    // pista tem valor: vence cell-is-given sobre cell-has-value
+    expect(gameToggleNote(game, 2, 0, 5)).toEqual({ ok: false, reason: 'cell-is-given' });
+    // em gameClearNotes, posição inválida vence também
+    expect(gameClearNotes(game, 9, 0)).toEqual({ ok: false, reason: 'cell-not-found' });
   });
 });

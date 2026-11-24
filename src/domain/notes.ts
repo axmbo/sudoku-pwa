@@ -6,5 +6,6 @@ export type Notes = readonly Digit[];
 export const emptyNotes: Notes = Object.freeze([]) as Notes;
 
 export function toggleNote(notes: Notes, digit: Digit): Notes {
-  return Object.freeze([...notes, digit].sort((a, b) => a - b)) as Notes;
+  const next = notes.includes(digit) ? notes.filter((d) => d !== digit) : [...notes, digit];
+  return Object.freeze(next.sort((a, b) => a - b)) as Notes;
 }

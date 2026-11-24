@@ -2,6 +2,17 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.6 — 24/11/2026
+
+Aprovado pelo Diretor na `/retro 001` ([ciclo-01](retro/ciclo-01.md); candidatas em [melhorias.md](melhorias.md)):
+
+- M-003 (ampliada), agente `eng-testes`: retorno e corpo do commit de teste com `total N / falham F / passam P` e a falha do vermelho colada (3 de 7 tarefas ficaram sem).
+- M-005, `PROCESSO.md` §6: a lista fechada ganha "mudança só de contrato de tipo, com comportamento já coberto"; a regra do v0.3 (isenção só por tarefa) ganha essa única exceção pontual. O `tsc-red-filter` não muda.
+- M-006, skill `implementar`: antes de propor exceção a regra, buscar em `PROCESSO.md` e no CHANGELOG e citar a regra conflitante.
+- M-007, skill `revisar` (passo 6): `estado.md` atualizado antes de abrir o PR.
+- M-008, `metricas.md`: `testes_novos` = delta de testes do projeto na tarefa; o agente `eng-testes` aponta para lá.
+- M-009 (a), skill `gestao-contexto`: o manifesto lista os contratos importados com linhas.
+
 ## v0.5 — 23/11/2026
 
 Aprovado pelo Diretor ao fechar a T06 da spec 001 ([M-004](melhorias.md)):

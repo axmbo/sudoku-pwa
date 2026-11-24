@@ -18,4 +18,20 @@ describe('puzzle', () => {
     expect(Object.isFrozen(result.value.solution)).toBe(true);
     expect(Object.isFrozen(result.value.solution[2])).toBe(true);
   });
+
+  const withoutField = (field: string): unknown =>
+    Object.fromEntries(Object.entries(validPuzzleInput()).filter(([key]) => key !== field));
+
+  it.each([
+    ['givens ausente', withoutField('givens')],
+    ['solution ausente', withoutField('solution')],
+    ['difficulty ausente', withoutField('difficulty')],
+    ['seed ausente', withoutField('seed')],
+    ['generatorVersion ausente', withoutField('generatorVersion')],
+    ['seed vazia', { ...validPuzzleInput(), seed: '' }],
+    ['generatorVersion 0', { ...validPuzzleInput(), generatorVersion: 0 }],
+    ['generatorVersion 1,5', { ...validPuzzleInput(), generatorVersion: 1.5 }],
+  ])('INV: recusa malformed-puzzle quando %s', (_name, input) => {
+    expect(createPuzzle(input)).toEqual({ ok: false, reason: 'malformed-puzzle' });
+  });
 });

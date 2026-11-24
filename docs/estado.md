@@ -5,7 +5,8 @@
 - **Fase:** 1 (domínio e primeira UI). Fase 0 encerrada no [PR #1](https://github.com/axmbo/sudoku-pwa/pull/1) (23/11/2026, `8b5b40e`; 1,73M tokens, 1,75× o provável). Regras vivas: `PROCESSO.md` v0.6.
 - **Spec 001 concluída e arquivada (24/11/2026):** [PR #2](https://github.com/axmbo/sudoku-pwa/pull/2) mergeado; 25 CA, 390 testes, cobertura e Stryker 100% no domínio. Ponto de leitura: [RESUMO](../specs/_arquivo/001-tabuleiro-conflitos/RESUMO.md); detalhe em `specs/_arquivo/001-tabuleiro-conflitos/` ([notas](../specs/_arquivo/001-tabuleiro-conflitos/notas.md), `revisao-r1.md`, `revisao-r2.md`). [ADR 0007](adr/0007-convencoes-do-dominio.md) aceito.
 - **Retro do ciclo 01 feita (24/11/2026):** [ciclo-01](process/retro/ciclo-01.md); real das 7 tarefas 836,9k de subagentes contra 900k prováveis (0,93×). Promovidas no v0.6 (24/11/2026): M-003, M-005 a M-008, M-009(a); candidatas: M-001, M-002, M-009(b), em [melhorias.md](process/melhorias.md). Ciclo 01 não é múltiplo de 3: sem revisão estrutural (próxima no ciclo 03).
-- **Próximo:** `/especificar 004`, seguida da 005 (primeiro rodável). [PR #6](https://github.com/axmbo/sudoku-pwa/pull/6) (retro e v0.6) mergeado em 24/11/2026; começar em sessão nova (`/clear` + `/retomar`), para valer o agente `eng-testes` do v0.6.
+- **Spec ativa: 004 aprovada (24/11/2026)**, branch `feat/004-estado-de-jogo`, issue [#14](https://github.com/axmbo/sudoku-pwa/issues/14): [spec](../specs/004-estado-de-jogo/spec.md), 33 CA. O `produto-ux` sugere dividir em 004a (jogo) e 004b (serialização) se o plano passar de 8 tarefas: decidir no `/planejar`.
+- **Próximo:** `/planejar 004`, depois a 005 (primeiro rodável).
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o hook do `dev` bloqueia arquivo de teste (provado em 22/11/2026).
 
 ## Decisões do Diretor (22/11/2026 a 24/11/2026)
@@ -18,6 +19,7 @@
 6. Minors aceitos viram issues `débito` no GitHub; aqui fica só o índice.
 7. `board.test.ts` (~8,2k tokens) será dividido por operação antes de crescer, tarefa futura.
 8. Depois da 001, segue 004 e depois 005 (primeiro rodável), com puzzle fixo até a 003; 002 e 003 depois (24/11/2026; [plano](process/plano-fase-1.md)).
+9. Spec 004 (24/11/2026): anotações dos vizinhos ficam ao colocar valor; desfazer é por ação; após a vitória tudo é recusado; sem conferir contra a solução antes da grade cheia; o jogo gravado leva o histórico completo.
 
 ## Pendências do Diretor
 

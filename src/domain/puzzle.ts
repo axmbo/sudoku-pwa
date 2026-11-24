@@ -1,3 +1,4 @@
+import { findConflicts } from './conflicts';
 import { flattenGrid, type Grid } from './board';
 import type { Result } from './result';
 
@@ -25,8 +26,9 @@ export function createPuzzle(input: unknown): Result<Puzzle, PuzzleRefusal> {
     return { ok: false, reason: 'malformed-puzzle' };
   }
   const { givens, solution, difficulty, seed, generatorVersion } = input as Record<string, unknown>;
+  const givenValues = flattenGrid(givens);
   if (
-    flattenGrid(givens) === null ||
+    givenValues === null ||
     flattenGrid(solution) === null ||
     !isNonEmptyString(difficulty) ||
     !isNonEmptyString(seed) ||
@@ -34,6 +36,9 @@ export function createPuzzle(input: unknown): Result<Puzzle, PuzzleRefusal> {
     (generatorVersion as number) < 1
   ) {
     return { ok: false, reason: 'malformed-puzzle' };
+  }
+  if (findConflicts(givenValues).length > 0) {
+    return { ok: false, reason: 'conflicting-givens' };
   }
   return {
     ok: true,

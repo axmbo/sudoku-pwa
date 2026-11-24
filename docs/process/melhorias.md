@@ -77,6 +77,12 @@ Formato:
 - Lugar de promoção: skill `pdca` e skill `gestao-contexto`
 - Estado: **promovida** em 24/11/2026 (v0.6) só a parte (a), à skill `gestao-contexto`; parte (b) (`min_est` pela vazão) segue candidata, uma amostra só, reavaliar após a 004
 
+## M-010 — Prever a via 7b no template de tasks.md para mutantes (ciclo 02, 24/11/2026)
+- Lição: na T01 da 004, mutantes sobreviventes em `canUndo`/`canRedo` só se mataram com `Game` montado à mão, num `test` isolado nascido verde (via 7b, commit 51b359e, aceito pelo Diretor em 24/11/2026); a tarefa era `tdd: sim` e não declarava isso. Origem: `specs/004-estado-de-jogo/notas.md`, descoberta 3.
+- Proposta (diff): `specs/_templates/tasks.md` ganha, por tarefa, campo opcional "via 7b para mutantes: sim/não (estado ainda não alcançável pela API; `Game` montado à mão)".
+- Lugar de promoção: `specs/_templates/tasks.md` (e `PROCESSO.md` §6 se citar a via)
+- Estado: **candidata**, aguardando aprovação do Diretor
+
 ## M-011 — Interação com o Diretor e comando `/prosseguir` (ciclo 02, 24/11/2026)
 - Lição: na T05 da 004, perguntas chegavam ao Diretor com subagentes ainda rodando (saída nova enquanto ele respondia) e em todos os níveis, inclusive detalhe de teste, sem contexto suficiente. Retomar exigia `/clear`, `/retomar` e saber qual era a próxima etapa.
 - Proposta (diff): `PROCESSO.md` §1 ganha "Interação com o Diretor" (pergunta só com tudo parado; só decisão de Diretor sobe; relatório gerencial; complexa uma por vez). Skill nova `/prosseguir` executa a etapa da linha **Próximo** do `estado.md`, que passa a trazer um único comando. O `/clear` continua manual (a skill não o dispara).

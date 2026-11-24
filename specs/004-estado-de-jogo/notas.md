@@ -7,3 +7,4 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 24/11 · T01 · Mutantes sobreviventes em `canUndo`/`canRedo` (só a partida nova os cobria) foram mortos no commit 51b359e, nascido verde num `test` isolado pela via 7b (precedente 206ba3e da 001), com `Game` montado à mão. A T01 é `tdd: sim` e não declarava isso. Ajuste possível no template de tasks: prever a via 7b para mutantes quando o estado ainda não é alcançável pela API.
 - 24/11 · T01 · `createPuzzle` valida `input` não objeto e forma 9x9 de `Digit | null`; `null` na solution é `invalid-solution`, não `malformed-puzzle`.
 - 24/11 · T01 · A assinatura `toggleNote(notes, digit)`/`emptyNotes` foi assumida pela eng-testes e conferida com o plano.
+- 24/11 · T01 · O Diretor aceitou o commit 51b359e pela via 7b (24/11/2026); melhoria registrada como M-010 (candidata).

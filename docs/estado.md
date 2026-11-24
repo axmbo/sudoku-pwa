@@ -25,8 +25,9 @@
 
 ## Pendências do Diretor
 
-1. Candidatas que seguem: M-001, M-002 e M-009(b) (reavaliar após a 004).
-2. Proteção da `main` + regra de quem cria tags `v*` (adiada em 23/11/2026: "depois").
+1. Candidatas que seguem: M-001, M-002, M-009(b) e M-010 (7b no template de tasks); reavaliar após a 004.
+2. Reavaliar a âncora de estimativa da 004 depois da T02 (T01 saiu 1,43× o provável).
+3. Proteção da `main` + regra de quem cria tags `v*` (adiada em 23/11/2026: "depois").
 
 ## Débitos
 

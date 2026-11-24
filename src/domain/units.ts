@@ -19,3 +19,14 @@ const INDEXES: readonly Index[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 export const ALL_UNITS: readonly Unit[] = (['row', 'column', 'box'] as const).flatMap((kind) =>
   INDEXES.map((index) => ({ kind, index })),
 );
+
+/** Índices (0–80) das 9 células da unidade, em ordem crescente. */
+export function unitCells({ kind, index }: Unit): readonly number[] {
+  return INDEXES.map((offset) => {
+    if (kind === 'row') return cellIndex(index, offset);
+    if (kind === 'column') return cellIndex(offset, index);
+    const row = Math.floor(index / 3) * 3 + Math.floor(offset / 3);
+    const col = (index % 3) * 3 + (offset % 3);
+    return cellIndex(row, col);
+  });
+}

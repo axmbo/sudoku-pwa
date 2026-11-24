@@ -239,4 +239,42 @@ describe('game (desfazer e refazer)', () => {
     expect(cellAt(result.value.board, 2, 7)).toEqual({ value: 9, given: false });
     expect(notesAt(result.value, 2, 7)).toEqual([]);
   });
+
+  describe('CA-004-12: refazer cobre todos os tipos de jogada', () => {
+    it('CA-004-12: refazer erase tira o valor de novo', () => {
+      const game = must(gameErase(must(gamePlace(newGame(), 2, 7, 6)), 2, 7));
+
+      const result = gameRedo(must(gameUndo(game)));
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toEqual(game);
+      expect(cellAt(result.value.board, 2, 7)).toEqual({ value: null, given: false });
+    });
+
+    it('CA-004-12: refazer clear-notes esvazia as três anotações', () => {
+      let game = newGame();
+      for (const d of [2, 5, 7] as const) game = must(gameToggleNote(game, 2, 7, d));
+      game = must(gameClearNotes(game, 2, 7));
+
+      const result = gameRedo(must(gameUndo(game)));
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toEqual(game);
+      expect(notesAt(result.value, 2, 7)).toEqual([]);
+    });
+
+    it('CA-004-12: refazer toggle-note devolve só aquela anotação, mantendo as outras', () => {
+      let game = newGame();
+      for (const d of [2, 5, 8] as const) game = must(gameToggleNote(game, 2, 7, d));
+
+      const result = gameRedo(must(gameUndo(game)));
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toEqual(game);
+      expect(notesAt(result.value, 2, 7)).toEqual([2, 5, 8]);
+    });
+  });
 });

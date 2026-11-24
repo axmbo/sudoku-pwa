@@ -16,6 +16,9 @@ export interface Game {
   readonly cursor: number;
 }
 
+export type NoteRefusal = 'cell-is-given';
+export type ClearNotesRefusal = 'cell-is-given';
+
 export type GameStatus = 'incomplete' | 'full-incorrect' | 'won';
 
 export function createGame(input: unknown): Result<Game, PuzzleRefusal> {
@@ -59,7 +62,10 @@ export function gameToggleNote(
   row: Index,
   col: Index,
   digit: Digit,
-): Result<Game, never> {
+): Result<Game, NoteRefusal> {
+  if (cellAt(game.board, row, col).given) {
+    return { ok: false, reason: 'cell-is-given' };
+  }
   const index = cellIndex(row, col);
   const current = game.notes[index] as Notes;
   const entry: HistoryEntry = {
@@ -70,7 +76,14 @@ export function gameToggleNote(
 }
 
 /** Esvazia as anotações da célula (row, col); sem anotações, não há efeito. */
-export function gameClearNotes(game: Game, row: Index, col: Index): Result<Game, never> {
+export function gameClearNotes(
+  game: Game,
+  row: Index,
+  col: Index,
+): Result<Game, ClearNotesRefusal> {
+  if (cellAt(game.board, row, col).given) {
+    return { ok: false, reason: 'cell-is-given' };
+  }
   const index = cellIndex(row, col);
   const current = game.notes[index] as Notes;
   if (current.length === 0) {

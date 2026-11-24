@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { createBoard } from './board';
 import { givensGrid, validPuzzleInput } from './__arbitraries__/puzzle';
 import { canRedo, canUndo, createGame, getGameConflicts, notesAt, type Game } from './game';
-import type { Notes } from './notes';
+import type { HistoryEntry } from './history';
+import { emptyNotes, type Notes } from './notes';
 
 describe('game (criação)', () => {
   it('INV: createGame devolve Game com cursor 0, history vazio, 81 anotações vazias e board com as pistas', () => {
@@ -59,4 +60,25 @@ describe('game (criação)', () => {
     // [símbolo novo: `notesAt`]
     expect(notesAt(newGame(), row, col)).toEqual([]);
   });
+
+  const entry = (index: number): HistoryEntry => ({
+    move: { kind: 'place', index, digit: 5 },
+    before: { value: null, notes: emptyNotes },
+  });
+
+  it.each([
+    ['cursor 0 com 1 jogada (nada a desfazer, uma a refazer)', 1, 0, false, true],
+    ['cursor 1 com 1 jogada (uma a desfazer, nada a refazer)', 1, 1, true, false],
+    ['cursor 1 com 2 jogadas (ambos possíveis)', 2, 1, true, true],
+    ['cursor 2 com 2 jogadas (só desfazer)', 2, 2, true, false],
+  ])(
+    'INV: canUndo e canRedo seguem o cursor: %s',
+    (_name, length, cursor, expectedUndo, expectedRedo) => {
+      const history = [entry(25), entry(65)].slice(0, length);
+      const game: Game = { ...newGame(), history, cursor };
+
+      expect(canUndo(game)).toBe(expectedUndo);
+      expect(canRedo(game)).toBe(expectedRedo);
+    },
+  );
 });

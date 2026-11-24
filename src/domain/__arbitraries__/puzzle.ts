@@ -28,3 +28,13 @@ export function validPuzzleInput(): {
     generatorVersion: 1,
   };
 }
+
+/** Entrada de `createPuzzle` com uma única célula não pista vazia, em (row, col). */
+export function almostSolvedInput(row: number, col: number): ReturnType<typeof validPuzzleInput> {
+  return {
+    ...validPuzzleInput(),
+    givens: solutionGrid.map((line, r) =>
+      line.map((value, c) => (r === row && c === col ? null : value)),
+    ),
+  };
+}

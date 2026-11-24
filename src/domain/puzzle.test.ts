@@ -34,4 +34,48 @@ describe('puzzle', () => {
   ])('INV: recusa malformed-puzzle quando %s', (_name, input) => {
     expect(createPuzzle(input)).toEqual({ ok: false, reason: 'malformed-puzzle' });
   });
+
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['número', 42],
+    ['texto', 'puzzle'],
+    ['array', []],
+  ])('INV: recusa malformed-puzzle (sem lançar) quando a entrada é %s', (_name, input) => {
+    expect(createPuzzle(input)).toEqual({ ok: false, reason: 'malformed-puzzle' });
+  });
+
+  const gridWith = (edit: (rows: unknown[][]) => void): unknown => {
+    const rows = validPuzzleInput().solution.map((row) => [...row]);
+    edit(rows);
+    return rows;
+  };
+
+  const badGrids: [string, unknown][] = [
+    ['com 8 linhas', gridWith((rows) => rows.pop())],
+    ['com 10 linhas', gridWith((rows) => rows.push([...(rows[0] ?? [])]))],
+    ['com uma linha de 8 colunas', gridWith((rows) => rows[2]?.pop())],
+    ['com uma linha de 10 colunas', gridWith((rows) => rows[2]?.push(1))],
+    ['com uma linha que não é array', gridWith((rows) => rows.splice(2, 1, 'abcdefghi' as never))],
+    ['com célula 10 em (2,7)', gridWith((rows) => rows[2]?.splice(7, 1, 10))],
+    ['com célula 0 em (2,7)', gridWith((rows) => rows[2]?.splice(7, 1, 0))],
+    ['com célula -1 em (2,7)', gridWith((rows) => rows[2]?.splice(7, 1, -1))],
+    ['com célula 1,5 em (2,7)', gridWith((rows) => rows[2]?.splice(7, 1, 1.5))],
+    ['com célula "5" (texto) em (2,7)', gridWith((rows) => rows[2]?.splice(7, 1, '5'))],
+    ['com célula undefined em (2,7)', gridWith((rows) => rows[2]?.splice(7, 1, undefined))],
+  ];
+
+  it.each(badGrids)('INV: recusa malformed-puzzle quando givens vem %s', (_name, givens) => {
+    expect(createPuzzle({ ...validPuzzleInput(), givens })).toEqual({
+      ok: false,
+      reason: 'malformed-puzzle',
+    });
+  });
+
+  it.each(badGrids)('INV: recusa malformed-puzzle quando solution vem %s', (_name, solution) => {
+    expect(createPuzzle({ ...validPuzzleInput(), solution })).toEqual({
+      ok: false,
+      reason: 'malformed-puzzle',
+    });
+  });
 });

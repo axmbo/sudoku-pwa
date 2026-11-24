@@ -15,4 +15,16 @@ describe('notes', () => {
 
     expect(toggleNote(withNotes, 2)).toEqual([4, 7]);
   });
+
+  it('CA-004-02: o resultado é congelado e a entrada não é mutada', () => {
+    const before = toggleNote(toggleNote(emptyNotes, 7), 2);
+
+    const inserted = toggleNote(before, 4);
+    const removed = toggleNote(before, 2);
+
+    expect(before).toEqual([2, 7]);
+    expect(Object.isFrozen(inserted)).toBe(true);
+    expect(Object.isFrozen(removed)).toBe(true);
+    expect(Object.isFrozen(toggleNote(emptyNotes, 5))).toBe(true);
+  });
 });

@@ -20,3 +20,6 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 23/11 · T05 · `placeValue` e `eraseValue` retornam `Result<Board, never>` provisório; a T06 troca pelo tipo de recusa (CA-07, 08, 16, 20, 21, 24, 25).
 - 23/11 · T05 · Commitlint avisou `footer-leading-blank` no `adf4dac` (corpo do vermelho); o aviso não se repetiu nos demais commits.
 - 23/11 · T05 · Cinco leituras fora do manifesto: eng-testes leu `conflicts.ts` e `units.ts` (formato de `CellConflict`/`Unit`); dev leu `result.ts` (tipo `Result`), `package.json` e `stryker.config.json` (comando do Stryker). Sugere incluir esses contratos nos manifestos de T06/T07.
+- 23/11 · T07 · P4 (igualdade entre caminhos) não matava o mutante "getConflicts ignora pistas", porque os dois caminhos erram igual; a propriedade ganhou comparação com o oráculo de P2.
+- 23/11 · T07 · `numRuns` reduzidos (P2 100, P3 150, P4 100): com P3 em 500, o dry-run do Stryker estourou 5 s.
+- 23/11 · T07 · Nit/débito: o script de mutação é `npm run test:mut`, mas `tasks.md` diz `npm run mutation`; registrado aqui, sem editar `tasks.md`.

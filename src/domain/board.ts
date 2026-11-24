@@ -63,19 +63,33 @@ export function getConflicts(board: Board): readonly CellConflict[] {
   return findConflicts(board.cells.map((cell) => cell.value));
 }
 
-/** Coloca `value` na célula (`row`, `col`); só o caminho feliz (recusas: T06). */
+export type PlaceRefusal = 'cell-is-given';
+
+/** Coloca `value` na célula (`row`, `col`); recusa pista (demais recusas: T06 seguintes). */
 export function placeValue(
   board: Board,
   row: number,
   col: number,
   value: number,
-): Result<Board, never> {
+): Result<Board, PlaceRefusal> {
+  if (isGivenAt(board, row, col)) {
+    return { ok: false, reason: 'cell-is-given' };
+  }
   return { ok: true, value: replaceCell(board, row, col, value as Digit) };
 }
 
-/** Apaga o valor da célula (`row`, `col`); só o caminho feliz (recusas: T06). */
-export function eraseValue(board: Board, row: number, col: number): Result<Board, never> {
+export type EraseRefusal = 'cell-is-given';
+
+/** Apaga o valor da célula (`row`, `col`); recusa pista (demais recusas: T06 seguintes). */
+export function eraseValue(board: Board, row: number, col: number): Result<Board, EraseRefusal> {
+  if (isGivenAt(board, row, col)) {
+    return { ok: false, reason: 'cell-is-given' };
+  }
   return { ok: true, value: replaceCell(board, row, col, null) };
+}
+
+function isGivenAt(board: Board, row: number, col: number): boolean {
+  return (board.cells[row * 9 + col] as CellState).given;
 }
 
 /** Novo `Board` congelado com só a célula alvo trocada por uma do jogador. */

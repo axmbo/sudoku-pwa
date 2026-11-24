@@ -620,7 +620,12 @@ type PlaceResult = ReturnType<typeof placeValue>;
 type EraseResult = ReturnType<typeof eraseValue>;
 
 /** Captura `placeValue` sem lançar, para a falha ser de asserção (regra 10 das regras de teste). */
-function tryPlace(board: Board, row: number, col: number, value: number): PlaceResult | undefined {
+function tryPlace(
+  board: Board,
+  row: unknown,
+  col: unknown,
+  value: unknown,
+): PlaceResult | undefined {
   let result: PlaceResult | undefined;
   expect(() => {
     result = placeValue(board, row, col, value);
@@ -629,7 +634,7 @@ function tryPlace(board: Board, row: number, col: number, value: number): PlaceR
 }
 
 /** Captura `eraseValue` sem lançar. */
-function tryErase(board: Board, row: number, col: number): EraseResult | undefined {
+function tryErase(board: Board, row: unknown, col: unknown): EraseResult | undefined {
   let result: EraseResult | undefined;
   expect(() => {
     result = eraseValue(board, row, col);
@@ -710,9 +715,6 @@ describe('board: recusa em pista (cell-is-given)', () => {
   });
 });
 
-/** Valor fora do tipo `number`, só para exercitar a entrada suja em runtime. */
-const dirty = (value: unknown): number => value as number;
-
 describe('board: valor inválido ao colocar (invalid-value)', () => {
   const invalidValues: readonly [string, unknown][] = [
     ['0', 0],
@@ -738,7 +740,7 @@ describe('board: valor inválido ao colocar (invalid-value)', () => {
     (_nome, value) => {
       const board = mustCreate(input);
 
-      const result = tryPlace(board, 4, 6, dirty(value));
+      const result = tryPlace(board, 4, 6, value);
 
       expect(result).toStrictEqual({ ok: false, reason: 'invalid-value' });
       expect(board.cells[42]).toEqual({ value: null, given: false });
@@ -751,7 +753,7 @@ describe('board: valor inválido ao colocar (invalid-value)', () => {
       // (2,1) = cells[19] com 5 do jogador.
       const board = mustPlace(mustCreate(input), 2, 1, 5);
 
-      const result = tryPlace(board, 2, 1, dirty(value));
+      const result = tryPlace(board, 2, 1, value);
 
       expect(result).toStrictEqual({ ok: false, reason: 'invalid-value' });
       expect(board.cells[19]).toEqual({ value: 5, given: false });
@@ -808,7 +810,7 @@ describe('board: célula fora da grade (cell-not-found)', () => {
   it.each(invalidCoords)(
     'CA-001-21: linha %s é recusada com cell-not-found em placeValue',
     (_nome, row) => {
-      const result = tryPlace(mustCreate(input), dirty(row), 6, 7);
+      const result = tryPlace(mustCreate(input), row, 6, 7);
 
       expect(result).toStrictEqual(notFound);
     },
@@ -817,7 +819,7 @@ describe('board: célula fora da grade (cell-not-found)', () => {
   it.each(invalidCoords)(
     'CA-001-21: coluna %s é recusada com cell-not-found em placeValue',
     (_nome, col) => {
-      const result = tryPlace(mustCreate(input), 4, dirty(col), 7);
+      const result = tryPlace(mustCreate(input), 4, col, 7);
 
       expect(result).toStrictEqual(notFound);
     },
@@ -826,7 +828,7 @@ describe('board: célula fora da grade (cell-not-found)', () => {
   it.each(invalidCoords)(
     'CA-001-21: linha %s é recusada com cell-not-found em eraseValue',
     (_nome, row) => {
-      const result = tryErase(mustCreate(input), dirty(row), 6);
+      const result = tryErase(mustCreate(input), row, 6);
 
       expect(result).toStrictEqual(notFound);
     },
@@ -835,7 +837,7 @@ describe('board: célula fora da grade (cell-not-found)', () => {
   it.each(invalidCoords)(
     'CA-001-21: coluna %s é recusada com cell-not-found em eraseValue',
     (_nome, col) => {
-      const result = tryErase(mustCreate(input), 4, dirty(col));
+      const result = tryErase(mustCreate(input), 4, col);
 
       expect(result).toStrictEqual(notFound);
     },
@@ -931,7 +933,7 @@ describe('board: célula fora da grade (cell-not-found)', () => {
 
     expect(() => placeValue(board, 8, 9, 6)).not.toThrow();
     expect(() => eraseValue(board, 8, 9)).not.toThrow();
-    expect(() => placeValue(board, dirty({}), dirty(null), 6)).not.toThrow();
+    expect(() => placeValue(board, {}, null, 6)).not.toThrow();
   });
 });
 

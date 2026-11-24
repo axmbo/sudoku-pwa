@@ -1,4 +1,4 @@
-import { createBoard, getConflicts, type Board } from './board';
+import { cellAt, createBoard, getConflicts, type Board } from './board';
 import type { CellConflict } from './conflicts';
 import type { HistoryEntry } from './history';
 import { cellIndex, type Index } from './units';
@@ -65,4 +65,27 @@ export function gameToggleNote(
     i === index ? toggleNote(current, digit) : current,
   );
   return { ok: true, value: Object.freeze({ ...game, notes: Object.freeze(notes) }) };
+}
+
+/** Esvazia as anotações da célula (row, col); sem anotações, não há efeito. */
+export function gameClearNotes(game: Game, row: Index, col: Index): Result<Game, never> {
+  const index = cellIndex(row, col);
+  const current = game.notes[index] as Notes;
+  if (current.length === 0) {
+    return { ok: true, value: game };
+  }
+  const entry: HistoryEntry = {
+    move: { kind: 'clear-notes', index },
+    before: { value: cellAt(game.board, row, col).value, notes: current },
+  };
+  const notes = game.notes.map((existing, i) => (i === index ? emptyNotes : existing));
+  return {
+    ok: true,
+    value: Object.freeze({
+      ...game,
+      notes: Object.freeze(notes),
+      history: Object.freeze([...game.history.slice(0, game.cursor), entry]),
+      cursor: game.cursor + 1,
+    }),
+  };
 }

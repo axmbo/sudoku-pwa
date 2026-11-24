@@ -82,7 +82,7 @@ A spec 001 entrega o tabuleiro com valores e conflitos, mas o jogador ainda não
 ### Desfazer e refazer
 
 - **CA-004-11** — Desfazer a última jogada
-  - Dado uma partida com ao menos uma jogada no histórico
+  - Dado uma partida não vencida (em partida vencida, ver CA-004-23) com ao menos uma jogada no histórico
   - Quando o jogador desfaz
   - Então o estado volta exatamente ao de antes da última jogada (valores e anotações) e a jogada passa a poder ser refeita.
 
@@ -107,12 +107,12 @@ A spec 001 entrega o tabuleiro com valores e conflitos, mas o jogador ainda não
   - Então não há mais nada a refazer.
 
 - **CA-004-16** — Desfazer e refazer em sequência longa
-  - Dado uma partida com 500 jogadas válidas
+  - Dado uma partida com 500 jogadas válidas, nenhuma das quais a vence (partida vencida: ver CA-004-23)
   - Quando o jogador desfaz todas e depois refaz todas
   - Então, após desfazer todas, o estado é o inicial do puzzle; após refazer todas, é idêntico ao de antes de desfazer; nenhuma jogada é perdida (sem limite prático de histórico).
 
 - **CA-004-17** — Desfazer cobre todos os tipos de jogada
-  - Dado jogadas de colocar valor, apagar valor, alternar anotação e limpar anotações
+  - Dado jogadas de colocar valor, apagar valor, alternar anotação e limpar anotações, numa partida não vencida (partida vencida: ver CA-004-23)
   - Quando o jogador desfaz cada uma
   - Então cada desfazer restaura exatamente o estado anterior àquela jogada, qualquer que seja o tipo.
 

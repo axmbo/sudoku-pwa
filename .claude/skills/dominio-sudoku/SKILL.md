@@ -39,6 +39,6 @@ Detalhe de algoritmo e PRNG: [ADR 0005](../../../docs/adr/0005-worker-e-gerador-
 5. O nível do puzzle = nível da técnica mais difícil que o solver lógico precisou; o solver lógico resolve o puzzle só com técnicas até esse nível.
 6. Determinismo: `generate(seed, version)` devolve sempre o mesmo puzzle.
 7. `deserialize(serialize(board)) = board`, inclusive anotações e histórico.
-8. `undo(apply(board, move)) = board`; `redo(undo(b)) = b` enquanto não houver jogada nova.
+8. `undo(apply(board, move)) = board`; `redo(undo(b)) = b` enquanto não houver jogada nova. Só vale em partida não vencida: depois da vitória, `undo` e `redo` são recusados (spec 004, CA-004-23).
 9. Conflito é derivado do estado, nunca armazenado.
 10. Vitória ⇔ grade completa, sem conflito e igual à solução.

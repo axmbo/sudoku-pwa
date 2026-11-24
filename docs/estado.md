@@ -6,7 +6,8 @@
 - **Spec 001 concluída e arquivada (24/11/2026):** [PR #2](https://github.com/axmbo/sudoku-pwa/pull/2) mergeado; 25 CA, 390 testes, cobertura e Stryker 100% no domínio. Ponto de leitura: [RESUMO](../specs/_arquivo/001-tabuleiro-conflitos/RESUMO.md); detalhe em `specs/_arquivo/001-tabuleiro-conflitos/` ([notas](../specs/_arquivo/001-tabuleiro-conflitos/notas.md), `revisao-r1.md`, `revisao-r2.md`). [ADR 0007](adr/0007-convencoes-do-dominio.md) aceito.
 - **Retro do ciclo 01 feita (24/11/2026):** [ciclo-01](process/retro/ciclo-01.md); real das 7 tarefas 836,9k de subagentes contra 900k prováveis (0,93×). Promovidas no v0.6 (24/11/2026): M-003, M-005 a M-008, M-009(a); candidatas: M-001, M-002, M-009(b), em [melhorias.md](process/melhorias.md). Ciclo 01 não é múltiplo de 3: sem revisão estrutural (próxima no ciclo 03).
 - **Spec ativa: 004 aprovada (24/11/2026) e planejada**, branch `feat/004-estado-de-jogo`, issue [#14](https://github.com/axmbo/sudoku-pwa/issues/14): [spec](../specs/004-estado-de-jogo/spec.md) (33 CA), [plan](../specs/004-estado-de-jogo/plan.md), [tasks](../specs/004-estado-de-jogo/tasks.md) (8 tarefas, sem ADR novo). Âncora do ciclo reancorada para 1,25M provável (tarefas 940k).
-- **Próximo:** `/analisar 004` (`revisor`), depois `/implementar`.
+- **Análise de consistência ok (24/11/2026):** r1 não ok (2 major), r2 ok; a spec aprovada recebeu ressalva "partida não vencida" em CA-004-11/16/17, derivada da decisão 3.
+- **Próximo:** `/clear` + `/retomar`, depois `/implementar 004 T01`.
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o hook do `dev` bloqueia arquivo de teste (provado em 22/11/2026).
 
 ## Decisões do Diretor (22/11/2026 a 24/11/2026)

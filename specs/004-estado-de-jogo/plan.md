@@ -5,14 +5,14 @@
 
 ## Módulos e fronteiras
 
-Tudo em `src/domain/`, puro (sem DOM, relógio, `Math.random`, I/O). Cada arquivo importa só os de cima na lista; nada importa de `src/persistence/` nem de UI.
+Tudo em `src/domain/`, puro (sem DOM, relógio, `Math.random`, I/O). Cada arquivo importa só os de cima na lista (ordem real: `puzzle`, `notes`, `history`, `game`, `serialize`); nada importa de `src/persistence/` nem de UI.
 
 | Arquivo | Papel | Importa |
 |---|---|---|
 | `puzzle.ts` (novo) | `Puzzle`, `createPuzzle(unknown)`: valida pistas, solução completa e consistente | `board`, `conflicts`, `digit`, `result` |
 | `notes.ts` (novo) | `Notes` (conjunto ordenado), `toggleNote`, `emptyNotes` | `digit` |
-| `game.ts` (novo) | `Game`, `createGame`, leituras (`notesAt`, `getGameStatus`, `getGameConflicts`, `canUndo`, `canRedo`), jogadas e `commit` do histórico | `board`, `notes`, `puzzle`, `units`, `result` |
-| `history.ts` (novo) | `Move`, `HistoryEntry`, `applyMove` interno, `undo`/`redo` | `notes`, `digit`, `result` |
+| `history.ts` (novo) | `Move`, `CellMemo`, `HistoryEntry` (tipos, T01), `applyMove` interno, `undo`/`redo` | `board` (valores), `notes`, `digit`, `units` |
+| `game.ts` (novo) | `Game`, `createGame`, leituras (`notesAt`, `getGameStatus`, `getGameConflicts`, `canUndo`, `canRedo`), jogadas e `commit` do histórico | `board`, `conflicts` (`CellConflict`), `history`, `notes`, `puzzle`, `units`, `result` |
 | `serialize.ts` (novo) | `serializeGame`, `deserializeGame` (inclui replay de validação) | `game`, `history`, `puzzle` |
 | `board.ts` | **não muda** (só reusa `placeValue`, `eraseValue`, `cellAt`, `getConflicts`) | |
 
@@ -98,12 +98,12 @@ Todas ancoradas em CA:
 ```
 {"schemaVersion":1,"data":{
   "puzzle":{"givens":"<81 chars, . = vazio>","solution":"<81 dígitos>","difficulty":"..","seed":"..","generatorVersion":1},
-  "values":"<81 chars>", "notes":[<81 inteiros, bit d-1 = dígito d>],
+  "values":"<81 chars, . = vazio, como em givens>", "notes":[<81 inteiros, bit d-1 = dígito d>],
   "moves":[[<0 place|1 erase|2 toggle-note|3 clear-notes>,<índice>,<dígito ou 0>], ...],
   "cursor":<int>}}
 ```
 
-- **Fica fora** (CA-004-31): conflitos, status/vitória, `before` das entradas, tempo (B-07). Isso mantém o dado enxuto e sem redundância derivável.
+- **Fica fora** (CA-004-31): conflitos, status/vitória, `before` das entradas, tempo (B-07; o ADR 0004 põe o timer no envelope `game`, então acrescentá-lo depois muda o schema: entra como `schemaVersion` 2 com migração `v1 -> v2`, a registrar em B-06/B-07). Isso mantém o dado enxuto e sem redundância derivável.
 - `deserializeGame` ordem: (1) texto vazio, JSON inválido, não objeto, `schemaVersion` ausente ou não inteiro ≥ 1 → `invalid-data`; (2) `schemaVersion` > 1 → `future-version` (antes de olhar o resto, sem tocar no dado); (3) campo obrigatório ausente ou de tipo errado → `invalid-data`; (4) incoerência → `inconsistent-data`: puzzle recusado por `createPuzzle`, valor sobre pista diferente do dado, anotação em célula com valor ou em pista, `cursor` fora de `0..moves.length`, jogada que o jogo recusaria (replay), estado após o replay de `moves[0..cursor)` diferente de `values`/`notes`, `moves[cursor..)` não reaplicável em sequência (CA-004-25 exige refazer funcionar), partida vencida antes do último movimento aplicado ou com refazíveis restantes. O replay também recalcula `before`.
 - O replay usa arrays locais mutáveis dentro da função (não exportados) e congela o resultado; a API pública continua imutável (ADR 0007).
 
@@ -141,8 +141,8 @@ Todos em Vitest; propriedades em `*.prop.test.ts` com `fast-check`; mutation (St
 | CA-004-13 | unit | `nothing-to-undo`, estado igual |
 | CA-004-14 | unit | `nothing-to-redo` em partida sem desfazer e depois de refazer tudo |
 | CA-004-15 | unit | jogada nova zera `canRedo` |
-| CA-004-16 | prop | 500 jogadas válidas geradas; desfaz tudo = inicial; refaz tudo = igual; numRuns reduzido pelo custo |
-| CA-004-17 | unit + prop | um exemplo por tipo de jogada; prop: `gameUndo(apply(g,m)) = g` para qualquer jogada aceita (invariante 8) |
+| CA-004-16 | prop | 500 jogadas válidas geradas, escolhidas para não vencer; desfaz tudo = inicial; refaz tudo = igual; numRuns reduzido pelo custo |
+| CA-004-17 | unit + prop | um exemplo por tipo de jogada; prop: `gameUndo(apply(g,m)) = g` para jogada aceita que **não vence** (decisão 3: após a vitória desfazer é recusado); prop: jogada que vence ⇒ `gameUndo` recusa com `game-over` e o estado segue `won` |
 | CA-004-18 | unit + prop | recusas e jogadas sem efeito não mudam histórico nem `canRedo` |
 | CA-004-19 | unit | uma célula vazia, coloca o 3 → `won` |
 | CA-004-20 | unit | cheia com erro, com e sem conflito → `full-incorrect` ≠ `incomplete` |

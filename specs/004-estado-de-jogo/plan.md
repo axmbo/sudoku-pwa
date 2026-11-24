@@ -173,7 +173,7 @@ Organização dos testes (estado, decisão 7): os testes novos já nascem dividi
 
 1. **Anotações no `Game`, não no `Board`:** mantém 001 intacta (`board.ts` e seus 390 testes). Alternativa descartada: estender `CellState` com `notes`, que reabriria 001.
 2. **Histórico com `before` em memória, só comandos no disco:** desfazer O(1); o dado gravado leva só a jogada, e o replay na leitura valida coerência (CA-004-29) e reconstrói `before`. Alternativa descartada: gravar `before` (redundante e exige validar contra o replay mesmo assim).
-3. **String JSON determinística como saída de `serializeGame`**, no envelope `{schemaVersion, data}` do ADR 0004: a B-06 grava sem remontar e a versão do formato é a `schemaVersion` do envelope (uma só versão a migrar). Não há decisão nova de arquitetura: aplica o ADR 0004. Se o Diretor preferir objeto em vez de texto, só T07 e T08 mudam.
+3. **String JSON determinística como saída de `serializeGame`**, no envelope `{schemaVersion, data}` do ADR 0004: a B-06 grava sem remontar e a versão do formato é a `schemaVersion` do envelope (uma só versão a migrar). Não há decisão nova de arquitetura: aplica o ADR 0004. Confirmado pelo Diretor em 24/11/2026 (texto, não objeto).
 4. **Sem ADR novo.** Nenhuma escolha fere ADR aceito nem constituição; as convenções (recusa como valor, `unknown`, 0–8, imutável) vêm do 0007.
 5. **Nomes `game*`** (`gamePlace`, …) evitam colidir com `placeValue`/`eraseValue` do `board.ts`, que continuam sendo a regra de célula.
 
@@ -183,4 +183,4 @@ Organização dos testes (estado, decisão 7): os testes novos já nascem dividi
 - **`difficulty`/`seed` como `string` opaca** pode divergir do tipo que a 003 definir → `createPuzzle` é o único ponto a ajustar; a 003 deve reutilizar `Puzzle` e estreitar `difficulty`. Não confirmado se o nível será união de literais.
 - **Replay na leitura em histórico enorme** (dezenas de milhares) → linear e com arrays locais; teste de leitura com 10.000 jogadas na T08 como regressão de tempo (limiar a calibrar, não inventado aqui).
 - **Mutantes na validação de `deserialize`** (muitas ramificações) → `it.each` por incoerência da spec e dos extras; mutante equivalente justificado em `notas.md`.
-- **Spec silenciosa em dois pontos** (ver perguntas ao Diretor no retorno): limpar anotações em célula com valor e a mesma referência em jogada sem efeito. O plano adota o comportamento descrito acima e pede um CA se o Diretor discordar.
+- **Spec silenciosa em dois pontos**, resolvidos pelo Diretor em 24/11/2026 sem CA novo: limpar anotações em célula com valor é no-op `ok` sem entrada no histórico (em pista, `cell-is-given`); jogada sem efeito (CA-004-18) devolve `ok` com a mesma referência de `Game`.

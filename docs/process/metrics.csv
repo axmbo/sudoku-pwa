@@ -25,7 +25,7 @@ fase-0,-,9-resumo,orquestrador,claude-opus-5-5,nao,5000,10000,20000,2,5,10,4,995
 fase-1,001,ciclo-completo,todos,claude-sonnet-5-5,,250000,500000,1000000,60,120,240,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra por tarefa x agente no /planejar; ancora passo 5
 fase-1,002,ciclo-completo,todos,claude-sonnet-5-5,,200000,400000,800000,45,90,180,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra no /planejar
 fase-1,003,ciclo-completo,todos,claude-sonnet-5-5,,400000,800000,1600000,90,180,360,,,,,,,15000,,,,,,,,,,risco alto; provavel divisao em 003a e 003b
-fase-1,004,ciclo-completo,todos,claude-sonnet-5-5,,250000,500000,1000000,60,120,240,,,,,,,15000,,,,,,,,,,estimativa do plano da Fase 1; quebra no /planejar
+fase-1,004,ciclo-completo,todos,claude-sonnet-5-5,,625000,1250000,2500000,200,400,800,,,,,,,15000,,,,,,,,,,"reancorada pelo Diretor em 24/11/2026 (era 250k/500k/1M e 60/120/240 min): tarefas 940k + planejamento ~155k + revisao ~120k + retro ~30k; tarefas 320 min provavel"
 fase-1,005,ciclo-completo,todos,claude-sonnet-5-5,,350000,700000,1400000,90,180,360,,,,,,,15000,,,,,,,,,,inclui qa-auditor; quebra no /planejar
 fase-1,001,T01,eng-testes,claude-sonnet-5-5,nao,27000,45000,90000,9,15,30,54,71044,13998,735017,85096,n/d,7300,10.5,1,,,,,,100,100,4 vermelhos; min_real = intervalo do log (05:14-05:24 UTC) intercalado com o dev; 1.9x o provavel; fonte log jsonl
 fase-1,001,T01,dev,claude-sonnet-5-5,nao,18000,30000,60000,6,10,20,56,38749,9438,778134,48243,n/d,7300,5.7,5,,,,,,100,100,4 GREENs + 1 REFACTOR; leituras: package.json plan.md tasks.md board.test.ts log do Stryker; 1.6x o provavel; total T01 133339 contra 75000 provavel (1.78x); fonte log jsonl

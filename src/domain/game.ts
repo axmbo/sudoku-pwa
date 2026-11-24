@@ -51,3 +51,17 @@ export function canRedo(game: Game): boolean {
 export function notesAt(game: Game, row: Index, col: Index): Notes {
   return game.notes[cellIndex(row, col)] as Notes;
 }
+
+/** Alterna a anotação `digit` na célula (row, col). */
+export function gameToggleNote(
+  game: Game,
+  row: Index,
+  col: Index,
+  digit: number,
+): Result<Game, never> {
+  const index = cellIndex(row, col);
+  const notes = game.notes.map((current, i) =>
+    i === index ? ([digit] as unknown as Notes) : current,
+  );
+  return { ok: true, value: Object.freeze({ ...game, notes: Object.freeze(notes) }) };
+}

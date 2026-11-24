@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cellAt, createBoard, getConflicts, placeValue, type Board } from './board';
+import { cellAt, createBoard, eraseValue, getConflicts, placeValue, type Board } from './board';
 import type { Digit } from './digit';
 
 const _ = null;
@@ -503,5 +503,115 @@ describe('board: placeValue (caminho feliz)', () => {
     expect(Object.isFrozen(next)).toBe(true);
     expect(Object.isFrozen(next.cells)).toBe(true);
     expect(next.cells.every((cell) => Object.isFrozen(cell))).toBe(true);
+  });
+});
+
+/** Aplica `eraseValue` esperando aceite; falha o teste se recusar. */
+function mustErase(board: Board, row: number, col: number): Board {
+  const result = eraseValue(board, row, col);
+  expect(result.ok).toBe(true);
+  if (!result.ok) throw new Error('eraseValue recusou jogada válida');
+  return result.value;
+}
+
+describe('board: eraseValue (caminho feliz)', () => {
+  it('CA-001-05: apaga o valor do jogador; a célula fica vazia e nenhuma outra muda', () => {
+    const board = mustPlace(mustCreate(input), 4, 2, 6);
+    const snapshot = structuredClone(board);
+
+    // (4,2) = cells[38]
+    const next = mustErase(board, 4, 2);
+
+    expect(next.cells[38]).toEqual({ value: null, given: false });
+    next.cells.forEach((cell, i) => {
+      if (i !== 38) expect(cell).toEqual(board.cells[i]);
+    });
+    expect(board).toEqual(snapshot);
+    expect(board.cells[38]).toEqual({ value: 6, given: false });
+  });
+
+  it('CA-001-06: apagar célula vazia é aceito e o conteúdo fica idêntico', () => {
+    const board = mustCreate(input);
+    const snapshot = structuredClone(board);
+
+    const next = mustErase(board, 6, 3);
+
+    expect(next).toEqual(board);
+    expect(next.cells.length).toBe(81);
+    expect(board).toEqual(snapshot);
+  });
+
+  it('CA-001-05: o resultado é congelado (Board, cells e cada CellState)', () => {
+    const board = mustPlace(mustCreate(input), 4, 2, 6);
+
+    const next = mustErase(board, 4, 2);
+
+    expect(Object.isFrozen(next)).toBe(true);
+    expect(Object.isFrozen(next.cells)).toBe(true);
+    expect(next.cells.every((cell) => Object.isFrozen(cell))).toBe(true);
+  });
+});
+
+describe('board: conflito ao colocar valor', () => {
+  it('CA-001-15: valor repetido na linha é aceito e as duas células constam em conflito', () => {
+    // 4 em (4,6) e depois (4,1): mesma linha 4, colunas e blocos distintos.
+    const board = mustPlace(mustCreate(input), 4, 6, 4);
+
+    const next = mustPlace(board, 4, 1, 4);
+
+    expect(next.cells[37]).toEqual({ value: 4, given: false });
+    expect(getConflicts(next)).toEqual([
+      { row: 4, col: 1, value: 4, units: [{ kind: 'row', index: 4 }] },
+      { row: 4, col: 6, value: 4, units: [{ kind: 'row', index: 4 }] },
+    ]);
+  });
+
+  it('CA-001-15: valor repetido na coluna é aceito e as duas células constam em conflito', () => {
+    // 2 em (6,5) e depois (1,5): mesma coluna 5, linhas e blocos distintos.
+    const board = mustPlace(mustCreate(input), 6, 5, 2);
+
+    const next = mustPlace(board, 1, 5, 2);
+
+    expect(next.cells[14]).toEqual({ value: 2, given: false });
+    expect(getConflicts(next)).toEqual([
+      { row: 1, col: 5, value: 2, units: [{ kind: 'column', index: 5 }] },
+      { row: 6, col: 5, value: 2, units: [{ kind: 'column', index: 5 }] },
+    ]);
+  });
+
+  it('CA-001-15: valor repetido no bloco é aceito e as duas células constam em conflito', () => {
+    // 8 em (3,4) e depois (5,3): bloco 4, linhas e colunas distintas.
+    const board = mustPlace(mustCreate(input), 3, 4, 8);
+
+    const next = mustPlace(board, 5, 3, 8);
+
+    expect(next.cells[48]).toEqual({ value: 8, given: false });
+    expect(getConflicts(next)).toEqual([
+      { row: 3, col: 4, value: 8, units: [{ kind: 'box', index: 4 }] },
+      { row: 5, col: 3, value: 8, units: [{ kind: 'box', index: 4 }] },
+    ]);
+  });
+
+  it('CA-001-15: a jogada em conflito não é recusada', () => {
+    const board = mustPlace(mustCreate(input), 4, 6, 4);
+
+    const result = placeValue(board, 4, 1, 4);
+
+    expect(result.ok).toBe(true);
+    expect(getConflicts(board)).toEqual([]);
+  });
+
+  it('CA-001-16: pista e célula do jogador em conflito; a pista segue intacta', () => {
+    // Pista 5 em (2,7); 5 em (2,1): mesma linha 2, blocos 0 e 2.
+    const board = mustCreate(input);
+
+    const next = mustPlace(board, 2, 1, 5);
+
+    expect(getConflicts(next)).toEqual([
+      { row: 2, col: 1, value: 5, units: [{ kind: 'row', index: 2 }] },
+      { row: 2, col: 7, value: 5, units: [{ kind: 'row', index: 2 }] },
+    ]);
+    expect(next.cells[25]).toEqual({ value: 5, given: true });
+    expect(next.cells[19]).toEqual({ value: 5, given: false });
   });
 });

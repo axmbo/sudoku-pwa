@@ -615,3 +615,97 @@ describe('board: conflito ao colocar valor', () => {
     expect(next.cells[19]).toEqual({ value: 5, given: false });
   });
 });
+
+type PlaceResult = ReturnType<typeof placeValue>;
+type EraseResult = ReturnType<typeof eraseValue>;
+
+/** Captura `placeValue` sem lançar, para a falha ser de asserção (regra 10 das regras de teste). */
+function tryPlace(board: Board, row: number, col: number, value: number): PlaceResult | undefined {
+  let result: PlaceResult | undefined;
+  expect(() => {
+    result = placeValue(board, row, col, value);
+  }).not.toThrow();
+  return result;
+}
+
+/** Captura `eraseValue` sem lançar. */
+function tryErase(board: Board, row: number, col: number): EraseResult | undefined {
+  let result: EraseResult | undefined;
+  expect(() => {
+    result = eraseValue(board, row, col);
+  }).not.toThrow();
+  return result;
+}
+
+describe('board: recusa em pista (cell-is-given)', () => {
+  // Pista 5 em (2,7) = cells[25]. Ver `input`.
+  it.each([
+    ['igual ao da pista', 5],
+    ['diferente do da pista', 8],
+  ])('CA-001-07: colocar valor %s em pista é recusado com cell-is-given', (_nome, value) => {
+    const board = mustCreate(input);
+
+    const result = tryPlace(board, 2, 7, value);
+
+    expect(result).toEqual({ ok: false, reason: 'cell-is-given' });
+    expect(board.cells[25]).toEqual({ value: 5, given: true });
+  });
+
+  it('CA-001-08: apagar pista é recusado com cell-is-given', () => {
+    const board = mustCreate(input);
+
+    const result = tryErase(board, 2, 7);
+
+    expect(result).toEqual({ ok: false, reason: 'cell-is-given' });
+    expect(board.cells[25]).toEqual({ value: 5, given: true });
+  });
+
+  it('CA-001-16: pista em conflito continua imutável ao tentar mudar o valor', () => {
+    // 5 em (2,1) conflita com a pista 5 em (2,7): mesma linha 2.
+    const board = mustPlace(mustCreate(input), 2, 1, 5);
+
+    const result = tryPlace(board, 2, 7, 4);
+
+    expect(result).toEqual({ ok: false, reason: 'cell-is-given' });
+    expect(board.cells[25]).toEqual({ value: 5, given: true });
+    expect(board.cells[19]).toEqual({ value: 5, given: false });
+  });
+
+  it('CA-001-16: pista em conflito continua imutável ao tentar apagar', () => {
+    const board = mustPlace(mustCreate(input), 2, 1, 5);
+
+    const result = tryErase(board, 2, 7);
+
+    expect(result).toEqual({ ok: false, reason: 'cell-is-given' });
+    expect(board.cells[25]).toEqual({ value: 5, given: true });
+    expect(board.cells[19]).toEqual({ value: 5, given: false });
+  });
+
+  it('CA-001-24: colocar em pista recusado deixa tabuleiro e conflitos intactos, sem value', () => {
+    const board = mustPlace(mustCreate(input), 2, 1, 5);
+    const boardBefore = structuredClone(board);
+    const conflictsBefore = structuredClone(getConflicts(board));
+    expect(conflictsBefore).toEqual([
+      { row: 2, col: 1, value: 5, units: [{ kind: 'row', index: 2 }] },
+      { row: 2, col: 7, value: 5, units: [{ kind: 'row', index: 2 }] },
+    ]);
+
+    const result = tryPlace(board, 2, 7, 8);
+
+    expect(result).toStrictEqual({ ok: false, reason: 'cell-is-given' });
+    expect(board).toEqual(boardBefore);
+    expect(getConflicts(board)).toEqual(conflictsBefore);
+  });
+
+  it('CA-001-24: apagar pista recusado deixa tabuleiro e conflitos intactos, sem value', () => {
+    const board = mustPlace(mustCreate(input), 2, 1, 5);
+    const boardBefore = structuredClone(board);
+    const conflictsBefore = structuredClone(getConflicts(board));
+
+    const result = tryErase(board, 2, 7);
+
+    expect(result).toStrictEqual({ ok: false, reason: 'cell-is-given' });
+    expect(board).toEqual(boardBefore);
+    expect(getConflicts(board)).toEqual(conflictsBefore);
+  });
+});

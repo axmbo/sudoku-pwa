@@ -1,8 +1,18 @@
-import { cellAt, createBoard, getConflicts, isCoordinate, type Board } from './board';
+import {
+  cellAt,
+  createBoard,
+  eraseValue,
+  getConflicts,
+  isCoordinate,
+  placeValue,
+  type Board,
+  type EraseRefusal,
+  type PlaceRefusal,
+} from './board';
 import type { CellConflict } from './conflicts';
 import type { HistoryEntry } from './history';
 import { cellIndex, type Index } from './units';
-import { isDigit } from './digit';
+import { isDigit, type Digit } from './digit';
 import { emptyNotes, toggleNote, type Notes } from './notes';
 import { createPuzzle, type Puzzle, type PuzzleRefusal } from './puzzle';
 import type { Result } from './result';
@@ -110,11 +120,62 @@ export function gameClearNotes(
   return { ok: true, value: commit(game, entry, emptyNotes) };
 }
 
-/** Jogada nova: grava as anotações da célula, trunca o histórico em `cursor` e acrescenta a entrada. */
-function commit(game: Game, entry: HistoryEntry, cellNotes: Notes): Game {
+/** Coloca `digit` na célula (row, col), limpando as anotações dela; mesmo valor não tem efeito. */
+export function gamePlace(
+  game: Game,
+  row: unknown,
+  col: unknown,
+  digit: unknown,
+): Result<Game, PlaceRefusal> {
+  const placed = placeValue(game.board, row, col, digit);
+  if (!placed.ok) {
+    return placed;
+  }
+  const r = row as Index;
+  const c = col as Index;
+  const cell = cellAt(game.board, r, c);
+  if (cell.value === digit) {
+    return { ok: true, value: game };
+  }
+  const index = cellIndex(r, c);
+  const entry: HistoryEntry = {
+    move: { kind: 'place', index, digit: digit as Digit },
+    before: { value: cell.value, notes: game.notes[index] as Notes },
+  };
+  return { ok: true, value: commit(game, entry, emptyNotes, placed.value) };
+}
+
+/** Apaga o valor da célula (row, col), limpando as anotações dela; célula vazia não tem efeito. */
+export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, EraseRefusal> {
+  const erased = eraseValue(game.board, row, col);
+  if (!erased.ok) {
+    return erased;
+  }
+  const r = row as Index;
+  const c = col as Index;
+  const cell = cellAt(game.board, r, c);
+  if (cell.value === null) {
+    return { ok: true, value: game };
+  }
+  const index = cellIndex(r, c);
+  const entry: HistoryEntry = {
+    move: { kind: 'erase', index },
+    before: { value: cell.value, notes: game.notes[index] as Notes },
+  };
+  return { ok: true, value: commit(game, entry, emptyNotes, erased.value) };
+}
+
+/** Jogada nova: grava tabuleiro e anotações da célula, trunca o histórico em `cursor` e acrescenta a entrada. */
+function commit(
+  game: Game,
+  entry: HistoryEntry,
+  cellNotes: Notes,
+  board: Board = game.board,
+): Game {
   const notes = game.notes.map((existing, i) => (i === entry.move.index ? cellNotes : existing));
   return Object.freeze({
     ...game,
+    board,
     notes: Object.freeze(notes),
     history: Object.freeze([...game.history.slice(0, game.cursor), entry]),
     cursor: game.cursor + 1,

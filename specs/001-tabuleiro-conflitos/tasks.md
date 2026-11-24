@@ -5,6 +5,8 @@
 
 Rascunho do `arquiteto` (passo 1 do `/planejar`); colunas de teste revisadas pela `eng-testes` (passo 2, 23/11/2026); manifestos fechados em 23/11 (curador-pdca; ~4 caracteres por token, sem contar L0, com `docs/estado.md` ~1,3k): T01 7,3k, T02 6,5k, T03 5,5k, T04 6,8k, T05 8,5k, T06 11,7k, T07 9,1k (era 8,7k; +0,4k pelos testes de `isDigit` vindos da T02), todos abaixo de 15k (T05, T06 e T07 reajustados em 23/11 pela decisão do Diretor: isenção de TDD só por tarefa). Estimativas de tokens/minutos por tarefa somam eng-testes + dev (quebra por agente em `docs/process/metrics.csv`). Ordem: contrato e criação, conflitos, jogadas, recusas, propriedades. Dependem do ADR 0007 (Aceito, 23/11/2026) e das decisões 4 a 7 do Diretor (seção "Decisões do Diretor" da spec); se mudarem, T05 e T06 são as afetadas.
 
+Reestimativa de 23/11/2026 (decisão do Diretor): tokens de T03–T07 ×2 (minutos inalterados), pois T01 fechou em 1,78× o provável e T02 em 2,57× (2,17× só subagentes). Provável antes → depois: T03 100k → 200k, T04 50k → 100k, T05 75k → 150k, T06 100k → 200k, T07 55k → 110k. O original fica em `obs` das linhas de `docs/process/metrics.csv`.
+
 Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 · 07 T06 · 08 T06 · 09 T03 · 10 T03 · 11 T03 · 12 T03 · 13 T03 · 14 T03 · 15 T05 · 16 T05 · 17 T07 · 18 T07 (exemplo e propriedade) · 19 T03 · 20 T06 · 21 T06 · 22 T02 · 23 T04 · 24 T06 (+T07) · 25 T04 (criar) e T06 (colocar/apagar). Cobertura: 25 de 25.
 
 **Regras de teste comuns (passo 2).** Sem UI nesta spec: nenhum E2E; pirâmide = unit + property-based. (1) Um vermelho por vez: cada linha de `it.each` entra em ciclo próprio ou em grupos da mesma classe, na ordem em que a tarefa lista. (2) Coordenadas assimétricas (linha ≠ coluna, ex.: 2,7) em todo exemplo, para matar mutante que troca `row`/`col`. (3) Valores esperados vêm de tabelas literais nos testes (grades de 81 caracteres, índices escritos à mão), nunca recomputados com a fórmula do código. (4) Propriedades usam o estilo de `digit.prop.test.ts`; falha imprime a seed e a regressão fixa `{ seed, path }` com comentário (skill `tdd-dominio`). (5) Recusa: asserção sobre `{ ok: false, reason }` inteiro (sem chave `value`). (6) `-0` como linha/coluna é inteiro de 0 a 8 e equivale a 0 (aceito); como valor de célula/jogada é recusado (`malformed-grid` / `invalid-value`). (7) **Todo commit `test` de tarefa não isenta falha.** Isenção de TDD é sempre por tarefa (PROCESSO.md §6), nunca pontual dentro de tarefa `tdd: sim`. Teste que nasceria verde (porque o GREEN anterior já generalizou) entra só como `it` adicional no mesmo commit `test` vermelho do comportamento vizinho (**via 7a**: o commit falha por causa do vizinho); a tarefa declara essa via por caso. Fora disso (**via 7b**), o caso vai para a T07 (`tdd: isento`, teste de invariante sobre estado existente), com o vermelho provado uma vez contra mutante manual descrito no corpo do commit. Nunca um commit `test` verde sozinho em T01–T06. (8) Tipo `Cell` do glossário é posição; o tipo de conteúdo do plano é `CellState`. (9) **Motivo do vermelho:** definido no `PROCESSO.md` §6 ("Motivo do vermelho"); não há stub antes do teste. Cada tarefa marca com **[símbolo novo: `X`]** o vermelho que usa a exceção (o primeiro teste de cada símbolo, declarado no corpo do commit `test`); o primeiro GREEN do `dev` cria o símbolo, em fake it quando couber. Os demais vermelhos falham por asserção contra o código anterior. Caso cuja expectativa já é satisfeita pelo fake it ou pela generalização anterior não abre ciclo: entra via 7a (ou 7b na T07). Tipos e a mudança de assinatura de `isDigit` não são vermelho de tipo: a T02 não testa o alargamento. (10) **Código anterior que pode lançar:** em entrada atípica (`null`, 8 linhas, buraco, coordenada fora da grade, índice 81) o código anterior pode lançar `TypeError`; o vermelho esperado é sempre asserção sobre o `Result`. Esses testes capturam sem lançar (`let r; expect(() => { r = op(x) }).not.toThrow();`) e depois afirmam o `Result` inteiro, de modo que a falha seja de asserção e não exceção solta. Nesta spec, "stub" só tem o sentido de mock provisório de dependência grande (regra de TDD).
@@ -57,7 +59,7 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
   - `specs/001-tabuleiro-conflitos/plan.md#Tipos públicos` (units, conflicts) e `#Contrato das operações` (getConflicts) (~1,5k)
   - `src/domain/units.ts` e `units.test.ts` (T01, ~0,4k); `src/domain/digit.ts` (~0,1k)
   - Total estimado: ~5,5k tokens (inclui `docs/estado.md` ~1,3k)
-- **Estimativa:** tokens 60k/100k/200k · minutos 20/35/70
+- **Estimativa:** tokens 120k/200k/400k · minutos 20/35/70
 - **Agentes:** `eng-testes` → `dev`
 
 ## T04 — Consulta de conflitos no tabuleiro e recusa de pistas em conflito
@@ -73,7 +75,7 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
   - `specs/001-tabuleiro-conflitos/plan.md#Contrato das operações` (createBoard, getConflicts) (~0,8k)
   - `src/domain/board.ts`, `src/domain/board.test.ts` (T01–T02, ~3k); assinatura de `src/domain/conflicts.ts` (~0,5k)
   - Total estimado: ~6,8k tokens (inclui `docs/estado.md` ~1,3k)
-- **Estimativa:** tokens 30k/50k/100k · minutos 10/20/40
+- **Estimativa:** tokens 60k/100k/200k · minutos 10/20/40
 - **Agentes:** `eng-testes` → `dev`
 
 ## T05 — Colocar e apagar valor (caminho feliz) e conflito resultante
@@ -89,7 +91,7 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
   - `specs/001-tabuleiro-conflitos/plan.md#Contrato das operações` (placeValue, eraseValue, imutabilidade) (~0,9k)
   - `src/domain/board.ts`, `src/domain/board.test.ts` (T01–T04, ~5,3k)
   - Total estimado: ~8,5k tokens (inclui `docs/estado.md` ~1,3k; `board.ts` + `board.test.ts` já com T01–T04, ~5,3k)
-- **Estimativa:** tokens 45k/75k/150k · minutos 15/30/60
+- **Estimativa:** tokens 90k/150k/300k · minutos 15/30/60
 - **Agentes:** `eng-testes` → `dev`
 
 ## T06 — Recusas e precedência de motivos ao colocar e apagar
@@ -106,7 +108,7 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
   - `specs/001-tabuleiro-conflitos/plan.md#Contrato das operações` (ordem de validação) (~0,8k)
   - `src/domain/board.ts` e `src/domain/board.test.ts` (T01–T05, ~8,3k)
   - Total estimado: ~11,7k tokens (inclui `docs/estado.md` ~1,3k; `board.ts` + `board.test.ts` já com T01–T05, ~8,3k). Acima de 10k: ler só os blocos `describe` de `placeValue`/`eraseValue` e a tabela de precedência por linhas; se o `board.test.ts` passar de ~7k tokens ao chegar aqui, dividir em T06a (CA-07, 08, 16, 20, com o CA-24 desses motivos) e T06b (CA-21, CA-24 de `cell-not-found` e CA-25, cuja tabela fica no vermelho do 21)
-- **Estimativa:** tokens 60k/100k/200k · minutos 15/25/50
+- **Estimativa:** tokens 120k/200k/400k · minutos 15/25/50
 - **Agentes:** `eng-testes` → `dev`
 
 ## T07 — Propriedades transversais e geradores (invariantes 1, 2, 9)
@@ -124,5 +126,5 @@ Matriz CA → tarefa: 01 T01 · 02 T01 · 03 T05 · 04 T05 · 05 T05 · 06 T05 �
   - `src/domain/__arbitraries__/grid.ts` (T01, ~0,5k); `src/domain/board.prop.test.ts` (bloco da T01, ~1k)
   - `src/domain/digit.ts` e `digit.test.ts` (~0,4k)
   - Total estimado: ~9,1k tokens (soma dos itens: 1,3 + 1,9 + 0,6 + 3,0 + 0,4 + 0,5 + 1,0 + 0,4; inclui `docs/estado.md` ~1,3k e `board.prop.test.ts` da T01, ~1k)
-- **Estimativa:** tokens 33k/55k/110k · minutos 15/25/50
+- **Estimativa:** tokens 66k/110k/220k · minutos 15/25/50
 - **Agentes:** `eng-testes` (o `revisor` valida a isenção; `dev` só se uma propriedade achar bug)

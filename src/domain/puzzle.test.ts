@@ -78,4 +78,17 @@ describe('puzzle', () => {
       reason: 'malformed-puzzle',
     });
   });
+
+  it.each([
+    ['7 repetido na linha 2 (colunas 0 e 7)', 7],
+    ['8 repetido na coluna 7 (linhas 0 e 2)', 8],
+  ])('INV: recusa conflicting-givens com pistas em conflito: %s', (_name, value) => {
+    const givens = validPuzzleInput().givens.map((row) => [...row]);
+    givens[2]?.splice(7, 1, value as never);
+
+    expect(createPuzzle({ ...validPuzzleInput(), givens })).toEqual({
+      ok: false,
+      reason: 'conflicting-givens',
+    });
+  });
 });

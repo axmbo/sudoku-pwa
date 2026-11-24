@@ -33,6 +33,8 @@ export type Result<T, R extends string> =
 export type Index = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // linha, coluna ou bloco; UI soma 1
 export type UnitKind = 'row' | 'column' | 'box';
 export interface Unit { readonly kind: UnitKind; readonly index: Index }
+export const ALL_UNITS: readonly Unit[]; // 27, ordem fixa: 9 row, 9 column, 9 box
+export function unitCells(unit: Unit): readonly number[]; // 9 índices de célula (0–80), crescentes
 
 // conflicts.ts (interno ao domínio)
 export interface CellConflict {
@@ -105,7 +107,7 @@ Mutation (Stryker, ≥ 70%, mutante sobrevivente em código novo é major) incid
 
 ## Orçamento de performance
 
-Impacto no JS inicial (ADR 0001, ≤ 60 kB gzip): **nulo por ora**, pois nenhum módulo da `src/ui` importa o domínio até a spec 005 (tree-shaking). Estimativa do domínio da 001 depois de bundled: < 2 kB gzip, **não medida**. O Worker (≤ 30 kB) reaproveitará `units.ts` e `Board` nas specs 002 e 003; as tabelas de unidades são constantes pré-calculadas uma vez. Custo de CPU: `getConflicts` é O(27 × 9) por consulta e cada jogada aloca um array de 81 células; irrelevante frente aos tetos de nós de geração (que são da 003). Sem dependência nova.
+Impacto no JS inicial (ADR 0001, ≤ 60 kB gzip): **nulo por ora**, pois nenhum módulo da `src/ui` importa o domínio até a spec 005 (tree-shaking). Estimativa do domínio da 001 depois de bundled: < 2 kB gzip, **não medida**. O Worker (≤ 30 kB) reaproveitará `units.ts` e `Board` nas specs 002 e 003; `unitCells` calcula os 9 índices a cada chamada, sem tabela pré-calculada (decisão do Diretor, 23/11/2026, na T03; a tabela exigiria asserção não nula, que o lint proíbe); se o custo pesar na 002 ou 003, a pré-computação entra como REFACTOR com teste que a exija. Custo de CPU: `getConflicts` é O(27 × 9) por consulta e cada jogada aloca um array de 81 células; irrelevante frente aos tetos de nós de geração (que são da 003). Sem dependência nova.
 
 ## Riscos
 

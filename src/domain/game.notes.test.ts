@@ -20,12 +20,12 @@ describe('game (anotações)', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(notesAt(result.value, 2, 7)).toEqual([4]);
-    expect(notesAt(result.value, 7, 2)).toEqual([]);
+    expect(notesAt(result.value, 3, 3)).toEqual([]);
     expect(result.value.notes.filter((notes: Notes) => notes.length > 0)).toHaveLength(1);
   });
   it('CA-004-01: alternar de novo o 4 em (2,7) remove só ele, mantendo as demais anotações da célula e de outras células', () => {
     const start = newGame();
-    const withOther = gameToggleNote(start, 7, 2, 9);
+    const withOther = gameToggleNote(start, 3, 3, 9);
     expect(withOther.ok).toBe(true);
     if (!withOther.ok) return;
     const withTwo = gameToggleNote(withOther.value, 2, 7, 2);
@@ -41,7 +41,7 @@ describe('game (anotações)', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(notesAt(result.value, 2, 7)).toEqual([2]);
-    expect(notesAt(result.value, 7, 2)).toEqual([9]);
+    expect(notesAt(result.value, 3, 3)).toEqual([9]);
   });
   it('CA-004-07: limpar três anotações de (2,7) esvazia a célula numa só entrada de histórico', () => {
     // [símbolo novo: `gameClearNotes`]
@@ -51,7 +51,7 @@ describe('game (anotações)', () => {
       if (!toggled.ok) throw new Error('fixture inválida');
       game = toggled.value;
     }
-    const other = gameToggleNote(game, 7, 2, 9);
+    const other = gameToggleNote(game, 3, 3, 9);
     if (!other.ok) throw new Error('fixture inválida');
     game = other.value;
     const before = game.history.length;
@@ -61,7 +61,7 @@ describe('game (anotações)', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(notesAt(result.value, 2, 7)).toEqual([]);
-    expect(notesAt(result.value, 7, 2)).toEqual([9]);
+    expect(notesAt(result.value, 3, 3)).toEqual([9]);
     expect(result.value.history).toHaveLength(before + 1);
   });
 

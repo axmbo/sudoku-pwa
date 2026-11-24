@@ -16,16 +16,30 @@ function freezeGrid(grid: Grid): Grid {
   return Object.freeze(grid.map((row) => Object.freeze([...row])));
 }
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value !== '';
+}
+
 export function createPuzzle(input: unknown): Result<Puzzle, PuzzleRefusal> {
-  const { givens, solution, difficulty, seed, generatorVersion } = input as Puzzle;
+  const { givens, solution, difficulty, seed, generatorVersion } = input as Record<string, unknown>;
+  if (
+    !Array.isArray(givens) ||
+    !Array.isArray(solution) ||
+    !isNonEmptyString(difficulty) ||
+    !isNonEmptyString(seed) ||
+    !Number.isInteger(generatorVersion) ||
+    (generatorVersion as number) < 1
+  ) {
+    return { ok: false, reason: 'malformed-puzzle' };
+  }
   return {
     ok: true,
     value: Object.freeze({
-      givens: freezeGrid(givens),
-      solution: freezeGrid(solution),
+      givens: freezeGrid(givens as Grid),
+      solution: freezeGrid(solution as Grid),
       difficulty,
       seed,
-      generatorVersion,
+      generatorVersion: generatorVersion as number,
     }),
   };
 }

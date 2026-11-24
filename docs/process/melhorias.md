@@ -44,5 +44,6 @@ Formato:
 ## M-005 — Vermelho só de tipo não cabe no §6 (revisão r1 da spec 001, 24/11/2026)
 - Lição: o R1-01 (assinaturas `number` → `unknown` em `placeValue`/`eraseValue`) só tem vermelho de tipo (TS2345), porque o comportamento em runtime já estava coberto. O pre-commit só tolera erros de símbolo inexistente, e a lista fechada de isenções não cobre mudança só de contrato. O Diretor autorizou exceção pontual: teste e produção num único commit `fix(domain)`, com o `tsc` vermelho no corpo.
 - Proposta (diff): incluir na lista fechada do `PROCESSO.md` §6 "mudança só de contrato de tipo, com comportamento já coberto (vermelho do `tsc` colado no corpo do commit)"; não ampliar o `tsc-red-filter`, para não afrouxar o RED de todos os ciclos.
-- Lugar de promoção: `PROCESSO.md` §6
+- Conflito: a exceção contraria a regra do [CHANGELOG-processo](CHANGELOG-processo.md) v0.3 ("isenção de TDD só por tarefa, nunca pontual dentro de tarefa `tdd: sim`"), confirmada pelo Diretor em 23/11/2026. O orquestrador não sinalizou o conflito ao propor a exceção; achado PR-04 da revisão do PR #2. O Diretor manteve a exceção em 24/11/2026.
+- Lugar de promoção: `PROCESSO.md` §6 (e revisão da regra do v0.3)
 - Estado: candidata (decidir na `/retro 001`)

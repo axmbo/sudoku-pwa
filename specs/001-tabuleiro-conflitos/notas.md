@@ -11,3 +11,8 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 23/11 · T01 · Aviso para a T02: `createBoard` usa `grid.flat()`; a validação de forma precisa vir antes, senão uma linha curta gera menos de 81 células.
 - 23/11 · T02 · Mutante sobrevivente equivalente em `digit.ts:3`: `typeof value === 'number'` → `true`. `Number.isInteger` já devolve `false` para não numéricos; o `typeof` fica só para estreitar o tipo (`unknown` → `number`) no type guard. Casos `unknown` de `isDigit` vão para a T07.
 - 23/11 · T02 · Decisão do Diretor: o mutante equivalente acima fica marcado com `// Stryker disable next-line ConditionalExpression` justificado; `digit.ts` volta a 100%.
+- 23/11 · T03 · Lacuna do plan.md: o tipo de retorno de `unitCells` não estava especificado; a eng-testes supôs `readonly number[]` e o Diretor confirmou.
+- 23/11 · T03 · Desvio do plano: `unitCells(unit)` calcula os índices 0–80 (crescentes) a cada chamada, sem tabela pré-calculada, porque a tabela exigia `!`, proibido pelo lint `no-non-null-assertion`. Registrado no plan.md (`9219b4a`).
+- 23/11 · T03 · Decisão do Diretor: `ALL_UNITS`/`unitCells` sem `Object.freeze` em runtime (constante de módulo); fica como débito, pois o ADR 0007 pede estado congelado.
+- 23/11 · T03 · P2a com seed fixa 20260003 e 300 execuções.
+- 23/11 · T03 · Novidade de processo: eng-testes e dev ficaram cada um num único contexto, retomado por SendMessage entre vermelhos. Custo por vermelho caiu (eng-testes 21k na T01, 41k na T02, 12,8k na T03) → M-004. Os `subagent_tokens` do harness (29k a 51k) são o tamanho do contexto no turno, não o acumulado.

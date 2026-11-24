@@ -63,15 +63,18 @@ export function getConflicts(board: Board): readonly CellConflict[] {
   return findConflicts(board.cells.map((cell) => cell.value));
 }
 
-export type PlaceRefusal = 'invalid-value' | 'cell-is-given';
+export type PlaceRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given';
 
-/** Coloca `value` na célula (`row`, `col`); recusa valor inválido e pista (demais recusas: T06 seguintes). */
+/** Coloca `value` na célula (`row`, `col`); recusa célula inexistente, valor inválido e pista (nessa ordem). */
 export function placeValue(
   board: Board,
   row: number,
   col: number,
   value: number,
 ): Result<Board, PlaceRefusal> {
+  if (!isCoordinate(row) || !isCoordinate(col)) {
+    return { ok: false, reason: 'cell-not-found' };
+  }
   if (!isDigit(value)) {
     return { ok: false, reason: 'invalid-value' };
   }
@@ -81,14 +84,22 @@ export function placeValue(
   return { ok: true, value: replaceCell(board, row, col, value as Digit) };
 }
 
-export type EraseRefusal = 'cell-is-given';
+export type EraseRefusal = 'cell-not-found' | 'cell-is-given';
 
-/** Apaga o valor da célula (`row`, `col`); recusa pista (demais recusas: T06 seguintes). */
+/** Apaga o valor da célula (`row`, `col`); recusa célula inexistente e pista (nessa ordem). */
 export function eraseValue(board: Board, row: number, col: number): Result<Board, EraseRefusal> {
+  if (!isCoordinate(row) || !isCoordinate(col)) {
+    return { ok: false, reason: 'cell-not-found' };
+  }
   if (isGivenAt(board, row, col)) {
     return { ok: false, reason: 'cell-is-given' };
   }
   return { ok: true, value: replaceCell(board, row, col, null) };
+}
+
+/** Coordenada válida: inteiro de 0 a 8 (`-0` equivale a 0); não lança para `bigint` ou objetos. */
+function isCoordinate(n: unknown): boolean {
+  return Number.isInteger(n) && (n as number) >= 0 && (n as number) <= 8;
 }
 
 function isGivenAt(board: Board, row: number, col: number): boolean {

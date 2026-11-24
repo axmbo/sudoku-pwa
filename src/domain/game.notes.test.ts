@@ -104,4 +104,25 @@ describe('game (anotações)', () => {
     expect(second.value.cursor).toBe(2);
     expect(game.history).toHaveLength(0);
   });
+  it('CA-004-03: alternar anotação em pista (2,0) é recusado com cell-is-given e a partida não muda', () => {
+    const toggled = gameToggleNote(newGame(), 2, 7, 4);
+    if (!toggled.ok) throw new Error('fixture inválida');
+    const game = toggled.value;
+    const snapshot = structuredClone(game);
+
+    const result = gameToggleNote(game, 2, 0, 5);
+
+    expect(result).toEqual({ ok: false, reason: 'cell-is-given' });
+    expect(game).toEqual(snapshot);
+    expect(game.history).toHaveLength(1);
+  });
+
+  it('CA-004-07: limpar anotações em pista (2,0) é recusado com cell-is-given', () => {
+    const game = newGame();
+
+    const result = gameClearNotes(game, 2, 0);
+
+    expect(result).toEqual({ ok: false, reason: 'cell-is-given' });
+    expect(game.history).toHaveLength(0);
+  });
 });

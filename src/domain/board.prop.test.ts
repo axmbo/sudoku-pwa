@@ -8,7 +8,7 @@ import {
   anyMove,
   applyMove,
   boardWithConflicts,
-  type Move,
+  type BoardAction,
 } from './__arbitraries__/board';
 import { gridWithoutConflicts } from './__arbitraries__/grid';
 
@@ -106,7 +106,7 @@ function oracleConflicts(board: Board): unknown[] {
 }
 
 /** Modelo de precedência do plano: coordenada, depois valor, depois pista. */
-function expectedReason(board: Board, move: Move): string | null {
+function expectedReason(board: Board, move: BoardAction): string | null {
   if (!isCoord(move.row) || !isCoord(move.col)) return 'cell-not-found';
   if (move.op === 'place' && !isDigitValue(move.value)) return 'invalid-value';
   const cell = board.cells[(move.row as number) * 9 + (move.col as number)];
@@ -186,7 +186,7 @@ describe('board (propriedades de jogadas)', () => {
           const row = Math.floor(i / 9);
           const col = i % 9;
           const goal = wanted[i] ?? null;
-          const steps: Move[] = [
+          const steps: BoardAction[] = [
             { op: 'place', row, col, value: detours[i] },
             goal === null ? { op: 'erase', row, col } : { op: 'place', row, col, value: goal },
           ];

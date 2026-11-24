@@ -4,12 +4,12 @@ import type { Result } from '../result';
 import { gridWithoutConflicts } from './grid';
 
 /** Jogada com argumentos de qualquer tipo (fronteira `unknown`). */
-export type Move =
+export type BoardAction =
   | { readonly op: 'place'; readonly row: unknown; readonly col: unknown; readonly value: unknown }
   | { readonly op: 'erase'; readonly row: unknown; readonly col: unknown };
 
 /** Aplica a jogada pela API pública; os `unknown` são repassados como estão (o domínio valida). */
-export function applyMove(board: Board, move: Move): Result<Board, string> {
+export function applyMove(board: Board, move: BoardAction): Result<Board, string> {
   if (move.op === 'place') {
     return placeValue(board, move.row as number, move.col as number, move.value as number);
   }
@@ -75,7 +75,7 @@ export const dirtyValue: fc.Arbitrary<unknown> = fc.oneof(
 );
 
 /** Jogada com coordenadas e valor possivelmente sujos. */
-export const anyMove: fc.Arbitrary<Move> = fc.oneof(
+export const anyMove: fc.Arbitrary<BoardAction> = fc.oneof(
   fc.record({
     op: fc.constant('place' as const),
     row: dirtyCoordinate,
@@ -86,7 +86,7 @@ export const anyMove: fc.Arbitrary<Move> = fc.oneof(
 );
 
 /** Colocação com coordenadas e valor válidos (pode recair numa pista e ser recusada). */
-export const wellFormedPlace: fc.Arbitrary<Move> = fc.record({
+export const wellFormedPlace: fc.Arbitrary<BoardAction> = fc.record({
   op: fc.constant('place' as const),
   row: coordinate,
   col: coordinate,
@@ -94,7 +94,7 @@ export const wellFormedPlace: fc.Arbitrary<Move> = fc.record({
 });
 
 /** Aplica as jogadas em ordem, mantendo o tabuleiro quando a jogada é recusada. */
-export function playAll(board: Board, moves: readonly Move[]): Board {
+export function playAll(board: Board, moves: readonly BoardAction[]): Board {
   return moves.reduce((current, move) => {
     const result = applyMove(current, move);
     return result.ok ? result.value : current;

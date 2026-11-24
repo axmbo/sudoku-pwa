@@ -36,4 +36,4 @@ Formato:
 - Lição: na T03 cada agente ficou num único contexto (SendMessage) por 5 vermelhos; tokens reais por vermelho da eng-testes: T01 21k, T02 41k, T03 12,8k; o dev gastou 9,5k por ciclo. T03 fechou em 0,56x o provável (111,8k contra 200k). Amostra de uma tarefa; confundida com o tamanho de cada vermelho.
 - Proposta (diff): `/implementar` (skill) manda cada vermelho/GREEN seguinte da mesma tarefa por SendMessage ao agente já aberto; agente novo só ao trocar de tarefa.
 - Lugar de promoção: skill `implementar`
-- Estado: candidata (confirmar na T04 antes de promover)
+- Estado: aprovada pelo Diretor em 23/11/2026 para teste na T04; promover à skill `implementar` se o ganho se confirmar

@@ -30,7 +30,7 @@ export type GamePlaceRefusal = PlaceRefusal | 'game-over';
 export type GameEraseRefusal = EraseRefusal | 'game-over';
 export type NoteRefusal =
   'game-over' | 'cell-not-found' | 'invalid-value' | 'cell-is-given' | 'cell-has-value';
-export type ClearNotesRefusal = 'cell-not-found' | 'cell-is-given';
+export type ClearNotesRefusal = 'game-over' | 'cell-not-found' | 'cell-is-given';
 
 export type UndoRefusal = 'nothing-to-undo';
 export type RedoRefusal = 'nothing-to-redo';
@@ -110,6 +110,9 @@ export function gameClearNotes(
   row: unknown,
   col: unknown,
 ): Result<Game, ClearNotesRefusal> {
+  if (getGameStatus(game) === 'won') {
+    return { ok: false, reason: 'game-over' };
+  }
   if (!isCoordinate(row) || !isCoordinate(col)) {
     return { ok: false, reason: 'cell-not-found' };
   }

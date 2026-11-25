@@ -107,6 +107,30 @@ function applyTuple(game: Game, tuple: unknown): Result<Game, DeserializeRefusal
   return result.ok ? result : INCONSISTENT;
 }
 
+/** Reaplica todas as jogadas e recua até `target`, reconstruindo `before` e os refazíveis. */
+function replay(
+  start: Game,
+  moves: readonly unknown[],
+  target: number,
+): Result<Game, DeserializeRefusal> {
+  let game = start;
+  for (const tuple of moves) {
+    const applied = applyTuple(game, tuple);
+    if (!applied.ok) {
+      return applied;
+    }
+    game = applied.value;
+  }
+  for (let i = moves.length; i > target; i--) {
+    const undone = gameUndo(game);
+    if (!undone.ok) {
+      return INCONSISTENT;
+    }
+    game = undone.value;
+  }
+  return { ok: true, value: game };
+}
+
 /** Lê a partida serializada, reaplicando as jogadas para reconstruir o histórico. */
 export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal> {
   const envelope = parseEnvelope(input);
@@ -145,20 +169,6 @@ export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal
   if (!created.ok) {
     return INCONSISTENT;
   }
-  let game = created.value;
-  for (const tuple of moves) {
-    const applied = applyTuple(game, tuple);
-    if (!applied.ok) {
-      return applied;
-    }
-    game = applied.value;
-  }
-  for (let i = moves.length; i > target; i--) {
-    const undone = gameUndo(game);
-    if (!undone.ok) {
-      return INCONSISTENT;
-    }
-    game = undone.value;
-  }
-  return sameState(game, values, notes) ? { ok: true, value: game } : INCONSISTENT;
+  const replayed = replay(created.value, moves, target);
+  return replayed.ok && sameState(replayed.value, values, notes) ? replayed : INCONSISTENT;
 }

@@ -64,15 +64,21 @@ function isIntegerIn(value: unknown, min: number, max: number): boolean {
   return Number.isInteger(value) && (value as number) >= min && (value as number) <= max;
 }
 
-/** Jogada bem formada: lista de 3 inteiros, tipo 0..3 e índice 0..80. */
+/** Jogada bem formada: lista de 3 inteiros, tipo 0..3, índice 0..80 e dígito 0 em erase/clear-notes. */
 function isMoveTuple(tuple: unknown): boolean {
   return (
     Array.isArray(tuple) &&
     tuple.length === 3 &&
     isIntegerIn(tuple[0], 0, MOVE_KINDS.length - 1) &&
     isIntegerIn(tuple[1], 0, 80) &&
-    Number.isInteger(tuple[2])
+    Number.isInteger(tuple[2]) &&
+    (tuple[0] === 0 || tuple[0] === 2 || tuple[2] === 0)
   );
+}
+
+/** Anotações bem formadas: 81 máscaras inteiras em 0..511. */
+function isNotesList(notes: unknown): notes is readonly unknown[] {
+  return Array.isArray(notes) && notes.length === 81 && notes.every((m) => isIntegerIn(m, 0, 511));
 }
 
 function parseEnvelope(input: unknown): unknown {
@@ -222,8 +228,11 @@ export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal
     !isRecord(puzzle) ||
     givens === null ||
     solution === null ||
-    typeof values !== 'string' ||
-    !Array.isArray(notes) ||
+    typeof puzzle.difficulty !== 'string' ||
+    typeof puzzle.seed !== 'string' ||
+    !Number.isInteger(puzzle.generatorVersion) ||
+    parseGrid(values) === null ||
+    !isNotesList(notes) ||
     !Array.isArray(moves) ||
     !moves.every(isMoveTuple) ||
     !Number.isInteger(cursor)
@@ -239,5 +248,7 @@ export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal
     return INCONSISTENT;
   }
   const replayed = replay(created.value, moves as MoveTuple[], target);
-  return replayed.ok && sameState(replayed.value, values, notes) ? replayed : INCONSISTENT;
+  return replayed.ok && sameState(replayed.value, values as string, notes)
+    ? replayed
+    : INCONSISTENT;
 }

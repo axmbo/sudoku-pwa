@@ -9,7 +9,7 @@ Priorizado de cima para baixo; um item = uma spec = um ciclo. Os critérios aqui
 | B-03 | Gerador com seed e dificuldade | mesma seed + versão ⇒ mesmo puzzle; solução única; nível pela técnica mais difícil exigida | 003 | — |
 | B-04 | Estado de jogo | anotações; desfazer/refazer; detectar vitória; serialização versionada | 004 | — |
 | B-05 | Grade acessível (primeira UI) | jogar só por teclado e com leitor de tela; conflito sem depender de cor; toque ≥ 44 px | 005 | — |
-| B-06 | Persistência local | retomar o jogo ao reabrir; schema versionado com migração (o jogo gravado da 004 é a v1; o timer entra na v2, com migração v1→v2); sobreviver à atualização do SW | — | — |
+| B-06 | Persistência local | retomar o jogo ao reabrir; schema versionado com migração (o jogo gravado da 004 é a v1; o timer entra na v2, com migração v1→v2); sobreviver à atualização do SW; teto de tamanho do dado lido antes do `deserializeGame` (revisão r1 da 004, R1-05) | — | — |
 | B-07 | Timer e estatísticas | timer com pausa automática (no jogo gravado, `schemaVersion` 2: ver plano da 004); estatísticas por nível (jogos, vitórias, melhor tempo, sequência) | — | — |
 | B-08 | Desafio diário | um desafio por nível por dia, igual em todos os dispositivos na mesma data local; histórico por dia e nível | — | — |
 | B-09 | PWA: instalação, offline e atualização | instalável; funciona offline após a 1ª visita; atualização pede recarga sem perder jogo | — | — |

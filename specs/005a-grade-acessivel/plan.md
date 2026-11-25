@@ -1,7 +1,7 @@
 # Plano 005a — Grade acessível (primeira UI jogável)
 
 - **Spec:** [spec.md](spec.md) · **Autor:** `arquiteto` · **Irmã (não planejada aqui):** [005b](../005b-anotacoes-e-tema/spec.md)
-- **ADRs:** [0001](../../docs/adr/0001-stack-e-ferramentas.md) (orçamento), [0003](../../docs/adr/0003-framework-de-ui.md) (Preact, roving tabindex, `useReducer` sobre o domínio, sem `preact/compat`), [0007](../../docs/adr/0007-convencoes-do-dominio.md) (recusa como valor, índices 0–8). **Nenhum ADR novo:** tudo cabe no 0003; o ponto aberto é a pergunta 1 abaixo (spec, não arquitetura). ADR 0004 não se aplica (CA-005-37: sem persistência).
+- **ADRs:** [0001](../../docs/adr/0001-stack-e-ferramentas.md) (orçamento), [0003](../../docs/adr/0003-framework-de-ui.md) (Preact, roving tabindex, `useReducer` sobre o domínio, sem `preact/compat`), [0007](../../docs/adr/0007-convencoes-do-dominio.md) (recusa como valor, índices 0–8). **Nenhum ADR novo:** tudo cabe no 0003; o conflito CA-005-28 × CA-005-34 foi resolvido pela pergunta 1 (decidida (a), 25/11/2026; spec, não arquitetura). ADR 0004 não se aplica (CA-005-37: sem persistência).
 
 ## Módulos e fronteiras
 
@@ -92,7 +92,7 @@ Camadas: **unit** = funções puras de `ui/model` (Vitest, sem DOM); **comp** = 
 | CA-005-22 | unit | jogada com conflito é aceita |
 | CA-005-26 | comp | clique/toque seleciona e dá `tabindex=0` |
 | CA-005-27 | comp | botão 1–9 e Apagar igual ao atalho; `selected` não muda |
-| CA-005-28 | E2E | `boundingBox` ≥ 44×44 nos botões e nas células (ver pergunta 1 sobre 320 px) |
+| CA-005-28 | E2E | `boundingBox`: botões ≥ 44×44 sempre; células ≥ 44×44 em largura ≥ ~396 px mais margens e ≥ 24×24 sem sobreposição em 320 px (pergunta 1, decidida (a)) |
 | CA-005-29 | unit + comp + E2E | `getGameStatus` `won`; banner visível e anúncio; digitar/apagar sem efeito; E2E joga até vencer só com teclado |
 | CA-005-30 | unit + comp | `full-incorrect`: aviso sem revelar células além dos conflitos; jogo continua |
 | CA-005-31 | unit + comp | rajada de jogadas: um `Announcement` por ação; região viva mostra só o último |
@@ -124,7 +124,7 @@ Ficaram **8 tarefas**, no teto de "~8". Não passa, mas está no limite e com du
 
 ## Riscos
 
-- **CA-005-28 × CA-005-34 em 320 px (conflito entre CA):** 9 células de 44 px somam 396 px, mais que 320 px. Não cabem sem rolagem horizontal. → Pergunta 1 (decisão de produto, a spec precisa de ajuste).
+- **CA-005-28 × CA-005-34 em 320 px (conflito entre CA):** 9 células de 44 px somam 396 px, mais que 320 px. Não cabem sem rolagem horizontal. → Pergunta 1: **decidido (a), 25/11/2026**; CA-005-28 reescrito na spec (células encolhem abaixo de ~396 px, mínimo 24×24; botões sempre ≥ 44).
 - **CSP `style-src 'self'`** barra `style=""` em HTML; o Preact aplica estilo por CSSOM (permitido), mas para não depender disso a UI usa só classes e variáveis CSS → teste E2E sem erro de CSP no console.
 - **Leitor de tela real não se testa em CI** (jsdom e axe não dizem o que o TalkBack lê) → roteiro manual por release (`qa-auditor`, já previsto na spec); região viva única e simples reduz o risco.
 - **Foco programático × Preact:** mover o foco depois da renderização pode competir com o `tabindex` → efeito após a atualização do DOM, testado em comp (jsdom) e E2E.
@@ -133,7 +133,7 @@ Ficaram **8 tarefas**, no teto de "~8". Não passa, mas está no limite e com du
 
 ## Perguntas ao Diretor
 
-1. **CA-005-28 × CA-005-34** (bloqueia T07/T08, não T01–T06): o que prevalece em 320 px? (a) células com ≥ 44 px só quando a largura permitir (≥ 396 px mais margens) e, abaixo, as células encolhem para caber (o mínimo 24×24 do WCAG 2.2 AA vale; botões do teclado seguem ≥ 44); prós: sem rolagem horizontal, fiel ao WCAG AA; contras: cai o "44" nas telas estreitas; (b) manter 44 px em tudo e permitir rolagem horizontal da grade; prós: alvo grande; contras: quebra CA-005-34 e é ruim para leitor de tela e zoom; (c) 44 px de área de toque com células visuais menores via `padding` sobreposto; contras: sobrepõe vizinhas (não cumpre "sem tocar no vizinho"). **Recomendo (a)**, com `produto-ux` ajustando a redação do CA-005-28.
-2. **Gate de tamanho do ADR 0001** não existe: criar um teste/script de tamanho (JS ≤ 60 kB, CSS ≤ 10 kB) agora (fora da 005a, item próprio) ou deixar para quando o bundle encostar no teto? Recomendo registrar débito e deixar a 005a só medir.
-3. **Cobertura de `src/ui/model`:** adotar limiar de branches (ex.: 90%) para essa pasta no Vitest, como no domínio? Recomendo sim, em item separado de configuração, sem bloquear a 005a.
-4. **Tamanho:** manter 8 tarefas em uma spec (recomendado) ou cortar em 005a-1/005a-2 (ver acima)?
+1. **Decidido (a), 25/11/2026.** **CA-005-28 × CA-005-34** (bloqueava T07/T08, não T01–T06): o que prevalece em 320 px? (a) células com ≥ 44 px só quando a largura permitir (≥ 396 px mais margens) e, abaixo, as células encolhem para caber (o mínimo 24×24 do WCAG 2.2 AA vale; botões do teclado seguem ≥ 44); prós: sem rolagem horizontal, fiel ao WCAG AA; contras: cai o "44" nas telas estreitas; (b) manter 44 px em tudo e permitir rolagem horizontal da grade; prós: alvo grande; contras: quebra CA-005-34 e é ruim para leitor de tela e zoom; (c) 44 px de área de toque com células visuais menores via `padding` sobreposto; contras: sobrepõe vizinhas (não cumpre "sem tocar no vizinho"). **Recomendo (a)**, com `produto-ux` ajustando a redação do CA-005-28.
+2. Decidido (recomendação), 25/11/2026: débito [#21](https://github.com/axmbo/sudoku-pwa/issues/21); a 005a só mede. **Gate de tamanho do ADR 0001** não existe: criar um teste/script de tamanho (JS ≤ 60 kB, CSS ≤ 10 kB) agora (fora da 005a, item próprio) ou deixar para quando o bundle encostar no teto? Recomendo registrar débito e deixar a 005a só medir.
+3. Decidido (recomendação), 25/11/2026: item separado [#22](https://github.com/axmbo/sudoku-pwa/issues/22). **Cobertura de `src/ui/model`:** adotar limiar de branches (ex.: 90%) para essa pasta no Vitest, como no domínio? Recomendo sim, em item separado de configuração, sem bloquear a 005a.
+4. Decidido (recomendação), 25/11/2026: 8 tarefas numa spec só, sem dividir. **Tamanho:** manter 8 tarefas em uma spec (recomendado) ou cortar em 005a-1/005a-2 (ver acima)?

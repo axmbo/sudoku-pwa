@@ -24,12 +24,12 @@ Fonte das regras: `PROCESSO.md` §4.
 6. O agente reporta `leituras_fora_manifesto`; muitas = manifesto pobre, contexto alto com pouco uso = inchado.
 
 ## Limpar ou compactar
-- **Limpar** (`/clear` + `/retomar`) entre tarefas independentes e entre ciclos, sempre depois de atualizar `estado.md`.
+- **Limpar** (`/clear` + `/prosseguir`, ou `/retomar` para só ver o estado) entre tarefas independentes e entre ciclos, sempre depois de atualizar `estado.md`.
 - **Compactar** só no meio de tarefa longa que não pode recomeçar por arquivo.
 - Sinais de limpeza: troca de tarefa, conversa com muitas leituras que não servem mais, retomada após pausa longa.
 
 ## Atualizar `docs/estado.md`
-- ≤ 40 linhas, só estado: fase/ciclo, spec ativa, tarefa atual, bloqueios, próximos passos, pendências do Diretor.
+- ≤ 40 linhas, só estado: fase/ciclo, spec ativa, tarefa atual, bloqueios, próximos passos, pendências do Diretor. A linha **Próximo** traz um único comando de etapa entre crases (ex.: `/implementar 004 T06`), que o `/prosseguir` executa.
 - Regra nunca vai para o estado: se aparecer, mova para o dono (§9 do `PROCESSO.md`).
 - Atualize ao fim de cada tarefa e sessão, no mesmo commit do trabalho.
 - Teste mental: uma sessão nova, lendo só L0 + L1, sabe o que fazer a seguir?

@@ -6,7 +6,8 @@ Carregado em toda sessão e em todo subagente próprio. Limite: 80 linhas. Detal
 
 1. Leia `docs/estado.md` (o hook `SessionStart` já o injeta) e `docs/constituicao.md`.
 2. Leia só o que a tarefa pede (manifesto). Fora dele, justifique no retorno.
-3. Retomada completa: `/retomar`.
+3. Retomada completa: `/retomar`. Retomar e já executar a próxima etapa: `/prosseguir`.
+4. Pergunta ao Diretor só com os subagentes parados, em relatório gerencial (`PROCESSO.md` §1).
 
 ## Regras de ouro
 

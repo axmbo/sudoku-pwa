@@ -14,4 +14,4 @@ disable-model-invocation: true
    - próximo passo concreto;
    - critério de saída da revisão e orçamento de contexto vigentes;
    - pendências do Diretor (numeradas, com as de antes marcadas).
-5. Espere confirmação antes de executar algo caro ou difícil de desfazer.
+5. Espere confirmação antes de executar algo caro ou difícil de desfazer. Para retomar e já executar a próxima etapa, o Diretor usa `/prosseguir`.

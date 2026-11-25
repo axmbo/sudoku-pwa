@@ -1,6 +1,6 @@
 # Processo de engenharia — Sudoku PWA
 
-Fonte única do processo (versão **v0.6**, ver [CHANGELOG-processo](docs/process/CHANGELOG-processo.md)). Agentes, skills, `CLAUDE.md` e `CONTRIBUTING.md` detalham ou resumem e apontam para cá; não copiam. Mudança neste arquivo só via PDCA (seção 9) com aprovação do Diretor.
+Fonte única do processo (versão **v0.7**, ver [CHANGELOG-processo](docs/process/CHANGELOG-processo.md)). Agentes, skills, `CLAUDE.md` e `CONTRIBUTING.md` detalham ou resumem e apontam para cá; não copiam. Mudança neste arquivo só via PDCA (seção 9) com aprovação do Diretor.
 
 ## 1. Papéis
 
@@ -18,6 +18,14 @@ Fonte única do processo (versão **v0.6**, ver [CHANGELOG-processo](docs/proces
 | `curador-pdca` | agente | contexto (`estado.md`, manifestos, podas) e PDCA (métricas, retro, melhorias) |
 
 Definições em [.claude/agents/](.claude/agents/). Princípios: quem implementa não revisa; quem revisa não edita código; o mínimo de agentes que cobre os ângulos. `curador-pdca` nasceu da fusão de `curador-contexto` + `analista-pdca` (volume inicial baixo, mesmos dados); o PDCA separa se ele estourar o orçamento.
+
+**Interação com o Diretor (M-011).**
+
+- **Pergunta só com tudo parado.** Enquanto houver subagente rodando, o Orquestrador manda só status curto, sem pergunta. Decisões vão ao Diretor quando todas as threads terminaram ou estão bloqueadas esperando por ele.
+- **Só decisão de Diretor sobe:** escopo, prioridade, aprovação (spec, ADR, processo, merge, release) ou algo caro de desfazer. Detalhe que tem padrão sensato na spec, no plano ou nas regras, o Orquestrador decide e registra em `notas.md`.
+- **Relatório gerencial.** Cada decisão chega com contexto, opções, recomendação e custo de desfazer, de modo que o Diretor decida sem abrir arquivo.
+- **Pergunta complexa vai uma por vez**, para o Diretor poder pedir esclarecimento antes de decidir.
+- **Retomar e seguir:** `/clear` e depois `/prosseguir`, que lê a etapa em `estado.md` e a executa (skill `prosseguir`).
 
 **Modelos:** todos em `sonnet` por padrão. `opus` só por tarefa, com a justificativa registrada na tarefa ou no ADR (candidatos: ADR de plataforma/ameaças, revisão do gerador/solver). `haiku` para consolidação mecânica. O PDCA compara a qualidade dos achados por modelo.
 
@@ -71,7 +79,7 @@ Procedimento na skill `gestao-contexto`.
 PLAN   fluxo SDD; Diretor aprova a spec; curador monta manifestos;
        Orquestrador estima tokens e minutos por agente (otimista/provável/pessimista)
 DO     por tarefa: eng-testes (vermelho) → dev (verde) → dev (refatora);
-       curador atualiza estado.md; /clear antes da próxima tarefa
+       curador atualiza estado.md; /clear + /prosseguir para a próxima tarefa
 CHECK  npm run check → revisor (diff + CA↔teste + deriva) → qa-auditor (se tocar UI/PWA)
        loop de revisão até o critério de saída
 ACT    curador-pdca registra métricas, retro e melhorias; arquiva a spec;

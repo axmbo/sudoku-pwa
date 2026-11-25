@@ -2,6 +2,14 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.7 — 24/11/2026
+
+Pedido direto do Diretor depois da T05 da spec 004 ([M-011](melhorias.md)):
+
+- `PROCESSO.md` §1, "Interação com o Diretor": pergunta só com os subagentes parados; só sobe decisão de Diretor (o detalhe com padrão sensato o Orquestrador decide e registra em `notas.md`); relatório gerencial com contexto, opções, recomendação e custo de desfazer; pergunta complexa uma por vez.
+- Skill nova `/prosseguir`: depois do `/clear`, retoma e executa a etapa da linha **Próximo** do `estado.md`; para sem executar se houver divergência ou decisão do Diretor. `/retomar` continua para só ver o estado.
+- Skill `gestao-contexto`: a linha **Próximo** traz um único comando de etapa. Skills `implementar` e `analisar` sugerem `/clear` + `/prosseguir`. `CLAUDE.md` e `PROCESSO.md` §5 apontam para o novo fluxo.
+
 ## v0.6 — 24/11/2026
 
 Aprovado pelo Diretor na `/retro 001` ([ciclo-01](retro/ciclo-01.md); candidatas em [melhorias.md](melhorias.md)):

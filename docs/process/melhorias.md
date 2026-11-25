@@ -76,3 +76,9 @@ Formato:
 - Proposta (diff): na skill `pdca` (Estimar), `min_est` provável = tokens prováveis / vazão medida, com a vazão revista a cada ciclo; na skill `gestao-contexto`, manifesto de tarefa que usa `Result`/`Unit`/`CellConflict` inclui esses contratos por linhas.
 - Lugar de promoção: skill `pdca` e skill `gestao-contexto`
 - Estado: **promovida** em 24/11/2026 (v0.6) só a parte (a), à skill `gestao-contexto`; parte (b) (`min_est` pela vazão) segue candidata, uma amostra só, reavaliar após a 004
+
+## M-011 — Interação com o Diretor e comando `/prosseguir` (ciclo 02, 24/11/2026)
+- Lição: na T05 da 004, perguntas chegavam ao Diretor com subagentes ainda rodando (saída nova enquanto ele respondia) e em todos os níveis, inclusive detalhe de teste, sem contexto suficiente. Retomar exigia `/clear`, `/retomar` e saber qual era a próxima etapa.
+- Proposta (diff): `PROCESSO.md` §1 ganha "Interação com o Diretor" (pergunta só com tudo parado; só decisão de Diretor sobe; relatório gerencial; complexa uma por vez). Skill nova `/prosseguir` executa a etapa da linha **Próximo** do `estado.md`, que passa a trazer um único comando. O `/clear` continua manual (a skill não o dispara).
+- Lugar de promoção: `PROCESSO.md` §1 e §5; skill `prosseguir`; skills `retomar`, `implementar`, `analisar`, `gestao-contexto`; `CLAUDE.md` ("Ao começar").
+- Estado: aprovada em 24/11/2026 (v0.7), por pedido direto do Diretor, fora de retro.

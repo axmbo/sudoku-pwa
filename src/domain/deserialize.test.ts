@@ -294,3 +294,110 @@ describe('deserializeGame (vitória, conflitos e os quatro tipos de jogada)', ()
     expect(deserializeGame(serializeGame(mixed))).toEqual({ ok: true, value: mixed });
   });
 });
+
+describe('deserializeGame (jogadas sem efeito, bordas e leitura estrita)', () => {
+  const moves = (list: unknown): string => withPatch((d) => (d.moves = list));
+  const free = 30; // (3,3): vazia na fixture
+  const given = 1; // (0,1): pista
+
+  /**
+   * Dado com `moves` e o estado gravado igual ao que uma leitura frouxa (que aceitasse a
+   * jogada) produziria: assim só a recusa da jogada, e não a divergência de estado, causa o
+   * `inconsistent-data`. `cells` e `notes` sobrescrevem a partida base (pistas, sem anotações).
+   */
+  const recorded = (
+    list: unknown[],
+    cells: Readonly<Record<number, string>> = {},
+    notes: Readonly<Record<number, number>> = {},
+  ): string =>
+    withPatch((d) => {
+      const base = [...(d.puzzle as { givens: string }).givens];
+      d.values = base.map((char, i) => cells[i] ?? char).join('');
+      d.notes = Array.from({ length: 81 }, (_zero, i) => notes[i] ?? 0);
+      d.moves = list;
+      d.cursor = list.length;
+    });
+
+  it.each<[string, string]>([
+    [
+      'place do valor que a célula já tem',
+      recorded(
+        [
+          [0, free, 5],
+          [0, free, 5],
+        ],
+        { [free]: '5' },
+      ),
+    ],
+    ['erase de célula vazia', recorded([[1, free, 0]])],
+    [
+      'toggle-note em célula com valor',
+      recorded(
+        [
+          [0, free, 5],
+          [2, free, 3],
+        ],
+        { [free]: '5' },
+        { [free]: 4 },
+      ),
+    ],
+    ['clear-notes em célula sem anotação', recorded([[3, free, 0]])],
+    ['erase em pista', recorded([[1, given, 0]], { [given]: '.' })],
+    ['clear-notes em pista', recorded([[3, given, 0]])],
+    ['toggle-note em pista', recorded([[2, given, 3]], {}, { [given]: 4 })],
+    ['place com dígito 0 em célula livre', recorded([[0, free, 0]], { [free]: '0' })],
+    ['place com dígito 10 em célula livre', recorded([[0, free, 10]], { [free]: '10' })],
+    [
+      'toggle-note com dígito 0 em célula livre',
+      recorded([[2, free, 0]], {}, { [free]: -2147483648 }),
+    ],
+    ['toggle-note com dígito 10 em célula livre', recorded([[2, free, 10]], {}, { [free]: 512 })],
+  ])('CA-004-29: jogada sem efeito ou recusada (%s) é inconsistent-data', (_nome, input) => {
+    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'inconsistent-data' });
+  });
+
+  it.each<[string, string]>([
+    ['kind 4 (logo após o último válido)', moves([[4, 0, 1]])],
+    ['givens com 82 caracteres', withPuzzle((p) => (p.givens = `${p.givens as string}1`))],
+    ['solution com 82 caracteres', withPuzzle((p) => (p.solution = `${p.solution as string}1`))],
+    [
+      'givens com prefixo inválido e 80 válidos',
+      withPuzzle((p) => (p.givens = `x${(p.givens as string).slice(1)}`)),
+    ],
+    [
+      'solution com prefixo inválido e 80 válidos',
+      withPuzzle((p) => (p.solution = `x${(p.solution as string).slice(1)}`)),
+    ],
+    [
+      'givens com 80 válidos e sufixo inválido',
+      withPuzzle((p) => (p.givens = `${(p.givens as string).slice(0, 80)}x`)),
+    ],
+    ['givens que não é texto', withPuzzle((p) => (p.givens = 5))],
+    ['givens que é lista com o texto válido dentro', withPuzzle((p) => (p.givens = [p.givens]))],
+    [
+      'entrada que é lista com o texto válido dentro',
+      [serializeGame(sample())] as unknown as string,
+    ],
+    [
+      'entrada que é objeto String com o texto válido',
+      new String(serializeGame(sample())) as unknown as string,
+    ],
+    ['entrada objeto vazio', {} as unknown as string],
+  ])('CA-004-28: %s é invalid-data', (_nome, input) => {
+    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'invalid-data' });
+  });
+
+  it.each<[string, (notes: number[]) => number[]]>([
+    ['80 máscaras com o prefixo igual', (n) => n.slice(0, 80)],
+    ['82 máscaras com o prefixo igual', (n) => [...n, 0]],
+  ])('CA-004-29: notes com %s é inconsistent-data', (_nome, change) => {
+    const input = withPatch((d) => (d.notes = change(d.notes as number[])));
+    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'inconsistent-data' });
+  });
+
+  it('CA-004-25: jogada na última célula (índice 80) e no kind 3 voltam iguais', () => {
+    const game = play(sample(), [(g) => gamePlace(g, 8, 8, 5), (g) => gameClearNotes(g, 2, 7)]);
+
+    expect(deserializeGame(serializeGame(game))).toEqual({ ok: true, value: game });
+  });
+});

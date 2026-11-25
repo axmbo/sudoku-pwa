@@ -27,6 +27,8 @@ Somente arquivos de teste (`*.test.ts`, `*.spec.ts`, `e2e/**`) e fixtures. Nunca
 - Rode o teste e confirme que **falha pelo motivo certo**: asserção, salvo a exceção do símbolo novo (`PROCESSO.md` §6, "Motivo do vermelho"), declarada no corpo do commit.
 - Commit `test(<escopo>): <o que o teste exige>` com o teste vermelho, antes de qualquer `feat`/`fix`. O corpo traz a linha `total N / falham F / passam P` e a falha do vermelho colada; o retorno repete a linha. `testes_novos` segue a definição de `docs/process/metricas.md`.
 - Isenção de teste de invariante (`PROCESSO.md` §6): o teste passa de imediato; prove o vermelho uma vez contra uma cópia sem a proteção (no scratchpad) e descreva a prova e a isenção no corpo do commit.
+- TS7006 em cascata no vermelho de símbolo novo: tipe o parâmetro à mão.
+- Fixture com poucas vazias lista as células vazias em comentário; gerador de propriedade prova com mutante manual que alcança o estado coberto.
 - Se o `dev` devolver um teste com justificativa, avalie; mudar o que o teste verifica exige registrar em `notas.md`.
 
 ## Retorno (≤ 15 linhas)

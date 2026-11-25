@@ -2,6 +2,16 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.8 — 25/11/2026
+
+Aprovado pelo Diretor na `/retro 004` ([ciclo-02](retro/ciclo-02.md); candidatas em [melhorias.md](melhorias.md)):
+
+- M-012 e M-010 (ampliada), `PROCESSO.md` §6: define as vias 7a e 7b do commit `test`; 7b exige declaração em `tasks.md`; defeito achado no REFACTOR ou na revisão pede vermelho antes; o GREEN não implementa o ciclo seguinte. Template `specs/_templates/tasks.md`: campo "via 7b para mutantes" e "refazer por tipo" em "Testes esperados". A skill `tdd-dominio` só aponta.
+- M-013, skills `revisar` (mutação completa antes do PR) e `tdd-dominio` (propriedade sob a config do Stryker).
+- M-014 e M-002 (só a nota), agente `eng-testes`: fixture/gerador alcançam o estado coberto; TS7006 em cascata se tipa à mão. O `tsc-red-filter` não muda.
+- M-015, skill `git-fluxo`: `Closes #N` no corpo do PR.
+- Mantidas: M-001 (descartar na revisão do ciclo 03 sem ocorrência) e M-009(b).
+
 ## v0.7 — 24/11/2026
 
 Pedido direto do Diretor depois da T05 da spec 004 ([M-011](melhorias.md)):

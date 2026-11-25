@@ -6,7 +6,14 @@ import {
   swapPairInput,
   validPuzzleInput,
 } from './__arbitraries__/puzzle';
-import { createGame, gamePlace, getGameConflicts, getGameStatus, type Game } from './game';
+import {
+  createGame,
+  gameErase,
+  gamePlace,
+  getGameConflicts,
+  getGameStatus,
+  type Game,
+} from './game';
 
 /** Partida com só (3,1) vazia; o valor correto ali é 3. */
 const oneMissing = (): Game => {
@@ -62,11 +69,14 @@ describe('game (estado derivado e vitória)', () => {
     expect(getGameStatus(placed.value)).toBe('incomplete');
   });
 
-  it('CA-004-23: gamePlace em partida vencida é recusado com game-over', () => {
+  it.each([
+    ['gamePlace', (g: Game) => gamePlace(g, 3, 1, 5)],
+    ['gameErase', (g: Game) => gameErase(g, 3, 1)],
+  ])('CA-004-23: %s em partida vencida é recusado com game-over', (_nome, operation) => {
     const won = gamePlace(oneMissing(), 3, 1, 3);
     if (!won.ok) throw new Error('fixture inválida');
 
-    expect(gamePlace(won.value, 3, 1, 5)).toEqual({ ok: false, reason: 'game-over' });
+    expect(operation(won.value)).toEqual({ ok: false, reason: 'game-over' });
   });
 });
 

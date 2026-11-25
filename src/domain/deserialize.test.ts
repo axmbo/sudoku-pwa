@@ -355,6 +355,7 @@ describe('deserializeGame (jogadas sem efeito, bordas e leitura estrita)', () =>
 
   it.each<[string, string]>([
     ['kind 4 (logo após o último válido)', moves([[4, 0, 1]])],
+    ['kind 4 com dígito 0', moves([[4, 0, 0]])],
     ['givens com 82 caracteres', withPuzzle((p) => (p.givens = `${p.givens as string}1`))],
     ['solution com 82 caracteres', withPuzzle((p) => (p.solution = `${p.solution as string}1`))],
     [

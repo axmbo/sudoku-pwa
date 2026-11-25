@@ -1,6 +1,13 @@
 import type { Grid } from './board';
-import type { Game } from './game';
-import type { Move } from './history';
+import {
+  gameClearNotes,
+  gameErase,
+  gamePlace,
+  gameToggleNote,
+  createGame,
+  type Game,
+} from './game';
+import { undo, type Move } from './history';
 import type { Notes } from './notes';
 import type { Result } from './result';
 
@@ -49,8 +56,79 @@ export function serializeGame(game: Game): string {
 
 export type DeserializeRefusal = 'invalid-data' | 'future-version' | 'inconsistent-data';
 
-/** Lê a partida serializada; por ora só recusa tudo como `invalid-data` (T08, em construção). */
+const MOVE_KINDS: readonly Move['kind'][] = ['place', 'erase', 'toggle-note', 'clear-notes'];
+
+function parseGrid(text: unknown): (number | null)[][] | null {
+  if (typeof text !== 'string' || !/^[.1-9]{81}$/.test(text)) {
+    return null;
+  }
+  const cells = [...text].map((char) => (char === '.' ? null : Number(char)));
+  return Array.from({ length: 9 }, (_row, r) => cells.slice(r * 9, r * 9 + 9));
+}
+
+function parseEnvelope(input: unknown): unknown {
+  try {
+    return typeof input === 'string' ? JSON.parse(input) : null;
+  } catch {
+    return null;
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function applyTuple(game: Game, tuple: unknown): Result<Game, DeserializeRefusal> {
+  const [code, index, digit] = tuple as readonly [number, number, number];
+  const row = Math.floor(index / 9);
+  const col = index % 9;
+  const kind = MOVE_KINDS[code];
+  const result =
+    kind === 'place'
+      ? gamePlace(game, row, col, digit)
+      : kind === 'erase'
+        ? gameErase(game, row, col)
+        : kind === 'toggle-note'
+          ? gameToggleNote(game, row, col, digit)
+          : gameClearNotes(game, row, col);
+  return result.ok ? result : { ok: false, reason: 'inconsistent-data' };
+}
+
+/** Lê a partida serializada, reaplicando as jogadas para reconstruir o histórico. */
 export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal> {
-  void input;
-  return { ok: false, reason: 'invalid-data' };
+  const envelope = parseEnvelope(input);
+  if (!isRecord(envelope) || !isRecord(envelope.data)) {
+    return { ok: false, reason: 'invalid-data' };
+  }
+  const { puzzle, values, notes, moves, cursor } = envelope.data;
+  const givens = isRecord(puzzle) ? parseGrid(puzzle.givens) : null;
+  const solution = isRecord(puzzle) ? parseGrid(puzzle.solution) : null;
+  if (
+    envelope.schemaVersion !== GAME_FORMAT_VERSION ||
+    !isRecord(puzzle) ||
+    givens === null ||
+    solution === null ||
+    typeof values !== 'string' ||
+    !Array.isArray(notes) ||
+    !Array.isArray(moves) ||
+    !Number.isInteger(cursor)
+  ) {
+    return { ok: false, reason: 'invalid-data' };
+  }
+  const created = createGame({ ...puzzle, givens, solution });
+  if (!created.ok) {
+    return { ok: false, reason: 'inconsistent-data' };
+  }
+  let game = created.value;
+  for (const tuple of moves) {
+    const applied = applyTuple(game, tuple);
+    if (!applied.ok) {
+      return applied;
+    }
+    game = applied.value;
+  }
+  for (let i = moves.length; i > (cursor as number); i--) {
+    game = undo(game) as Game;
+  }
+  return { ok: true, value: game };
 }

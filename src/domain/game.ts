@@ -32,7 +32,7 @@ export type NoteRefusal =
   'game-over' | 'cell-not-found' | 'invalid-value' | 'cell-is-given' | 'cell-has-value';
 export type ClearNotesRefusal = 'game-over' | 'cell-not-found' | 'cell-is-given';
 
-export type UndoRefusal = 'nothing-to-undo';
+export type UndoRefusal = 'game-over' | 'nothing-to-undo';
 export type RedoRefusal = 'nothing-to-redo';
 
 export type GameStatus = 'incomplete' | 'full-incorrect' | 'won';
@@ -185,6 +185,9 @@ export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, 
 
 /** Desfaz a última jogada, restaurando valor e anotações da célula. */
 export function gameUndo(game: Game): Result<Game, UndoRefusal> {
+  if (getGameStatus(game) === 'won') {
+    return { ok: false, reason: 'game-over' };
+  }
   const undone = undo(game);
   return undone === null ? { ok: false, reason: 'nothing-to-undo' } : { ok: true, value: undone };
 }

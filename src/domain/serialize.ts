@@ -4,10 +4,11 @@ import {
   gameErase,
   gamePlace,
   gameToggleNote,
+  gameUndo,
   createGame,
   type Game,
 } from './game';
-import { undo, type Move } from './history';
+import type { Move } from './history';
 import type { Notes } from './notes';
 import type { Result } from './result';
 
@@ -78,6 +79,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+const INCONSISTENT = Object.freeze({ ok: false, reason: 'inconsistent-data' } as const);
+
+/** Valores e anotações gravados batem com os do jogo reconstruído. */
+function sameState(game: Game, values: string, notes: readonly unknown[]): boolean {
+  const rebuilt = game.notes.map(notesMask);
+  return (
+    values === gridText(game.board.cells.map((cell) => cell.value)) &&
+    notes.length === rebuilt.length &&
+    notes.every((mask, i) => mask === rebuilt[i])
+  );
+}
+
 function applyTuple(game: Game, tuple: unknown): Result<Game, DeserializeRefusal> {
   const [code, index, digit] = tuple as readonly [number, number, number];
   const row = Math.floor(index / 9);
@@ -91,7 +104,7 @@ function applyTuple(game: Game, tuple: unknown): Result<Game, DeserializeRefusal
         : kind === 'toggle-note'
           ? gameToggleNote(game, row, col, digit)
           : gameClearNotes(game, row, col);
-  return result.ok ? result : { ok: false, reason: 'inconsistent-data' };
+  return result.ok ? result : INCONSISTENT;
 }
 
 /** Lê a partida serializada, reaplicando as jogadas para reconstruir o histórico. */
@@ -124,9 +137,13 @@ export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal
   ) {
     return { ok: false, reason: 'invalid-data' };
   }
+  const target = cursor as number;
+  if (target < 0 || target > moves.length) {
+    return INCONSISTENT;
+  }
   const created = createGame({ ...puzzle, givens, solution });
   if (!created.ok) {
-    return { ok: false, reason: 'inconsistent-data' };
+    return INCONSISTENT;
   }
   let game = created.value;
   for (const tuple of moves) {
@@ -136,8 +153,12 @@ export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal
     }
     game = applied.value;
   }
-  for (let i = moves.length; i > (cursor as number); i--) {
-    game = undo(game) as Game;
+  for (let i = moves.length; i > target; i--) {
+    const undone = gameUndo(game);
+    if (!undone.ok) {
+      return INCONSISTENT;
+    }
+    game = undone.value;
   }
-  return { ok: true, value: game };
+  return sameState(game, values, notes) ? { ok: true, value: game } : INCONSISTENT;
 }

@@ -103,7 +103,7 @@ Convenção: "célula selecionada" = a que tem o foco na grade. Valores, conflit
 - **CA-005-21** — Conflito resolvido
   - Dado que existiam conflitos
   - Quando uma jogada (trocar ou apagar valor) elimina o último conflito
-  - Então as marcas somem e o leitor de tela anuncia "sem conflitos"; jogadas que não mudam o estado de conflito não geram anúncio de conflito. (O mesmo efeito via desfazer é tratado no CA-005-23, na 005b.)
+  - Então as marcas somem e o leitor de tela anuncia "sem conflitos"; jogadas que não mudam o estado de conflito não geram anúncio de conflito. "Mudar o estado de conflito" significa: a jogada cria conflito para a célula jogada (CA-005-20) ou elimina o último conflito existente (este CA); trocar um valor em conflito por outro que continua em conflito não gera novo anúncio de conflito. (O mesmo efeito via desfazer é tratado no CA-005-23, na 005b.)
 - **CA-005-22** — Conflito não bloqueia
   - Dado um valor que gera conflito
   - Quando é colocado
@@ -140,15 +140,15 @@ Convenção: "célula selecionada" = a que tem o foco na grade. Valores, conflit
 - **CA-005-31** — Anúncios sem inundar
   - Dado uma sequência rápida de jogadas
   - Quando o jogador digita
-  - Então cada jogada gera no máximo um anúncio, e um anúncio novo substitui o pendente em vez de enfileirar todos.
+  - Então cada jogada gera no máximo um anúncio, e um anúncio novo substitui o pendente em vez de enfileirar todos. Quando uma jogada cumpre mais de um anúncio (CA-005-12, 14, 20, 21, 29, 30), vale o de maior prioridade, nesta ordem: vitória (CA-005-29); grade cheia com erros (CA-005-30); conflito criado (CA-005-20); "sem conflitos" (CA-005-21); novo conteúdo da célula (CA-005-12 e 14). O conflito segue indicado no nome acessível das células e na marca visual.
 - **CA-005-33** — Movimento reduzido
   - Dado que o sistema pede movimento reduzido
   - Quando há transições ou animações (ex.: vitória)
   - Então elas são suprimidas ou substituídas por mudança instantânea.
 - **CA-005-34** — Layout em retrato e zoom
-  - Dado tela estreita em retrato (a partir de 320 px de largura) e fonte do sistema aumentada ou zoom de 200%
+  - Dado tela estreita em retrato com área útil de 320 px CSS de largura (já descontado o efeito de qualquer zoom: por exemplo, uma tela de 640 px com zoom de 200% tem 320 px CSS) e, separadamente, texto ampliado a 200% pela configuração de fonte do sistema ou do navegador
   - Quando a tela é exibida
-  - Então a grade ocupa a largura disponível, o teclado na tela fica abaixo dela, tudo cabe sem rolagem horizontal, nada se sobrepõe e as células seguem legíveis. (Layout lado a lado em tela larga: CA-005-40, na 005b.)
+  - Então a grade ocupa a largura disponível, o teclado na tela fica abaixo dela, tudo cabe sem rolagem horizontal, nada se sobrepõe, as nove células de uma linha cabem lado a lado (9 × 24 px = 216 px, mínimo do CA-005-28) e o dígito de cada célula aparece inteiro, sem corte. Larguras abaixo de 320 px CSS não são alvo desta spec. (Layout lado a lado em tela larga: CA-005-40, na 005b.)
 - **CA-005-35** — Verificação automática de acessibilidade
   - Dado a tela nos estados inicial, com conflito e em vitória
   - Quando a verificação automática de acessibilidade roda

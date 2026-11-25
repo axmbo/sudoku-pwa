@@ -12,12 +12,13 @@
 | `src/ui/fixed-puzzle.ts` | Puzzle fixo (dados `unknown` no formato de `createPuzzle`) e `fixedGame()` que o valida com `createGame`. É o único ponto a trocar quando o gerador (002/003) e o novo jogo (B-10) chegarem. | domínio |
 | `src/ui/model/navigation.ts` | `moveSelection`: puro, sem DOM (setas, Home/End, Ctrl+Home/End, sem volta). | `Index` |
 | `src/ui/model/messages.ts` | Todos os textos pt-BR: nome da célula, anúncios, avisos. Única fonte de texto para a 005b estender (anotações). | domínio (tipos) |
+| `src/ui/model/view.ts` | `gridView`: seletor puro que deriva, do `Game` e da seleção, a visão das 81 células (valor, pista, conflito, selecionada, par da selecionada, mesmo valor). Tira a lógica de realce de `Cell.tsx` e a deixa em teste unitário. | domínio (funções de leitura: `cellAt`, `getGameConflicts`), `messages` (tipo `CellView`), `navigation` |
 | `src/ui/model/reducer.ts` | `gameReducer` sobre o domínio (`gamePlace`, `gameErase`, `getGameConflicts`, `getGameStatus`) mais a política de anúncio. Puro; sem DOM, relógio ou aleatoriedade. | domínio, `messages`, `navigation` |
-| `src/ui/Grid.tsx`, `Cell.tsx` | `role="grid"`/`row`/`gridcell`, roving tabindex, teclado, destaque, ícone de conflito. Gerencia o foco no DOM (efeito). | `model/*`, domínio (tipos) |
+| `src/ui/Grid.tsx`, `Cell.tsx` | `role="grid"`/`row`/`gridcell`, roving tabindex, teclado, destaque, ícone de conflito. Consomem `gridView`; **não** consultam o domínio. Gerenciam o foco no DOM (efeito). | `model/*`, domínio (só tipos) |
 | `src/ui/Keypad.tsx` | Botões 1–9 e Apagar. | `model/*` |
-| `src/ui/Announcer.tsx` | Região viva única (`role="status"`, educada). | tipos |
+| `src/ui/Announcer.tsx` | Região viva única (`role="status"`, educada); o nó de texto é remontado por `key={id}`. | tipos |
 | `src/ui/App.tsx` | Compõe tudo, `useReducer(gameReducer, fixedGame())`, banner visível de vitória/erros. | tudo de `ui` |
-| `src/ui/styles.css`, `src/ui/theme.css` | Layout e tokens de cor (tema claro em variáveis CSS; a 005b acrescenta o escuro só trocando valores). | — |
+| `src/ui/styles.css`, `src/ui/theme.css` | Layout e tokens de cor (tema claro em variáveis CSS; a 005b acrescenta o escuro só trocando valores). O dígito da célula é dimensionado pela célula (decisão 7). | — |
 | `src/main.tsx` (altera) | Monta `<App/>`; `index.html` já tem `lang="pt-BR"` e `<title>`. | `ui/App` |
 
 Os testes ficam ao lado (`*.test.ts(x)`, projeto `ui` do Vitest, jsdom); E2E em `e2e/`.
@@ -25,11 +26,12 @@ Os testes ficam ao lado (`*.test.ts(x)`, projeto `ui` do Vitest, jsdom); E2E em 
 ### Decisões de projeto
 
 1. **Selecionado ≠ focado.** O estado guarda `selected` (célula). O roving tabindex dá `tabindex=0` a `selected` (CA-005-06); toque e botões do teclado na tela mudam `selected` sem tirar a seleção ao focar o botão (CA-005-26/27). O contorno de seleção vem de classe (`is-selected`), não de `:focus`, e o `:focus-visible` cobre o foco por teclado (CA-005-11).
-2. **Um anúncio por jogada (CA-005-31).** O reducer devolve no máximo um `Announcement`; o `Announcer` mostra só o último (substitui, não enfileira). `id` crescente faz o mesmo texto ser relido (`aria-atomic`). Precedência numa jogada: vitória > grade cheia com erros > conflito criado na célula jogada > "sem conflitos" (havia conflito e deixou de haver) > novo conteúdo da célula. Recusa por pista: "pista, não pode ser alterada" (CA-005-15). Recusa `game-over` (após vitória): sem anúncio (a grade segue navegável). **`announcement` é por ação, nunca herdado:** toda ação que não produz anúncio (`select`, `move`, jogada sem efeito, recusa `game-over`) devolve `announcement: null`; só a ação que anuncia traz um `Announcement` novo (`id` = anterior + 1). `id` nunca decresce e não avança sem anúncio novo. Assim o `Announcer` recebe só o novo e nunca relê um anúncio velho; limpar a região viva (`null`) não gera fala. O banner de vitória/erros é derivado de `getGameStatus`, não do `announcement`, e por isso persiste.
-3. **Conflito criado vs. já existente (CA-005-20/21).** Comparam-se `getGameConflicts` antes e depois: anuncia-se conflito só se a célula jogada está nos conflitos de depois; usa-se a primeira unidade de `CellConflict.units` da célula (ordem fixa linha, coluna, caixa), no texto "Conflito: 5 repetido na linha 3" (índice +1 na UI). Conflito segue derivado, nunca guardado (invariante 9).
+2. **Um anúncio por jogada (CA-005-31).** O reducer devolve no máximo um `Announcement`; o `Announcer` mostra só o último (substitui, não enfileira). **Releitura do mesmo texto:** `aria-atomic` só decide quanto da região é lido, não força releitura. O `Announcer` renderiza o texto num nó filho com `key={id}`, então cada anúncio novo (mesmo com texto idêntico, ex.: "pista, não pode ser alterada" duas vezes) **remonta** o nó e o leitor de tela o trata como conteúdo novo. O teste afirma só o que jsdom vê (o nó é substituído: referência diferente, texto igual); a fala real fica no roteiro de TalkBack do `qa-auditor`. Precedência numa jogada (spec CA-005-31): vitória > grade cheia com erros > conflito criado na célula jogada > "sem conflitos" (havia conflito e deixou de haver) > novo conteúdo da célula. Recusa por pista: "pista, não pode ser alterada" (CA-005-15). Recusa `game-over` (após vitória): sem anúncio (a grade segue navegável). **`announcement` é por ação, nunca herdado:** toda ação que não produz anúncio (`select`, `move`, jogada sem efeito, recusa `game-over`) devolve `announcement: null`; só a ação que anuncia traz um `Announcement` novo (`id` = anterior + 1). `id` nunca decresce e não avança sem anúncio novo. Assim o `Announcer` recebe só o novo e nunca relê um anúncio velho; limpar a região viva (`null`) não gera fala. O banner de vitória/erros é derivado de `getGameStatus`, não do `announcement`, e por isso persiste.
+3. **Conflito criado vs. já existente (CA-005-20/21).** Comparam-se `getGameConflicts` antes e depois. **"Muda o estado de conflito" (spec CA-005-21)** = (i) a célula jogada passa a estar em conflito sem estar antes (conflito criado, CA-005-20) ou (ii) havia conflito e deixou de haver qualquer ("sem conflitos"). Trocar um valor em conflito por outro que continua em conflito não anuncia conflito (cai no conteúdo da célula; o conflito segue no nome acessível e na marca). Para o anúncio de conflito criado, usa-se a primeira unidade de `CellConflict.units` da célula (ordem fixa linha, coluna, caixa), no texto "Conflito: 5 repetido na linha 3" (índice +1 na UI). Conflito segue derivado, nunca guardado (invariante 9).
 4. **Nome da célula por `aria-label`** (CA-005-03), mais a região viva para o que muda (rótulo de elemento focado que muda nem sempre é relido). Pista sem cor: peso da fonte e `aria-label` com "pista" (CA-005-02); conflito: ícone/padrão por CSS (`::after`/SVG inline por classe, sem `style` inline por causa da CSP `style-src 'self'`) mais "em conflito" no rótulo.
 5. **Vitória e grade cheia** vêm de `getGameStatus` (`won` / `full-incorrect`); banner visível mais anúncio único; sem animação, e `prefers-reduced-motion` zera transições (CA-005-33).
-6. **005b não fica sem porta:** `UiAction` e `Announcement` são uniões abertas a `toggle-note`, `undo`, `redo` e `set-mode`; `messages.cellLabel` recebe `notes` opcional ainda ignorado; tokens de cor são variáveis CSS trocáveis por `prefers-color-scheme`; o `Keypad` aceita botões extras por composição.
+6. **005b não fica sem porta, só com o que já existe e é testado:** `UiAction` é uma união extensível (a 005b acrescenta `toggle-note`, `undo`, `redo`, `set-mode`); os tokens de cor são variáveis CSS trocáveis por `prefers-color-scheme`. Nada de `notes` em `cellLabel`/`CellView` nem botões extras no `Keypad` aqui: a 005b os acrescenta com CA e teste próprios.
+7. **Dígito dimensionado pela célula (CA-005-34, risco de corte).** Com texto a 200% e células de 24 a 35 px, um `font-size` só em `rem` corta o dígito. A célula (`gridcell`) é o contêiner (`container-type: inline-size`, altura por `aspect-ratio: 1`, sem `padding` nem `overflow: hidden`) e contém um elemento filho só para o dígito (`<span class="cell-digit">`); é nesse filho que fica `font-size: min(1.25rem, 70cqi)` com `line-height: 1` (no próprio contêiner, `cqi` mediria o ancestral, não a célula): acompanha o texto do sistema até onde a célula permite e nunca passa dela. **Alvo de navegadores (decisão 15 do Diretor, 25/11/2026):** Baseline 2023 (container queries: Chrome 105, Safari 16, Firefox 110; de memória, sem consulta externa), registrado aqui e não em ADR. **Fallback único:** `@media` por classe de largura reduzindo o dígito, só se o E2E de T08 mostrar corte; sem declaração `font-size: 1rem` prévia. A raiz (`html`) não fixa `font-size` em `px`, para a ampliação de texto valer. Sem mudança de comportamento; o dígito pode não chegar a 200% de tamanho em célula pequena, o que a spec admite (exige dígito inteiro, não ampliado).
 
 ## Tipos públicos
 
@@ -48,6 +50,15 @@ export const messages: {
   readonly won: string; readonly fullWithErrors: string;
 };
 
+// src/ui/model/view.ts  (seletor puro; sem DOM)
+export interface GridCellView extends CellView {
+  readonly row: Index; readonly col: Index;
+  readonly selected: boolean;      // é a célula selecionada
+  readonly peer: boolean;          // mesma linha, coluna ou caixa da selecionada (exceto ela)
+  readonly sameValue: boolean;     // mesmo valor da selecionada (só se a selecionada tem valor; exceto ela)
+}
+export function gridView(game: Game, selected: Selection): readonly GridCellView[]; // 81 itens, ordem linha a linha
+
 // src/ui/model/reducer.ts
 export interface Announcement { readonly id: number; readonly text: string }
 export interface UiState {
@@ -64,7 +75,8 @@ export function initialState(game: Game): UiState;      // selected = (0,0)
 export function gameReducer(state: UiState, action: UiAction): UiState;
 
 // src/ui/fixed-puzzle.ts
-export const FIXED_PUZZLE: unknown;                    // formato aceito por createPuzzle (pistas + solução)
+export const FIXED_PUZZLE: unknown;                    // 5 campos de createPuzzle: pistas, solução, difficulty, seed, generatorVersion
+                                                       // difficulty/seed/generatorVersion são rótulos opacos (ex.: 'fixo', '005a', 1) que o gerador (002/003) substitui
 export function fixedGame(): Game;                     // createGame(FIXED_PUZZLE); lança se recusar (erro de programação)
 ```
 
@@ -72,14 +84,14 @@ export function fixedGame(): Game;                     // createGame(FIXED_PUZZL
 
 ## Estratégia de teste
 
-Camadas: **unit** = funções puras de `ui/model` (Vitest, sem DOM); **comp** = Testing Library + jsdom (papéis, rótulos, teclado, toque); **E2E** = Playwright (só jornadas); **a11y** = `@axe-core/playwright` nos três estados; **CSS** = verificação estática de tokens (razão de contraste calculada de variáveis CSS) e medição de geometria no Playwright. jsdom não faz layout nem cor computada, por isso CA de tamanho/contraste/zoom vão a E2E ou ao teste estático.
+Camadas: **unit** = funções puras de `ui/model` (Vitest, sem DOM); **comp** = Testing Library + jsdom (papéis, rótulos, teclado, toque); **E2E** = Playwright (só jornadas); **a11y** = `@axe-core/playwright` nos três estados; **CSS** = verificação estática de tokens (razão de contraste calculada de variáveis CSS) e medição de geometria no Playwright. jsdom não faz layout nem cor computada, por isso CA de tamanho/contraste/zoom vão a E2E ou ao teste estático. A derivação de visão (`gridView`) e a política de anúncio são **unit puro**; os componentes só ligam.
 
 | CA | Camada | Observação |
 |---|---|---|
-| CA-005-01 | unit + comp + E2E | unit: `fixedGame()` ok e **solução única** provada por contador de soluções só no teste (o domínio ainda não tem solver); comp: 81 células, pistas, 9 caixas separadas (classe de borda); E2E: abre e vê a grade |
+| CA-005-01 | unit + comp + E2E | unit: `fixedGame()` ok e **solução única** provada por contador de soluções só no teste (o domínio ainda não tem solver; escolhe a célula vazia com menos candidatos, corte em 2 e teto de tempo explícito no teste); comp: 81 células, pistas, 9 caixas separadas (classe de borda); E2E: abre e vê a grade |
 | CA-005-02 | comp | nome só diz "pista" nas pistas; peso/estilo distintos via classe (aparência real: E2E/manual) |
 | CA-005-03 | unit + comp | `cellLabel` pelos quatro formatos; comp: `getByRole('gridcell', {name})` |
-| CA-005-05 | comp + a11y | classes de realce de linha/coluna/caixa/mesmo valor; contorno próprio por classe `is-selected`; verificação visual no E2E |
+| CA-005-05 | unit (`gridView`) + comp + a11y | unit: `peer`/`sameValue`/`selected` corretos; comp: classes de realce de linha/coluna/caixa/mesmo valor; contorno próprio por classe `is-selected`; verificação visual no E2E |
 | CA-005-06 | unit + comp | só uma célula com `tabindex=0`; (1,1) na primeira vez e a última selecionada depois |
 | CA-005-07, 08, 09 | unit (propriedade sobre `moveSelection`: resultado sempre em 0–8; borda não se move) + comp (teclado dispara o foco) | |
 | CA-005-10 | E2E | Tab e Shift+Tab percorrem todos os controles, sem armadilha |
@@ -88,20 +100,20 @@ Camadas: **unit** = funções puras de `ui/model` (Vitest, sem DOM); **comp** = 
 | CA-005-14 | unit + comp | Backspace, Delete e 0; anúncio "vazia" |
 | CA-005-15 | unit + comp | pista: estado idêntico, anúncio de imutabilidade |
 | CA-005-19 | comp | ícone/padrão de conflito (elemento ou classe) em todas as células do conflito; "em conflito" no nome |
-| CA-005-20, 21 | unit (reducer) | conflito criado (texto com valor e unidade), não repetido sem mudança de estado, "sem conflitos" ao eliminar o último; troca ou apagar |
+| CA-005-20, 21 | unit (reducer) | conflito criado (texto com valor e unidade); troca de valor em conflito por outro que segue em conflito não anuncia conflito; "sem conflitos" ao eliminar o último; troca ou apagar |
 | CA-005-22 | unit | jogada com conflito é aceita |
 | CA-005-26 | comp | clique/toque seleciona e dá `tabindex=0` |
 | CA-005-27 | comp | botão 1–9 e Apagar igual ao atalho; `selected` não muda |
-| CA-005-28 | E2E | `boundingBox`: botões ≥ 44×44 sempre; células ≥ 44×44 em largura ≥ ~396 px mais margens e ≥ 24×24 sem sobreposição em 320 px (pergunta 1, decidida (a)) |
+| CA-005-28 | E2E | `boundingBox`: botões ≥ 44×44 sempre; células ≥ 44×44 em largura ≥ ~396 px mais margens e ≥ 24×24 sem sobreposição em 320 px CSS (pergunta 1, decidida (a)) |
 | CA-005-29 | unit + comp + E2E | `getGameStatus` `won`; banner visível e anúncio; digitar/apagar sem efeito; E2E joga até vencer só com teclado |
 | CA-005-30 | unit + comp | `full-incorrect`: aviso sem revelar células além dos conflitos; jogo continua |
-| CA-005-31 | unit + comp | rajada de jogadas: um `Announcement` por ação; região viva mostra só o último |
+| CA-005-31 | unit + comp | rajada: um `Announcement` por ação; precedência vitória > grade cheia com erros > conflito criado > "sem conflitos" > conteúdo (um caso unit por par vizinho); `Announcer` remonta o nó por `key={id}` (comp: nó substituído, mesmo com texto idêntico); região viva mostra só o último |
 | CA-005-33 | CSS estático | regra `prefers-reduced-motion` zera transição/animação (E2E com `emulateMedia` confere) |
-| CA-005-34 | E2E | viewport 320 px, zoom 200%: sem `scrollWidth > clientWidth`, teclado abaixo da grade, sem sobreposição |
+| CA-005-34 | E2E + CSS estático | **Emulação** (o viewport do Playwright já é em px CSS, então 320 px CSS = 640 px a 200% de zoom, sem emular zoom): `viewport {width: 320}` e, separadamente, texto a 200% com `font-size` da raiz em 200% (`addInitScript` que faz `document.documentElement.style.setProperty('font-size','200%')`, por CSSOM, permitido pela CSP; confere `getComputedStyle(html).fontSize` = 2× o padrão). Afirma: `documentElement.scrollWidth ≤ clientWidth`; nove células por linha com `boundingBox` de ≥ 24 px lado a lado e sem sobreposição; teclado abaixo da grade; em cada célula e no seu dígito `scrollWidth ≤ clientWidth` e `scrollHeight ≤ clientHeight` (dígito inteiro, sem corte). Estático: células sem `overflow: hidden`, dígito com `cqi` (decisão 7), `html` sem `font-size` em px. O zoom real do navegador fica no roteiro do `qa-auditor` |
 | CA-005-35 | a11y (E2E) | axe com 0 sérias/críticas nos estados inicial, com conflito e vitória |
 | CA-005-36 | comp + E2E | `lang`, `<title>`, um `h1`; textos só de `messages` |
 | CA-005-37 | E2E | recarregar volta ao puzzle fixo; nada de `localStorage`/IndexedDB; a tela não menciona salvamento |
-| CA-005-39 | CSS estático + a11y | contraste calculado dos pares do tema claro (texto 4,5:1; componente e foco 3:1) e `color-contrast` do axe |
+| CA-005-39 | CSS estático + a11y | contraste calculado dos pares do tema claro (texto 4,5:1; componente e foco 3:1), incluindo texto de pista e de valor do jogador sobre cada fundo de realce (selecionada, par, mesmo valor) e sobre o fundo de conflito, e `color-contrast` do axe |
 
 Domínio: sem mutação nova (não muda). Mutation do Stryker não cobre `src/ui/` (config atual só do domínio); não se amplia aqui. Cobertura: meta de branches ≥ 90% segue só para o domínio; `ui/model` terá teste de ramos por CA, sem limiar novo (proposta de limiar para `ui/model`: pergunta 3).
 
@@ -120,15 +132,17 @@ Ficaram **8 tarefas**, no teto de "~8". Não passa, mas está no limite e com du
 - **Recomendação: não dividir.** A 005 já foi dividida uma vez (005a/005b); a 005a é a menor fatia jogável de ponta a ponta.
 - **Prós de não dividir:** uma entrega verificável (jogar e vencer); sem custo extra de ciclo (spec, planejar, analisar, PR); o teste de jornada só faz sentido com tudo montado.
 - **Contras:** T05 (Grid) e T07 (CSS) podem estourar a estimativa; um PR grande para revisão; se T05 ou T07 passarem de 15k de manifesto na execução, dividir ali.
-- **Alternativa, se o Diretor preferir:** cortar após T06 (lógica e componentes, sem estilo nem E2E) como 005a-1 e deixar T07 e T08 (estilo, contraste, zoom, E2E, axe) como 005a-2. Prós: PRs menores. Contras: o 005a-1 fica sem aparência final nem a11y verificada; mais um ciclo de processo, e CA de estilo e a11y só fecham no segundo. Não decido sozinho: pergunta 4.
+- **Alternativa, se o Diretor preferir:** cortar após T06 (lógica e componentes, sem estilo nem E2E) como 005a-1 e deixar T07 e T08 (estilo, contraste, zoom, E2E, axe) como 005a-2. Prós: PRs menores. Contras: o 005a-1 fica sem aparência final nem a11y verificada; mais um ciclo de processo, e CA de estilo e a11y só fecham no segundo. Decidido na pergunta 4 (8 tarefas numa spec só).
 
 ## Riscos
 
-- **CA-005-28 × CA-005-34 em 320 px (conflito entre CA):** 9 células de 44 px somam 396 px, mais que 320 px. Não cabem sem rolagem horizontal. → Pergunta 1: **decidido (a), 25/11/2026**; CA-005-28 reescrito na spec (células encolhem abaixo de ~396 px, mínimo 24×24; botões sempre ≥ 44).
+- **CA-005-28 × CA-005-34 em 320 px CSS (conflito entre CA):** 9 células de 44 px somam 396 px, mais que 320 px. Não cabem sem rolagem horizontal. → Pergunta 1: **decidido (a), 25/11/2026**; CA-005-28 reescrito na spec (células encolhem abaixo de ~396 px, mínimo 24×24; botões sempre ≥ 44).
 - **CSP `style-src 'self'`** barra `style=""` em HTML; o Preact aplica estilo por CSSOM (permitido), mas para não depender disso a UI usa só classes e variáveis CSS → teste E2E sem erro de CSP no console.
 - **Leitor de tela real não se testa em CI** (jsdom e axe não dizem o que o TalkBack lê) → roteiro manual por release (`qa-auditor`, já previsto na spec); região viva única e simples reduz o risco.
 - **Foco programático × Preact:** mover o foco depois da renderização pode competir com o `tabindex` → efeito após a atualização do DOM, testado em comp (jsdom) e E2E.
-- **Solução única do puzzle fixo** sem solver no domínio → contador de soluções só no teste de T01 (força bruta com corte em 2); pode ser trocado pelo solver da 003.
+- **Solução única do puzzle fixo** sem solver no domínio → contador de soluções só no teste de T01 (célula com menos candidatos primeiro, corte em 2, teto de tempo explícito para não virar teste instável); pode ser trocado pelo solver da 003.
+- **Dígito cortado com texto a 200% (CA-005-34):** tratado na decisão 7 (dígito dimensionado pela célula via `cqi`). Se o `cqi` não bastar (alvo Baseline 2023, decisão 7), a saída sem mudar comportamento é reduzir o dígito por classe de largura (`@media`), o que perde a ampliação proporcional; fica registrado como risco, e o E2E de T08 (`scrollWidth ≤ clientWidth` na célula) é quem detecta, virando item novo `tdd: sim`.
+- **Zoom de navegador não emulado em CI:** o E2E prova 320 px CSS e texto a 200%, não o zoom real nem 640 px a 200% → roteiro manual do `qa-auditor`.
 - **Estimativas** de tokens/minutos são hipóteses (calibração da 004, ×1,4), sem medição própria da UI.
 
 ## Perguntas ao Diretor

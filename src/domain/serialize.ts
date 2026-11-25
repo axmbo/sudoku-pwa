@@ -67,6 +67,21 @@ function parseGrid(text: unknown): (number | null)[][] | null {
   return Array.from({ length: 9 }, (_row, r) => cells.slice(r * 9, r * 9 + 9));
 }
 
+function isIntegerIn(value: unknown, min: number, max: number): boolean {
+  return Number.isInteger(value) && (value as number) >= min && (value as number) <= max;
+}
+
+/** Jogada bem formada: lista de 3 inteiros, tipo 0..3 e índice 0..80. */
+function isMoveTuple(tuple: unknown): boolean {
+  return (
+    Array.isArray(tuple) &&
+    tuple.length === 3 &&
+    isIntegerIn(tuple[0], 0, MOVE_KINDS.length - 1) &&
+    isIntegerIn(tuple[1], 0, 80) &&
+    Number.isInteger(tuple[2])
+  );
+}
+
 function parseEnvelope(input: unknown): unknown {
   try {
     return typeof input === 'string' ? JSON.parse(input) : null;
@@ -157,6 +172,7 @@ export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal
     typeof values !== 'string' ||
     !Array.isArray(notes) ||
     !Array.isArray(moves) ||
+    !moves.every(isMoveTuple) ||
     !Number.isInteger(cursor)
   ) {
     return { ok: false, reason: 'invalid-data' };

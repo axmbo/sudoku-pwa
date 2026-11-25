@@ -120,9 +120,9 @@ Convenção: "célula selecionada" = a que tem o foco na grade. Valores, conflit
   - Quando o jogador toca num botão de 1 a 9 ou em Apagar
   - Então o efeito é o mesmo do atalho de teclado equivalente (CA-005-12 a 15), aplicado à célula selecionada, que continua selecionada. (Anotar, Desfazer e Refazer na tela: CA-005-38, na 005b.)
 - **CA-005-28** — Alvos de toque
-  - Dado qualquer botão ou célula tocável
-  - Quando medido
-  - Então tem ao menos 44×44 px CSS de área de toque, com espaço suficiente para não tocar no vizinho por engano.
+  - Dado os botões do teclado na tela e as células da grade
+  - Quando medidos
+  - Então os botões têm sempre ao menos 44×44 px CSS; as células têm ao menos 44×44 px quando a largura disponível permite (cerca de 396 px mais as margens ou mais); em larguras menores as células encolhem para caber, nunca abaixo de 24×24 px CSS (mínimo do WCAG 2.2 AA, critério 2.5.8) e sem sobreposição com as vizinhas.
 
 ### Vitória e grade cheia
 
@@ -173,7 +173,7 @@ Resumo dos requisitos (os CA acima são a fonte verificável):
 - **Teclado:** jogo de valores completo sem mouse; uma parada de Tab na grade; setas sem volta; Home/End e Ctrl+Home/End; sem armadilha de foco.
 - **Leitor de tela (pt-BR):** nome da célula com linha, coluna, conteúdo, pista e conflito; mudanças relevantes em aviso educado, uma por jogada.
 - **Foco e contraste:** foco visível ≥ 3:1; texto ≥ 4,5:1 (tema claro); conflito, pista e selecionada nunca só por cor.
-- **Toque:** alvos ≥ 44×44 px; teclado na tela com dígitos e Apagar.
+- **Toque:** botões do teclado na tela sempre ≥ 44×44 px; células ≥ 44×44 px quando a largura permite (≥ ~396 px mais margens), senão encolhem até no mínimo 24×24 px (CA-005-28); teclado na tela com dígitos e Apagar.
 - **Movimento:** movimento reduzido respeitado.
 - **Verificação:** automática (0 sérias/críticas), E2E só com teclado, e roteiro manual com TalkBack por release (registrado pelo `qa-auditor`, fora desta spec).
 - **Desempenho:** a resposta a uma tecla ou toque não tem atraso perceptível e o orçamento do ADR 0001 vale.
@@ -199,3 +199,4 @@ Resumo dos requisitos (os CA acima são a fonte verificável):
 8. **Destaque de linha, coluna, caixa e mesmo valor:** (a) sim, sutil (CA-005-05).
 9. **Divisão da spec:** dividir em 005a e 005b, com o teclado numérico na tela na 005a e o tema escuro na 005b.
 10. **Issues:** 005a = #19; 005b = #20.
+11. **Alvos de toque × 320 px (conflito CA-005-28 × CA-005-34):** (a) células ≥ 44×44 px quando a largura permitir (≥ ~396 px mais margens); abaixo disso encolhem para caber, nunca abaixo de 24×24 px (WCAG 2.2 AA, 2.5.8) e sem sobreposição; botões do teclado na tela sempre ≥ 44×44 px. Reescreve o CA-005-28; o CA-005-34 permanece (sem rolagem horizontal a partir de 320 px).

@@ -6,8 +6,9 @@
 - **Spec 001 concluída e arquivada (24/11/2026):** [PR #2](https://github.com/axmbo/sudoku-pwa/pull/2); [RESUMO](../specs/_arquivo/001-tabuleiro-conflitos/RESUMO.md); [ADR 0007](adr/0007-convencoes-do-dominio.md). Retro: [ciclo-01](process/retro/ciclo-01.md); promovidas no v0.6: M-003, M-005 a M-008, M-009(a).
 - **Spec 004 concluída, mergeada e arquivada (25/11/2026 10:08 BRT, rebase merge):** [PR #16](https://github.com/axmbo/sudoku-pwa/pull/16), 33 CA, 672 testes, cobertura 100%, mutation 100% (rodada completa). Ponto de leitura: [RESUMO](../specs/_arquivo/004-estado-de-jogo/RESUMO.md). A issue [#14](https://github.com/axmbo/sudoku-pwa/issues/14) foi fechada à mão em 25/11/2026 10:20 BRT, com autorização do Diretor (o PR escreveu "Fecha", que o GitHub não reconhece; M-015).
 - **Retro do ciclo 02 feita (25/11/2026):** [ciclo-02](process/retro/ciclo-02.md); tarefas 1,19M de subagentes contra 1,22M prováveis (0,97×); real rastreado do ciclo 1,40M contra âncora 1,62M (sem orquestrador, planejamento, análise e CI: n/d). Candidatas novas M-012 a M-015 e reavaliação de M-001, M-002, M-009(b), M-010 em [melhorias](process/melhorias.md). Ciclo 02 não é múltiplo de 3: sem revisão estrutural (próxima no ciclo 03).
-- **Spec 005 especificada e dividida (25/11/2026, aprovada pelo Diretor):** [005a](../specs/005a-grade-acessivel/spec.md) (30 CA, [#19](https://github.com/axmbo/sudoku-pwa/issues/19); grade, teclado, valor, conflito, teclado na tela, vitória) e depois [005b](../specs/005b-anotacoes-e-tema/spec.md) (15 CA, [#20](https://github.com/axmbo/sudoku-pwa/issues/20); anotações, desfazer/refazer, tema escuro, tela larga). Recomendações de UX aprovadas em bloco. Branch `feat/005a-grade-acessivel`. Alerta: a 005a ainda pode passar de ~8 tarefas (o `arquiteto` avalia no plano).
-- **Próximo:** `/planejar 005a` (puzzle fixo até a 003; [plano da fase](process/plano-fase-1.md)).
+- **Spec 005 especificada e dividida (25/11/2026, aprovada pelo Diretor):** [005a](../specs/005a-grade-acessivel/spec.md) (30 CA, [#19](https://github.com/axmbo/sudoku-pwa/issues/19)) e depois [005b](../specs/005b-anotacoes-e-tema/spec.md) (15 CA, [#20](https://github.com/axmbo/sudoku-pwa/issues/20)). Branch `feat/005a-grade-acessivel`.
+- **005a planejada (25/11/2026):** [plan](../specs/005a-grade-acessivel/plan.md) e [tasks](../specs/005a-grade-acessivel/tasks.md): 8 tarefas (T07 CSS e T08 E2E isentas), domínio intocado, tudo em `src/ui/`, sem ADR novo; manifestos ≤ 8,4k; âncora provável ~1,47M tokens (faixa 0,86M–2,74M), reancorar após T02 e T05. Real do planejamento: 205,6k tokens (3 subagentes; orquestrador n/d). Perguntas 1 a 4 do plano abertas (ver Pendências).
+- **Próximo:** `/analisar 005a` (a pergunta 1 bloqueia só T07 e T08).
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o hook do `dev` bloqueia arquivo de teste (provado em 22/11/2026).
 
 ## Decisões do Diretor (22/11/2026 a 25/11/2026)
@@ -28,8 +29,9 @@
 
 ## Pendências do Diretor
 
-1. Mantidas até a revisão estrutural do ciclo 03: M-001 (descartar sem ocorrência) e M-009(b) (`min_est` pela vazão).
-2. Proteção da `main` + regra de quem cria tags `v*` (adiada em 23/11/2026: "depois").
+1. Plano da 005a ([plan.md](../specs/005a-grade-acessivel/plan.md), perguntas): (1) CA-005-28 (alvos ≥44 px) × CA-005-34 (320 px sem rolagem), **bloqueia T07/T08**; (2) gate de tamanho do ADR 0001 como débito; (3) limiar de branches ~90% em `src/ui/model`; (4) manter 8 tarefas numa spec.
+2. Mantidas até a revisão estrutural do ciclo 03: M-001 (descartar sem ocorrência) e M-009(b) (`min_est` pela vazão).
+3. Proteção da `main` + regra de quem cria tags `v*` (adiada em 23/11/2026: "depois").
 
 ## Débitos
 

@@ -12,4 +12,4 @@ disable-model-invocation: true
 3. Leve ao Diretor as candidatas, numeradas. Aprovadas: promova ao lugar mais barato e registre no `CHANGELOG-processo.md`.
 4. Ciclo múltiplo de 3: inclua a revisão estrutural da equipe (`PROCESSO.md` §9).
 5. Spec mergeada: `RESUMO.md` e arquivamento em `specs/_arquivo/`.
-6. `docs/estado.md` atualizado; commit `docs(process): retro do ciclo NN`; sugira `/clear`.
+6. `docs/estado.md` atualizado, com a etapa seguinte (em geral `/especificar NNN` da próxima spec do plano da fase) como **Próximo**; commit `docs(process): retro do ciclo NN`; sugira `/clear` + `/prosseguir`.

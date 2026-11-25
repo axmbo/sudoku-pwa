@@ -27,6 +27,7 @@ export interface Game {
 }
 
 export type GamePlaceRefusal = PlaceRefusal | 'game-over';
+export type GameEraseRefusal = EraseRefusal | 'game-over';
 export type NoteRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given' | 'cell-has-value';
 export type ClearNotesRefusal = 'cell-not-found' | 'cell-is-given';
 
@@ -153,7 +154,10 @@ export function gamePlace(
 }
 
 /** Apaga o valor da célula (row, col), limpando as anotações dela; célula vazia não tem efeito. */
-export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, EraseRefusal> {
+export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, GameEraseRefusal> {
+  if (getGameStatus(game) === 'won') {
+    return { ok: false, reason: 'game-over' };
+  }
   const erased = eraseValue(game.board, row, col);
   if (!erased.ok) {
     return erased;

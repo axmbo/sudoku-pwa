@@ -10,11 +10,14 @@ Proposta do passo 7 do [plano da Fase 0](plano-fase-0.md). A Fase 1 entrega o n�
 | 002 | B-02 | solver (backtracking + contagem de soluções com corte em 2) | 001 |
 | 003 | B-03 | gerador com seed + dificuldade por técnicas | 001, 002 |
 | 004 | B-04 | estado de jogo (anotações, desfazer/refazer, vitória, serialização versionada) | 001 |
-| 005 | B-05 | grade acessível (primeira UI) | 001, 004 |
+| 005a | B-05 | grade acessível jogável: teclado, valor, conflito, teclado na tela, vitória | 001, 004 |
+| 005b | B-05 | anotações, desfazer/refazer, tema escuro e layout largo na UI | 005a |
 
 A 004 não depende de 002 nem de 003; pode vir antes da 003 se a 003 travar.
 
 **Ordem decidida pelo Diretor em 24/11/2026:** 001 → 004 → 005 → 002 → 003, para chegar antes à primeira UI. Até o gerador (003) existir, a 005 usa um **puzzle fixo**, embutido e com solução única (aceito pelo Diretor em 24/11/2026); a 003 o substitui.
+
+**Divisão da 005 decidida pelo Diretor em 25/11/2026:** 005a e depois 005b (37 CA passavam da faixa de um ciclo). O teclado na tela fica na 005a, para ela já ser jogável no celular. Os IDs `CA-005-NN` valem nas duas. Ordem: 001 → 004 → 005a → 005b → 002 → 003.
 
 ## Estimativa por ciclo
 
@@ -26,7 +29,7 @@ A 004 não depende de 002 nem de 003; pode vir antes da 003 se a 003 travar.
 | 002 | 200k / 400k / 800k | 45 / 90 / 180 | baixo; algoritmo conhecido, property-based forte |
 | 003 | 400k / 800k / 1,6M | 90 / 180 / 360 | **alto**; técnicas de dificuldade e determinismo. Provavelmente dividida em 003a (gerador + seed + unicidade) e 003b (níveis por técnica) |
 | 004 | 250k / 500k / 1M | 60 / 120 / 240 | médio; o schema versionado conversa com o ADR 0004 |
-| 005 | 350k / 700k / 1,4M | 90 / 180 / 360 | médio; E2E, axe e leitor de tela com o `qa-auditor` |
+| 005 | 350k / 700k / 1,4M | 90 / 180 / 360 | médio; E2E, axe e leitor de tela com o `qa-auditor`; dividida em 005a e 005b (25/11/2026), com a faixa por parte no `/planejar` |
 | **Total** | **1,45M / 2,9M / 5,8M** | **~6h / 11,5h / 23h** | sem contar a espera pelo Diretor |
 
 ## Orçamento por agente

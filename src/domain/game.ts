@@ -197,7 +197,15 @@ function commit(
   });
 }
 
-/** Estado derivado da partida (fake it: triangulado nos próximos ciclos). */
+/** Estado derivado da partida: vazia ⇒ incompleta; cheia ⇒ vitória só se igual à solução. */
 export function getGameStatus(game: Game): GameStatus {
-  return game.board.cells.some((cell) => cell.value === null) ? 'incomplete' : 'won';
+  const { cells } = game.board;
+  if (cells.some((cell) => cell.value === null)) {
+    return 'incomplete';
+  }
+  const solution = game.puzzle.solution;
+  const matches = cells.every(
+    (cell, index) => cell.value === solution[Math.floor(index / 9)]?.[index % 9],
+  );
+  return matches ? 'won' : 'full-incorrect';
 }

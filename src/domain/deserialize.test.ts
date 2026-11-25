@@ -353,6 +353,28 @@ describe('deserializeGame (jogadas sem efeito, bordas e leitura estrita)', () =>
     expect(deserializeGame(input)).toEqual({ ok: false, reason: 'inconsistent-data' });
   });
 
+  /**
+   * Jogada com dígito fora de 1..9 como refazível (cursor 0, estado da partida nova): uma leitura
+   * frouxa a aceitaria no replay e a desfaria, devolvendo `ok: true`; só a recusa da jogada dá
+   * `inconsistent-data`.
+   */
+  const redoable = (move: unknown[]): string =>
+    withPatch((d) => {
+      d.values = (d.puzzle as { givens: string }).givens;
+      d.notes = Array<number>(81).fill(0);
+      d.moves = [move];
+      d.cursor = 0;
+    });
+
+  it.each<[string, string]>([
+    ['place com dígito 0 refazível', redoable([0, free, 0])],
+    ['place com dígito 10 refazível', redoable([0, free, 10])],
+    ['toggle-note com dígito 0 refazível', redoable([2, free, 0])],
+    ['toggle-note com dígito 10 refazível', redoable([2, free, 10])],
+  ])('CA-004-29: %s é inconsistent-data', (_nome, input) => {
+    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'inconsistent-data' });
+  });
+
   it.each<[string, string]>([
     ['kind 4 (logo após o último válido)', moves([[4, 0, 1]])],
     ['kind 4 com dígito 0', moves([[4, 0, 0]])],

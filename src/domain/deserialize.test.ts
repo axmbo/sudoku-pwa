@@ -345,13 +345,10 @@ describe('deserializeGame (jogadas sem efeito, bordas e leitura estrita)', () =>
     ['erase em pista', recorded([[1, given, 0]], { [given]: '.' })],
     ['clear-notes em pista', recorded([[3, given, 0]])],
     ['toggle-note em pista', recorded([[2, given, 3]], {}, { [given]: 4 })],
-    ['place com dígito 0 em célula livre', recorded([[0, free, 0]], { [free]: '0' })],
-    ['place com dígito 10 em célula livre', recorded([[0, free, 10]], { [free]: '10' })],
-    [
-      'toggle-note com dígito 0 em célula livre',
-      recorded([[2, free, 0]], {}, { [free]: -2147483648 }),
-    ],
-    ['toggle-note com dígito 10 em célula livre', recorded([[2, free, 10]], {}, { [free]: 512 })],
+    ['place com dígito 0 em célula livre', recorded([[0, free, 0]])],
+    ['place com dígito 10 em célula livre', recorded([[0, free, 10]])],
+    ['toggle-note com dígito 0 em célula livre', recorded([[2, free, 0]])],
+    ['toggle-note com dígito 10 em célula livre', recorded([[2, free, 10]])],
   ])('CA-004-29: jogada sem efeito ou recusada (%s) é inconsistent-data', (_nome, input) => {
     expect(deserializeGame(input)).toEqual({ ok: false, reason: 'inconsistent-data' });
   });
@@ -387,12 +384,30 @@ describe('deserializeGame (jogadas sem efeito, bordas e leitura estrita)', () =>
     expect(deserializeGame(input)).toEqual({ ok: false, reason: 'invalid-data' });
   });
 
-  it.each<[string, (notes: number[]) => number[]]>([
-    ['80 máscaras com o prefixo igual', (n) => n.slice(0, 80)],
-    ['82 máscaras com o prefixo igual', (n) => [...n, 0]],
-  ])('CA-004-29: notes com %s é inconsistent-data', (_nome, change) => {
-    const input = withPatch((d) => (d.notes = change(d.notes as number[])));
-    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'inconsistent-data' });
+  it.each<[string, string]>([
+    ['difficulty número', withPuzzle((p) => (p.difficulty = 5))],
+    ['difficulty null', withPuzzle((p) => (p.difficulty = null))],
+    ['difficulty objeto', withPuzzle((p) => (p.difficulty = {}))],
+    ['seed número', withPuzzle((p) => (p.seed = 5))],
+    ['generatorVersion texto', withPuzzle((p) => (p.generatorVersion = '1'))],
+    ['generatorVersion não inteiro', withPuzzle((p) => (p.generatorVersion = 1.5))],
+    ['generatorVersion null', withPuzzle((p) => (p.generatorVersion = null))],
+    ['values com 80 caracteres', withPatch((d) => (d.values = (d.values as string).slice(1)))],
+    ['values com 82 caracteres', withPatch((d) => (d.values = `${d.values as string}1`))],
+    ['values com caractere 0', withPatch((d) => (d.values = setChar(d.values as string, 3, '0')))],
+    ['values com caractere x', withPatch((d) => (d.values = setChar(d.values as string, 3, 'x')))],
+    ['values que é lista com o texto dentro', withPatch((d) => (d.values = [d.values]))],
+    ['notes com 80 elementos', withPatch((d) => (d.notes = (d.notes as number[]).slice(1)))],
+    ['notes com 82 elementos', withPatch((d) => (d.notes = [...(d.notes as number[]), 0]))],
+    ['notes com elemento 1.5', withNotes(3, 1.5)],
+    ['notes com elemento texto', withNotes(3, '3' as unknown as number)],
+    ['notes com elemento null', withNotes(3, null as unknown as number)],
+    ['notes com elemento -1', withNotes(3, -1)],
+    ['notes com elemento 512', withNotes(3, 512)],
+    ['erase com dígito 5', withPatch((d) => (d.moves = [[1, 30, 5]]))],
+    ['clear-notes com dígito 5', withPatch((d) => (d.moves = [[3, 30, 5]]))],
+  ])('CA-004-28: %s é recusado como invalid-data (fronteira de tipo)', (_nome, input) => {
+    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'invalid-data' });
   });
 
   it('CA-004-25: jogada na última célula (índice 80) e no kind 3 voltam iguais', () => {

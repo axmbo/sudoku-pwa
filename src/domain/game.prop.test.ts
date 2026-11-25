@@ -210,8 +210,6 @@ describe('game (propriedades)', () => {
     );
   });
 
-  // Timeout explícito: ~1,1 s local, mas a instrumentação do Stryker no runner do CI (job mutation)
-  // estoura os 5 s padrão no dry run.
   it('CA-004-22: won se e só se a grade está cheia, sem conflito e igual à solução', () => {
     const fillAll = (initial: Game, values: readonly number[]): void => {
       const empties = initial.board.cells.flatMap((c, i) => (c.value === null ? [i] : []));
@@ -268,7 +266,7 @@ describe('game (propriedades)', () => {
     }
     expect(getConflicts(current.board)).toEqual([]);
     expect(getGameStatus(current)).toBe('full-incorrect');
-  }, 20_000);
+  });
 
   it('INV: conflito é derivado: getGameConflicts(g) = getConflicts(g.board) em todo jogo gerado', () => {
     fc.assert(

@@ -2,7 +2,7 @@
 
 > Snapshot vivo para retomada. Máximo de 40 linhas. Só estado; regras ficam em `CLAUDE.md` e `PROCESSO.md`.
 
-- **Fase:** 1 (domínio e primeira UI). Fase 0 encerrada no [PR #1](https://github.com/axmbo/sudoku-pwa/pull/1) (23/11/2026, `8b5b40e`). Regras vivas: `PROCESSO.md` v0.7 ([PR #15](https://github.com/axmbo/sudoku-pwa/pull/15), 24/11/2026). `main` em `d191a54`.
+- **Fase:** 1 (domínio e primeira UI). Fase 0 encerrada no [PR #1](https://github.com/axmbo/sudoku-pwa/pull/1) (23/11/2026, `8b5b40e`). Regras vivas: `PROCESSO.md` v0.8 (retro do ciclo 02, 25/11/2026; v0.7 no [PR #15](https://github.com/axmbo/sudoku-pwa/pull/15)). `main` em `d191a54`.
 - **Spec 001 concluída e arquivada (24/11/2026):** [PR #2](https://github.com/axmbo/sudoku-pwa/pull/2); [RESUMO](../specs/_arquivo/001-tabuleiro-conflitos/RESUMO.md); [ADR 0007](adr/0007-convencoes-do-dominio.md). Retro: [ciclo-01](process/retro/ciclo-01.md); promovidas no v0.6: M-003, M-005 a M-008, M-009(a).
 - **Spec 004 concluída, mergeada e arquivada (25/11/2026 10:08 BRT, rebase merge):** [PR #16](https://github.com/axmbo/sudoku-pwa/pull/16), 33 CA, 672 testes, cobertura 100%, mutation 100% (rodada completa). Ponto de leitura: [RESUMO](../specs/_arquivo/004-estado-de-jogo/RESUMO.md). A issue [#14](https://github.com/axmbo/sudoku-pwa/issues/14) segue aberta (o PR escreveu "Fecha", que o GitHub não reconhece; M-015): fechar é do Diretor.
 - **Retro do ciclo 02 feita (25/11/2026):** [ciclo-02](process/retro/ciclo-02.md); tarefas 1,19M de subagentes contra 1,22M prováveis (0,97×); real rastreado do ciclo 1,40M contra âncora 1,62M (sem orquestrador, planejamento, análise e CI: n/d). Candidatas novas M-012 a M-015 e reavaliação de M-001, M-002, M-009(b), M-010 em [melhorias](process/melhorias.md). Ciclo 02 não é múltiplo de 3: sem revisão estrutural (próxima no ciclo 03).
@@ -26,7 +26,7 @@
 
 ## Pendências do Diretor
 
-1. Decidir as candidatas da retro do ciclo 02, em [melhorias](process/melhorias.md): recomendação do curador: promover M-010 (ampliada) e M-012; M-002 só a nota no agente `eng-testes`; M-013 a M-015 aprovar ou recusar; manter M-001 e M-009(b) até a revisão do ciclo 03.
+1. Mantidas até a revisão estrutural do ciclo 03: M-001 (descartar sem ocorrência) e M-009(b) (`min_est` pela vazão).
 2. Proteção da `main` + regra de quem cria tags `v*` (adiada em 23/11/2026: "depois").
 3. Fechar a issue #14 (ou autorizar o fechamento).
 

@@ -23,12 +23,13 @@ Fonte: `PROCESSO.md` §7 e [ADR 0006](../../../docs/adr/0006-plataforma-versiona
 ## PR
 - Um PR por spec. Título em Conventional Commits; corpo:
   ```
-  Fecha #<issue>. Spec: specs/NNN-<slug>/
+  Closes #<issue>. Spec: specs/NNN-<slug>/
   ## O que muda
   ## CA cobertos
   ## Como verificar
   ## Métricas (tokens/minutos est. × real)
   ```
+- A linha de fechamento usa `Closes #N` (em inglês; "Fecha" não é reconhecido); ao abrir o PR, confira `closingIssuesReferences`.
 - Labels: tipo (`feat`, `fix`…), severidade nas issues (`blocker`, `major`, `minor`, `nit`), `débito`, `full-ci` (dispara o CI completo).
 - Todo PR criado pela IA é revisado logo em seguida pelo `revisor` (contexto limpo, só leitura).
 - Comentário da IA em PR termina com assinatura (`---` + linha "Comentário gerado por <modelo> (Claude Code)").

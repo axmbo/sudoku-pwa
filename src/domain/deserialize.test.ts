@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { almostSolvedInput, solutionGrid, validPuzzleInput } from './__arbitraries__/puzzle';
-import { canRedo, createGame, gamePlace, gameToggleNote, gameUndo, type Game } from './game';
+import {
+  canRedo,
+  createGame,
+  gameClearNotes,
+  gameErase,
+  gamePlace,
+  gameToggleNote,
+  gameUndo,
+  getGameConflicts,
+  getGameStatus,
+  type Game,
+} from './game';
+import type { Result } from './result';
 import { deserializeGame, serializeGame } from './serialize';
 
 /** Partida pequena e conhecida: anotações 7 e 2 em (2,7), depois o 1 em (0,0). */
@@ -231,4 +243,54 @@ describe('deserializeGame (refazíveis)', () => {
       expect(read.ok && canRedo(read.value)).toBe(true);
     },
   );
+});
+
+/** Aplica os passos em ordem sobre a partida; fixture inválida lança. */
+const play = (start: Game, steps: readonly ((g: Game) => Result<Game, string>)[]): Game =>
+  steps.reduce((game, step) => {
+    const next = step(game);
+    if (!next.ok) throw new Error('fixture inválida');
+    return next.value;
+  }, start);
+
+describe('deserializeGame (vitória, conflitos e os quatro tipos de jogada)', () => {
+  it('CA-004-30: partida vencida volta won, com o mesmo histórico', () => {
+    const created = createGame(almostSolvedInput(2, 7));
+    if (!created.ok) throw new Error('fixture inválida');
+    const won = play(created.value, [
+      (g) => gameToggleNote(g, 2, 7, 4),
+      (g) => gamePlace(g, 2, 7, (solutionGrid[2] as number[])[7] as number),
+    ]);
+    expect(getGameStatus(won)).toBe('won');
+
+    const read = deserializeGame(serializeGame(won));
+
+    expect(read).toEqual({ ok: true, value: won });
+    expect(read.ok && getGameStatus(read.value)).toBe('won');
+    expect(read.ok && read.value.history).toEqual(won.history);
+  });
+
+  it('CA-004-31: conflitos e status voltam recalculados, iguais aos da original', () => {
+    // 2 em (0,0) repete o 2 dado em (0,1): conflito derivado, nunca gravado.
+    const conflicting = play(sample(), [(g) => gamePlace(g, 0, 0, 2)]);
+    expect(getGameConflicts(conflicting).length).toBeGreaterThan(0);
+
+    const read = deserializeGame(serializeGame(conflicting));
+
+    expect(read.ok && getGameConflicts(read.value)).toEqual(getGameConflicts(conflicting));
+    expect(read.ok && getGameStatus(read.value)).toBe(getGameStatus(conflicting));
+  });
+
+  it('CA-004-25: partida com place, erase, toggle-note e clear-notes volta igual', () => {
+    const mixed = play(sample(), [
+      (g) => gameErase(g, 0, 0),
+      (g) => gameToggleNote(g, 3, 3, 5),
+      (g) => gameToggleNote(g, 3, 3, 9),
+      (g) => gameClearNotes(g, 3, 3),
+      (g) => gamePlace(g, 4, 4, 5),
+      (g) => gameToggleNote(g, 2, 7, 3),
+    ]);
+
+    expect(deserializeGame(serializeGame(mixed))).toEqual({ ok: true, value: mixed });
+  });
 });

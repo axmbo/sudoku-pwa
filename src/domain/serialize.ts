@@ -97,14 +97,23 @@ function applyTuple(game: Game, tuple: unknown): Result<Game, DeserializeRefusal
 /** Lê a partida serializada, reaplicando as jogadas para reconstruir o histórico. */
 export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal> {
   const envelope = parseEnvelope(input);
-  if (!isRecord(envelope) || !isRecord(envelope.data)) {
+  if (!isRecord(envelope)) {
+    return { ok: false, reason: 'invalid-data' };
+  }
+  const { schemaVersion } = envelope;
+  if (!Number.isInteger(schemaVersion) || (schemaVersion as number) < 1) {
+    return { ok: false, reason: 'invalid-data' };
+  }
+  if ((schemaVersion as number) > GAME_FORMAT_VERSION) {
+    return { ok: false, reason: 'future-version' };
+  }
+  if (!isRecord(envelope.data)) {
     return { ok: false, reason: 'invalid-data' };
   }
   const { puzzle, values, notes, moves, cursor } = envelope.data;
   const givens = isRecord(puzzle) ? parseGrid(puzzle.givens) : null;
   const solution = isRecord(puzzle) ? parseGrid(puzzle.solution) : null;
   if (
-    envelope.schemaVersion !== GAME_FORMAT_VERSION ||
     !isRecord(puzzle) ||
     givens === null ||
     solution === null ||

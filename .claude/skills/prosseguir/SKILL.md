@@ -9,10 +9,10 @@ disable-model-invocation: true
 Uso: `/clear` e depois `/prosseguir`. A skill não dispara o `/clear` (comando interno do Claude Code), por isso ele continua com o Diretor.
 
 1. Faça os passos 1 a 3 do `/retomar` (`.claude/skills/retomar/SKILL.md`): estado, constituição, spec ativa e conferência do `git`.
-2. Pegue a etapa na linha **Próximo** do `estado.md`: o primeiro comando entre crases que não seja `/clear`, `/retomar` nem `/prosseguir` (ex.: `/implementar 004 T06`).
+2. Pegue a etapa na linha **Próximo** do `estado.md`: o comando de etapa entre crases (ex.: `/implementar 004 T06`), ignorando `/clear`, `/retomar` e `/prosseguir`.
 3. **Pare e relate ao Diretor**, sem executar, se:
    - o repositório diverge do estado (branch, árvore suja, commits que o estado não conhece);
-   - não há etapa, ou há mais de uma sem ordem clara;
+   - não há comando de etapa na linha **Próximo**, ou há mais de um (formato antigo: relate e proponha a linha corrigida);
    - a etapa depende de decisão do Diretor (aprovar spec, ADR ou mudança de processo, merge, tag, release) ou de uma pendência dele que a bloqueia.
 4. Senão, diga em até 3 linhas onde estamos e qual etapa vai rodar, e execute-a já: leia `.claude/skills/<etapa>/SKILL.md` e siga-o com os argumentos. As skills de etapa têm `disable-model-invocation`, então leia o arquivo em vez de chamar a ferramenta Skill.
 5. Durante a etapa e no relatório final, valem as regras de interação com o Diretor do `PROCESSO.md` §1: sem perguntas enquanto houver subagente rodando, e decisões só no relatório gerencial.

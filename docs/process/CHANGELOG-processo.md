@@ -8,7 +8,8 @@ Pedido direto do Diretor depois da T05 da spec 004 ([M-011](melhorias.md)):
 
 - `PROCESSO.md` §1, "Interação com o Diretor": pergunta só com os subagentes parados; só sobe decisão de Diretor (o detalhe com padrão sensato o Orquestrador decide e registra em `notas.md`); relatório gerencial com contexto, opções, recomendação e custo de desfazer; pergunta complexa uma por vez.
 - Skill nova `/prosseguir`: depois do `/clear`, retoma e executa a etapa da linha **Próximo** do `estado.md`; para sem executar se houver divergência ou decisão do Diretor. `/retomar` continua para só ver o estado.
-- Skill `gestao-contexto`: a linha **Próximo** traz um único comando de etapa. Skills `implementar` e `analisar` sugerem `/clear` + `/prosseguir`. `CLAUDE.md` e `PROCESSO.md` §5 apontam para o novo fluxo.
+- Skill `gestao-contexto`: a linha **Próximo** traz um único comando de etapa. Skills `implementar` e `analisar` sugerem `/clear` + `/prosseguir`. `CLAUDE.md` e `PROCESSO.md` §4 e §5 apontam para o novo fluxo.
+- Skills `especificar`, `planejar`, `revisar` e `retro` gravam a etapa seguinte na linha **Próximo** do `estado.md` e sugerem `/clear` + `/prosseguir`; `conferencia-claude-code.md` registra por que o `/prosseguir` lê o `SKILL.md` da etapa em vez de invocá-la (correções da revisão r1 do PR #15).
 
 ## v0.6 — 24/11/2026
 

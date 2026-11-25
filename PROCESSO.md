@@ -66,7 +66,7 @@ Camadas: **L0** `CLAUDE.md` (sempre); **L1** `docs/estado.md` + `docs/constituic
 - **Orçamento de contexto inicial por subagente: 15 mil tokens** (o PDCA ajusta).
 - **Manifesto por tarefa:** lista fechada de caminhos (com seção/linhas quando possível), montada pelo `curador-pdca` antes da tarefa. Leitura fora do manifesto exige justificativa e é contada em `leituras_fora_manifesto`.
 - **Handoff por arquivo:** `estado.md` é atualizado ao fim de cada tarefa e sessão; uma sessão nova retoma lendo só L0 + L1.
-- **Limpar > compactar:** entre tarefas independentes, `/clear` + `/retomar`. Compactar só no meio de tarefa longa.
+- **Limpar > compactar:** entre tarefas independentes, `/clear` + `/prosseguir` (ou `/retomar` para só ver o estado). Compactar só no meio de tarefa longa.
 - **Arquivamento:** spec concluída ganha `RESUMO.md` e vai para `specs/_arquivo/`. ADR superado é marcado, não apagado.
 - **Higiene e limites:** `CLAUDE.md` ≤ 80 linhas; agente ≤ 40 linhas de corpo; skill ≤ 80 linhas; `estado.md` ≤ 40 linhas. O `curador-pdca` mede a cada ciclo e propõe podas.
 - **Estado × regra:** estado (`estado.md`, `notas.md`) diz onde estamos; regra (este arquivo, `CLAUDE.md`, skills, agentes, constituição) diz como trabalhamos. Nunca no mesmo arquivo.

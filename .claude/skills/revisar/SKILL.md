@@ -13,4 +13,4 @@ disable-model-invocation: true
 4. Grave os pareceres em `specs/NNN-*/revisao-rN.md` e `qa.md`.
 5. **Critério de saída: 0 blocker, 0 major, ≤ 3 minor.** Não atingido: achados voltam ao dono (teste → `eng-testes`, código → `dev`) e nova rodada. Na 4ª rodada, pare e escale ao Diretor.
 6. Saiu do loop: minors viram issues `débito` (com o Diretor), `docs/estado.md` atualizado (revisão, PR, próximo passo) antes de abrir o PR, PR aberto (skill `git-fluxo`), métricas da revisão em `metrics.csv`.
-7. Próximo: `/retro NNN`.
+7. Grave `/retro NNN` como **Próximo** no `estado.md` e sugira `/clear` + `/prosseguir`.

@@ -13,4 +13,4 @@ disable-model-invocation: true
 4. Acione o agente `produto-ux` passando só ponteiros: o item do backlog, `docs/produto/visao.md`, `specs/_templates/spec.md` e o número `NNN`.
 5. Leve as perguntas dele ao Diretor (clarificar), numeradas. Com as respostas, `produto-ux` atualiza a spec.
 6. Spec aprovada pelo Diretor: status `aprovada`, `docs/estado.md` atualizado, commit `docs(spec): especifica NNN <título>`.
-7. Próximo: `/planejar NNN`.
+7. Grave `/planejar NNN` como **Próximo** no `estado.md` (o `/prosseguir` para até o Diretor aprovar a spec) e sugira `/clear` + `/prosseguir`.

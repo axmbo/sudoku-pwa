@@ -14,4 +14,4 @@ Pré-requisito: `specs/$ARGUMENTS-*/spec.md` com status `aprovada`. Senão, pare
 3. Acione o `curador-pdca` para fechar os manifestos (orçamento de 15k tokens) e estimar cada tarefa × agente em `docs/process/metrics.csv`.
 4. ADR novo `Proposto`: leve ao Diretor antes de seguir.
 5. Atualize `docs/estado.md`; commit `docs(spec): planeja NNN`.
-6. Próximo: `/analisar NNN`.
+6. Grave `/analisar NNN` como **Próximo** no `estado.md` e sugira `/clear` + `/prosseguir`.

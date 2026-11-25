@@ -78,3 +78,20 @@ describe('deserializeGame (recusas)', () => {
     expect(deserializeGame(input)).toEqual({ ok: false, reason: 'invalid-data' });
   });
 });
+
+describe('deserializeGame (versão futura)', () => {
+  it.each<[string, string]>([
+    ['versão 2 com o resto íntegro', withVersion(2)],
+    ['versão 99 com o resto íntegro', withVersion(99)],
+    ['versão 2 sem data', JSON.stringify({ schemaVersion: 2 })],
+    ['versão 99 com data ilegível', JSON.stringify({ schemaVersion: 99, data: 'lixo' })],
+    [
+      'versão 2 com campo de tipo errado',
+      withData('cursor', '0').replace('"schemaVersion":1', '"schemaVersion":2'),
+    ],
+  ])('CA-004-27: %s é recusada como future-version', (_nome, input) => {
+    const antes = input;
+    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'future-version' });
+    expect(input).toBe(antes);
+  });
+});

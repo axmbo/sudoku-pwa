@@ -2,6 +2,7 @@ import type { Grid } from './board';
 import type { Game } from './game';
 import type { Move } from './history';
 import type { Notes } from './notes';
+import type { Result } from './result';
 
 /** Versão do formato serializado da partida (ADR 0004). */
 export const GAME_FORMAT_VERSION = 1;
@@ -44,4 +45,12 @@ export function serializeGame(game: Game): string {
       cursor: game.cursor,
     },
   });
+}
+
+export type DeserializeRefusal = 'invalid-data' | 'future-version' | 'inconsistent-data';
+
+/** Lê a partida serializada; por ora só recusa tudo como `invalid-data` (T08, em construção). */
+export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal> {
+  void input;
+  return { ok: false, reason: 'invalid-data' };
 }

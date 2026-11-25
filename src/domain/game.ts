@@ -26,6 +26,7 @@ export interface Game {
   readonly cursor: number;
 }
 
+export type GamePlaceRefusal = PlaceRefusal | 'game-over';
 export type NoteRefusal = 'cell-not-found' | 'invalid-value' | 'cell-is-given' | 'cell-has-value';
 export type ClearNotesRefusal = 'cell-not-found' | 'cell-is-given';
 
@@ -129,7 +130,10 @@ export function gamePlace(
   row: unknown,
   col: unknown,
   digit: unknown,
-): Result<Game, PlaceRefusal> {
+): Result<Game, GamePlaceRefusal> {
+  if (getGameStatus(game) === 'won') {
+    return { ok: false, reason: 'game-over' };
+  }
   const placed = placeValue(game.board, row, col, digit);
   if (!placed.ok) {
     return placed;

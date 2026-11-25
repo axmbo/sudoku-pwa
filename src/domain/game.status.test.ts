@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   almostSolvedInput,
+  sevenForThreeInput,
   solutionGrid,
   swapPairInput,
   validPuzzleInput,
@@ -15,9 +16,18 @@ const oneMissing = (): Game => {
 };
 
 describe('game (estado derivado e vitória)', () => {
-  it('CA-004-19: colocar o valor correto na única célula vazia vence a partida', () => {
+  it.each([
+    ['única célula vazia (3,1), correto 3', () => oneMissing(), 3, 1, 3],
+    [
+      'grade cheia certa, contando as pistas (fixture padrão, 10 vazias)',
+      () => nearlyFilled(),
+      2,
+      7,
+      5,
+    ],
+  ])('CA-004-19: completar igual à solução vence a partida, %s', (_nome, build, r, c, digit) => {
     // [símbolo novo: `getGameStatus`]
-    const placed = gamePlace(oneMissing(), 3, 1, 3);
+    const placed = gamePlace(build(), r, c, digit);
     if (!placed.ok) throw new Error('fixture inválida');
 
     expect(getGameStatus(placed.value)).toBe('won');
@@ -40,16 +50,23 @@ describe('game (estado derivado e vitória)', () => {
     expect(getGameStatus(game)).toBe('full-incorrect');
   });
 
-  it('CA-004-33: colocar valor errado sem conflito é aceito e a partida segue incomplete', () => {
-    const created = createGame(swapPairInput());
+  it('CA-004-33: colocar 7 onde o correto é 3, sem conflito, é aceito e a partida segue incomplete', () => {
+    const created = createGame(sevenForThreeInput());
     if (!created.ok) throw new Error('fixture inválida');
 
-    const placed = gamePlace(created.value, 0, 0, 2);
+    const placed = gamePlace(created.value, 3, 1, 7);
 
     expect(placed.ok).toBe(true);
     if (!placed.ok) return;
     expect(getGameConflicts(placed.value)).toEqual([]);
     expect(getGameStatus(placed.value)).toBe('incomplete');
+  });
+
+  it('CA-004-23: gamePlace em partida vencida é recusado com game-over', () => {
+    const won = gamePlace(oneMissing(), 3, 1, 3);
+    if (!won.ok) throw new Error('fixture inválida');
+
+    expect(gamePlace(won.value, 3, 1, 5)).toEqual({ ok: false, reason: 'game-over' });
   });
 });
 

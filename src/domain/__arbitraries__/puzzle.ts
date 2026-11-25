@@ -52,3 +52,17 @@ export function swapPairInput(): ReturnType<typeof validPuzzleInput> {
     ),
   };
 }
+
+/**
+ * Entrada com (3,1) vazia (correto 3) e sem 7 nas pistas da linha 3, da coluna 1 e do bloco
+ * dele: o 7 colocado em (3,1) difere da solução e não gera conflito.
+ */
+export function sevenForThreeInput(): ReturnType<typeof validPuzzleInput> {
+  const emptied = new Set(['3,1', '3,5', '7,1', '4,2']);
+  return {
+    ...validPuzzleInput(),
+    givens: solutionGrid.map((line, r) =>
+      line.map((value, c) => (emptied.has(`${r},${c}`) ? null : value)),
+    ),
+  };
+}

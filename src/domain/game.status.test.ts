@@ -11,6 +11,7 @@ import {
   gameClearNotes,
   gameErase,
   gamePlace,
+  gameRedo,
   gameToggleNote,
   gameUndo,
   getGameConflicts,
@@ -81,7 +82,27 @@ describe('game (estado derivado e vitória)', () => {
     ['gameClearNotes', (g: Game) => gameClearNotes(g, 3, 1)],
     // sem o guard, desfaria a vitória com sucesso (há uma jogada no histórico)
     ['gameUndo', (g: Game) => gameUndo(g)],
+    // sem o guard, a recusa seria `nothing-to-redo`
+    ['gameRedo', (g: Game) => gameRedo(g)],
   ])('CA-004-23: %s em partida vencida é recusado com game-over', (_nome, operation) => {
+    const won = gamePlace(oneMissing(), 3, 1, 3);
+    if (!won.ok) throw new Error('fixture inválida');
+
+    expect(operation(won.value)).toEqual({ ok: false, reason: 'game-over' });
+  });
+
+  it.each([
+    ['gamePlace', 'cell-not-found', (g: Game) => gamePlace(g, 9, 0, 5)],
+    ['gamePlace', 'invalid-value', (g: Game) => gamePlace(g, 3, 1, 10)],
+    ['gamePlace', 'cell-is-given', (g: Game) => gamePlace(g, 0, 0, 5)],
+    ['gameErase', 'cell-not-found', (g: Game) => gameErase(g, 9, 0)],
+    ['gameErase', 'cell-is-given', (g: Game) => gameErase(g, 0, 0)],
+    ['gameToggleNote', 'cell-not-found', (g: Game) => gameToggleNote(g, 9, 0, 5)],
+    ['gameToggleNote', 'invalid-value', (g: Game) => gameToggleNote(g, 3, 1, 10)],
+    ['gameToggleNote', 'cell-is-given', (g: Game) => gameToggleNote(g, 0, 0, 5)],
+    ['gameClearNotes', 'cell-not-found', (g: Game) => gameClearNotes(g, 9, 0)],
+    ['gameClearNotes', 'cell-is-given', (g: Game) => gameClearNotes(g, 0, 0)],
+  ])('CA-004-23: game-over vence %s com %s em partida vencida', (_nome, _outra, operation) => {
     const won = gamePlace(oneMissing(), 3, 1, 3);
     if (!won.ok) throw new Error('fixture inválida');
 

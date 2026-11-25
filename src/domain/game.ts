@@ -196,3 +196,9 @@ function commit(
     cursor: game.cursor + 1,
   });
 }
+
+/** Estado derivado da partida (fake it: triangulado nos próximos ciclos). */
+export function getGameStatus(game: Game): GameStatus {
+  void game;
+  return 'won';
+}

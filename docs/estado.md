@@ -2,13 +2,13 @@
 
 > Snapshot vivo para retomada. Máximo de 40 linhas. Só estado; regras ficam em `CLAUDE.md` e `PROCESSO.md`.
 
-- **Fase:** 1 (domínio e primeira UI). Fase 0 encerrada no [PR #1](https://github.com/axmbo/sudoku-pwa/pull/1) (23/11/2026, `8b5b40e`; 1,73M tokens, 1,75× o provável). Regras vivas: `PROCESSO.md` v0.6.
+- **Fase:** 1 (domínio e primeira UI). Fase 0 encerrada no [PR #1](https://github.com/axmbo/sudoku-pwa/pull/1) (23/11/2026, `8b5b40e`; 1,73M tokens, 1,75× o provável). Regras vivas: `PROCESSO.md` v0.7 ([PR #15](https://github.com/axmbo/sudoku-pwa/pull/15), mergeado em 24/11/2026: interação com o Diretor e `/prosseguir`).
 - **Spec 001 concluída e arquivada (24/11/2026):** [PR #2](https://github.com/axmbo/sudoku-pwa/pull/2) mergeado; 25 CA, 390 testes, cobertura e Stryker 100% no domínio. Ponto de leitura: [RESUMO](../specs/_arquivo/001-tabuleiro-conflitos/RESUMO.md); detalhe em `specs/_arquivo/001-tabuleiro-conflitos/` ([notas](../specs/_arquivo/001-tabuleiro-conflitos/notas.md), `revisao-r1.md`, `revisao-r2.md`). [ADR 0007](adr/0007-convencoes-do-dominio.md) aceito.
 - **Retro do ciclo 01 feita (24/11/2026):** [ciclo-01](process/retro/ciclo-01.md); real das 7 tarefas 836,9k de subagentes contra 900k prováveis (0,93×). Promovidas no v0.6 (24/11/2026): M-003, M-005 a M-008, M-009(a); candidatas: M-001, M-002, M-009(b), em [melhorias.md](process/melhorias.md). Ciclo 01 não é múltiplo de 3: sem revisão estrutural (próxima no ciclo 03).
 - **Spec ativa: 004 aprovada (24/11/2026) e planejada**, branch `feat/004-estado-de-jogo`, issue [#14](https://github.com/axmbo/sudoku-pwa/issues/14): [spec](../specs/004-estado-de-jogo/spec.md) (33 CA), [plan](../specs/004-estado-de-jogo/plan.md), [tasks](../specs/004-estado-de-jogo/tasks.md) (8 tarefas, sem ADR novo). Âncora do ciclo: 1,62M provável (reancorada em 24/11/2026 após T01 e T02; era 1,25M).
 - **Análise de consistência ok (24/11/2026):** r1 não ok (2 major), r2 ok; a spec aprovada recebeu ressalva "partida não vencida" em CA-004-11/16/17, derivada da decisão 3.
 - **T01 a T05 da 004 concluídas (24 e 25/11/2026):** T01: `Puzzle`, `Notes`, `createGame`; 157,3k contra 110k prováveis (1,43×). T02: anotações; 163,6k contra 120k (1,36×). T03: `gamePlace`/`gameErase`; 85,1k contra 154k (0,55×). T04: `gameUndo`/`gameRedo`; 88,9k contra 196k (0,45×). T05: `getGameStatus` e guard `game-over` nas seis operações; 530 testes, branches 146/146, Stryker 100% em `game.ts`; real pelo log 145,1k (eng-testes 89,5k, dev 55,6k) contra 140k prováveis (1,04×); 14 min contra 35; 20 commits após `06f277f`. Descobertas em [notas](../specs/004-estado-de-jogo/notas.md).
-- **Próximo:** `/implementar 004 T06`, depois de o Diretor mergear o [PR #15](https://github.com/axmbo/sudoku-pwa/pull/15) (v0.7, `/prosseguir`) e esta branch ser rebaseada na `main`.
+- **Próximo:** `/implementar 004 T06` (via `/clear` + `/prosseguir`).
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o hook do `dev` bloqueia arquivo de teste (provado em 22/11/2026).
 
 ## Decisões do Diretor (22/11/2026 a 24/11/2026)

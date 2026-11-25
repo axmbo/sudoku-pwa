@@ -93,7 +93,7 @@ Todas ancoradas em CA:
 
 ### Formato serializado (v1, ADR 0004)
 
-`serializeGame` devolve JSON com chaves em ordem fixa, no envelope do `game` do ADR 0004 (assim a B-06 grava o objeto sem remontar):
+`serializeGame` devolve JSON compacto (sem espaços nem quebras de linha, como `JSON.stringify` sem indentação; o bloco abaixo está quebrado só para leitura) com chaves em ordem fixa, no envelope do `game` do ADR 0004 (assim a B-06 grava o objeto sem remontar). O compacto faz parte do formato: CA-004-26 exige texto idêntico byte a byte.
 
 ```
 {"schemaVersion":1,"data":{

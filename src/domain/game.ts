@@ -79,8 +79,8 @@ export function gameToggleNote(
   col: unknown,
   digit: unknown,
 ): Result<Game, NoteRefusal> {
-  if (getGameStatus(game) === 'won') {
-    return { ok: false, reason: 'game-over' };
+  if (isOver(game)) {
+    return GAME_OVER;
   }
   if (!isCoordinate(row) || !isCoordinate(col)) {
     return { ok: false, reason: 'cell-not-found' };
@@ -110,8 +110,8 @@ export function gameClearNotes(
   row: unknown,
   col: unknown,
 ): Result<Game, ClearNotesRefusal> {
-  if (getGameStatus(game) === 'won') {
-    return { ok: false, reason: 'game-over' };
+  if (isOver(game)) {
+    return GAME_OVER;
   }
   if (!isCoordinate(row) || !isCoordinate(col)) {
     return { ok: false, reason: 'cell-not-found' };
@@ -139,8 +139,8 @@ export function gamePlace(
   col: unknown,
   digit: unknown,
 ): Result<Game, GamePlaceRefusal> {
-  if (getGameStatus(game) === 'won') {
-    return { ok: false, reason: 'game-over' };
+  if (isOver(game)) {
+    return GAME_OVER;
   }
   const placed = placeValue(game.board, row, col, digit);
   if (!placed.ok) {
@@ -162,8 +162,8 @@ export function gamePlace(
 
 /** Apaga o valor da célula (row, col), limpando as anotações dela; célula vazia não tem efeito. */
 export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, GameEraseRefusal> {
-  if (getGameStatus(game) === 'won') {
-    return { ok: false, reason: 'game-over' };
+  if (isOver(game)) {
+    return GAME_OVER;
   }
   const erased = eraseValue(game.board, row, col);
   if (!erased.ok) {
@@ -185,8 +185,8 @@ export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, 
 
 /** Desfaz a última jogada, restaurando valor e anotações da célula. */
 export function gameUndo(game: Game): Result<Game, UndoRefusal> {
-  if (getGameStatus(game) === 'won') {
-    return { ok: false, reason: 'game-over' };
+  if (isOver(game)) {
+    return GAME_OVER;
   }
   const undone = undo(game);
   return undone === null ? { ok: false, reason: 'nothing-to-undo' } : { ok: true, value: undone };
@@ -194,8 +194,8 @@ export function gameUndo(game: Game): Result<Game, UndoRefusal> {
 
 /** Refaz a jogada desfeita mais recentemente. */
 export function gameRedo(game: Game): Result<Game, RedoRefusal> {
-  if (getGameStatus(game) === 'won') {
-    return { ok: false, reason: 'game-over' };
+  if (isOver(game)) {
+    return GAME_OVER;
   }
   const redone = redo(game);
   return redone === null ? { ok: false, reason: 'nothing-to-redo' } : { ok: true, value: redone };
@@ -229,4 +229,11 @@ export function getGameStatus(game: Game): GameStatus {
     (cell, index) => cell.value === solution[Math.floor(index / 9)]?.[index % 9],
   );
   return matches ? 'won' : 'full-incorrect';
+}
+
+const GAME_OVER = Object.freeze({ ok: false, reason: 'game-over' } as const);
+
+/** Partida vencida: toda jogada, desfazer e refazer são recusados. */
+function isOver(game: Game): boolean {
+  return getGameStatus(game) === 'won';
 }

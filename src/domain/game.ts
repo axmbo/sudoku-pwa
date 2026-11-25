@@ -224,10 +224,8 @@ export function getGameStatus(game: Game): GameStatus {
   if (cells.some((cell) => cell.value === null)) {
     return 'incomplete';
   }
-  const solution = game.puzzle.solution;
-  const matches = cells.every(
-    (cell, index) => cell.value === solution[Math.floor(index / 9)]?.[index % 9],
-  );
+  const flat = game.puzzle.solution.flat();
+  const matches = cells.every((cell, index) => cell.value === flat[index]);
   return matches ? 'won' : 'full-incorrect';
 }
 

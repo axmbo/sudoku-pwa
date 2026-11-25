@@ -1,15 +1,8 @@
-import type { Grid } from './board';
-import {
-  gameClearNotes,
-  gameErase,
-  gamePlace,
-  gameToggleNote,
-  gameUndo,
-  createGame,
-  type Game,
-} from './game';
-import type { Move } from './history';
-import type { Notes } from './notes';
+import type { CellState, Grid } from './board';
+import { isDigit, type Digit } from './digit';
+import { createGame, type Game } from './game';
+import type { CellMemo, HistoryEntry, Move } from './history';
+import { emptyNotes, toggleNote, type Notes } from './notes';
 import type { Result } from './result';
 
 /** Versão do formato serializado da partida (ADR 0004). */
@@ -106,44 +99,104 @@ function sameState(game: Game, values: string, notes: readonly unknown[]): boole
   );
 }
 
-function applyTuple(game: Game, tuple: unknown): Result<Game, DeserializeRefusal> {
-  const [code, index, digit] = tuple as readonly [number, number, number];
-  const row = Math.floor(index / 9);
-  const col = index % 9;
-  const kind = MOVE_KINDS[code];
-  const result =
-    kind === 'place'
-      ? gamePlace(game, row, col, digit)
-      : kind === 'erase'
-        ? gameErase(game, row, col)
-        : kind === 'toggle-note'
-          ? gameToggleNote(game, row, col, digit)
-          : gameClearNotes(game, row, col);
-  return result.ok ? result : INCONSISTENT;
+type MoveTuple = readonly [number, number, number];
+
+/** Estado mutável local do replay; só existe dentro de `replay` e é congelado no fim. */
+interface Scratch {
+  readonly cells: CellState[];
+  readonly notes: Notes[];
+  readonly history: HistoryEntry[];
 }
 
-/** Reaplica todas as jogadas e recua até `target`, reconstruindo `before` e os refazíveis. */
+/** Aplica a jogada ao estado local; `false` se o jogo a recusaria ou ela não tiver efeito. */
+function applyTuple(scratch: Scratch, [code, index, digit]: MoveTuple): boolean {
+  const cell = scratch.cells[index] as CellState;
+  const current = scratch.notes[index] as Notes;
+  const kind = MOVE_KINDS[code] as Move['kind'];
+  const needsDigit = kind === 'place' || kind === 'toggle-note';
+  if (cell.given || (needsDigit && !isDigit(digit))) {
+    return false;
+  }
+  if (kind === 'place') {
+    if (cell.value === digit) {
+      return false;
+    }
+    scratch.cells[index] = Object.freeze({ value: digit as Digit, given: false });
+    scratch.notes[index] = emptyNotes;
+    scratch.history.push({
+      move: { kind, index, digit: digit as Digit },
+      before: memo(cell, current),
+    });
+  } else if (kind === 'erase') {
+    if (cell.value === null) {
+      return false;
+    }
+    scratch.cells[index] = Object.freeze({ value: null, given: false });
+    scratch.notes[index] = emptyNotes;
+    scratch.history.push({ move: { kind, index }, before: memo(cell, current) });
+  } else if (kind === 'toggle-note') {
+    if (cell.value !== null) {
+      return false;
+    }
+    scratch.notes[index] = toggleNote(current, digit as Digit);
+    scratch.history.push({
+      move: { kind, index, digit: digit as Digit },
+      before: memo(cell, current),
+    });
+  } else {
+    if (current.length === 0) {
+      return false;
+    }
+    scratch.notes[index] = emptyNotes;
+    scratch.history.push({ move: { kind, index }, before: memo(cell, current) });
+  }
+  return true;
+}
+
+function memo(cell: CellState, notes: Notes): CellMemo {
+  return { value: cell.value, notes };
+}
+
+/** Partida cheia e igual à solução. */
+function isWon(cells: readonly CellState[], solution: readonly (Digit | null)[]): boolean {
+  return cells.every((cell, i) => cell.value === solution[i]);
+}
+
+/** Reaplica todas as jogadas em arrays locais e recua até `target`, reconstruindo `before`. */
 function replay(
   start: Game,
-  moves: readonly unknown[],
+  moves: readonly MoveTuple[],
   target: number,
 ): Result<Game, DeserializeRefusal> {
-  let game = start;
+  const solution = start.puzzle.solution.flat();
+  const scratch: Scratch = {
+    cells: [...start.board.cells],
+    notes: [...start.notes],
+    history: [],
+  };
   for (const tuple of moves) {
-    const applied = applyTuple(game, tuple);
-    if (!applied.ok) {
-      return applied;
-    }
-    game = applied.value;
-  }
-  for (let i = moves.length; i > target; i--) {
-    const undone = gameUndo(game);
-    if (!undone.ok) {
+    if (isWon(scratch.cells, solution) || !applyTuple(scratch, tuple)) {
       return INCONSISTENT;
     }
-    game = undone.value;
   }
-  return { ok: true, value: game };
+  if (target < moves.length && isWon(scratch.cells, solution)) {
+    return INCONSISTENT;
+  }
+  for (let i = moves.length - 1; i >= target; i--) {
+    const { move, before } = scratch.history[i] as HistoryEntry;
+    scratch.cells[move.index] = Object.freeze({ value: before.value, given: false });
+    scratch.notes[move.index] = before.notes;
+  }
+  return {
+    ok: true,
+    value: Object.freeze({
+      puzzle: start.puzzle,
+      board: Object.freeze({ cells: Object.freeze(scratch.cells) }),
+      notes: Object.freeze(scratch.notes),
+      history: Object.freeze(scratch.history),
+      cursor: target,
+    }),
+  };
 }
 
 /** Lê a partida serializada, reaplicando as jogadas para reconstruir o histórico. */
@@ -185,6 +238,6 @@ export function deserializeGame(input: unknown): Result<Game, DeserializeRefusal
   if (!created.ok) {
     return INCONSISTENT;
   }
-  const replayed = replay(created.value, moves, target);
+  const replayed = replay(created.value, moves as MoveTuple[], target);
   return replayed.ok && sameState(replayed.value, values, notes) ? replayed : INCONSISTENT;
 }

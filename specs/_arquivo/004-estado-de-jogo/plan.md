@@ -1,7 +1,7 @@
 # Plano 004 — Estado de jogo (anotações, desfazer/refazer, vitória, serialização)
 
 - **Spec:** [spec.md](spec.md) · **Autor:** `arquiteto`
-- **ADRs:** [0007](../../docs/adr/0007-convencoes-do-dominio.md) (Result, `unknown` na fronteira, 0–8, imutável e congelado), [0004](../../docs/adr/0004-persistencia-local.md) (envelope `game` com `schemaVersion`, puzzle completo, histórico), [0001](../../docs/adr/0001-stack-e-ferramentas.md) (orçamento). **Nenhum ADR novo** (ver "Decisões do plano").
+- **ADRs:** [0007](../../../docs/adr/0007-convencoes-do-dominio.md) (Result, `unknown` na fronteira, 0–8, imutável e congelado), [0004](../../../docs/adr/0004-persistencia-local.md) (envelope `game` com `schemaVersion`, puzzle completo, histórico), [0001](../../../docs/adr/0001-stack-e-ferramentas.md) (orçamento). **Nenhum ADR novo** (ver "Decisões do plano").
 
 ## Módulos e fronteiras
 

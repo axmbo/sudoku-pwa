@@ -100,7 +100,6 @@ function sameState(game: Game, values: string, notes: readonly unknown[]): boole
   const rebuilt = game.notes.map(notesMask);
   return (
     values === gridText(game.board.cells.map((cell) => cell.value)) &&
-    notes.length === rebuilt.length &&
     notes.every((mask, i) => mask === rebuilt[i])
   );
 }

@@ -8,6 +8,7 @@ import {
 } from './__arbitraries__/puzzle';
 import {
   createGame,
+  gameClearNotes,
   gameErase,
   gamePlace,
   gameToggleNote,
@@ -75,6 +76,8 @@ describe('game (estado derivado e vitória)', () => {
     ['gameErase', (g: Game) => gameErase(g, 3, 1)],
     // sem o guard, a recusa seria `cell-has-value` (grade vencida não tem vazia)
     ['gameToggleNote', (g: Game) => gameToggleNote(g, 3, 1, 5)],
+    // sem o guard, devolveria `ok` sem efeito (célula sem anotações)
+    ['gameClearNotes', (g: Game) => gameClearNotes(g, 3, 1)],
   ])('CA-004-23: %s em partida vencida é recusado com game-over', (_nome, operation) => {
     const won = gamePlace(oneMissing(), 3, 1, 3);
     if (!won.ok) throw new Error('fixture inválida');

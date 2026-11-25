@@ -7,8 +7,8 @@
 - **Retro do ciclo 01 feita (24/11/2026):** [ciclo-01](process/retro/ciclo-01.md); real das 7 tarefas 836,9k de subagentes contra 900k prováveis (0,93×). Promovidas no v0.6 (24/11/2026): M-003, M-005 a M-008, M-009(a); candidatas: M-001, M-002, M-009(b), em [melhorias.md](process/melhorias.md). Ciclo 01 não é múltiplo de 3: sem revisão estrutural (próxima no ciclo 03).
 - **Spec ativa: 004 aprovada (24/11/2026) e planejada**, branch `feat/004-estado-de-jogo`, issue [#14](https://github.com/axmbo/sudoku-pwa/issues/14): [spec](../specs/004-estado-de-jogo/spec.md) (33 CA), [plan](../specs/004-estado-de-jogo/plan.md), [tasks](../specs/004-estado-de-jogo/tasks.md) (8 tarefas, sem ADR novo). Âncora do ciclo: 1,62M provável (reancorada em 24/11/2026 após T01 e T02; era 1,25M).
 - **Análise de consistência ok (24/11/2026):** r1 não ok (2 major), r2 ok; a spec aprovada recebeu ressalva "partida não vencida" em CA-004-11/16/17, derivada da decisão 3.
-- **T01 a T04 da 004 concluídas (24/11/2026):** T01: `Puzzle`, `Notes`, `createGame`; 157,3k contra 110k prováveis (1,43×). T02: anotações no jogo; 163,6k contra 120k (1,36×). T03: `gamePlace` e `gameErase`; 85,1k contra 154k (0,55×). T04: `gameUndo` e `gameRedo` (`undo`/`redo` em `history.ts`); 507 testes, branches 100%, Stryker 100% em `history.ts` e `game.ts`; real pelo log 88,9k (eng-testes 55,4k, dev 33,5k) contra 196k prováveis (0,45×); 3 min de relógio contra 45 (commits af0051c, 7bf6640, 01276a9). Descobertas em [notas](../specs/004-estado-de-jogo/notas.md).
-- **Próximo:** `/clear` + `/retomar`, depois `/implementar 004 T05`.
+- **T01 a T05 da 004 concluídas (24 e 25/11/2026):** T01: `Puzzle`, `Notes`, `createGame`; 157,3k contra 110k prováveis (1,43×). T02: anotações; 163,6k contra 120k (1,36×). T03: `gamePlace`/`gameErase`; 85,1k contra 154k (0,55×). T04: `gameUndo`/`gameRedo`; 88,9k contra 196k (0,45×). T05: `getGameStatus` e guard `game-over` nas seis operações; 530 testes, branches 146/146, Stryker 100% em `game.ts`; real pelo log 145,1k (eng-testes 89,5k, dev 55,6k) contra 140k prováveis (1,04×); 14 min contra 35; 20 commits após `06f277f`. Descobertas em [notas](../specs/004-estado-de-jogo/notas.md).
+- **Próximo:** `/clear` + `/retomar`, depois `/implementar 004 T06`.
 - **Validado no Claude Code:** hook `SessionStart` injeta o estado; o hook do `dev` bloqueia arquivo de teste (provado em 22/11/2026).
 
 ## Decisões do Diretor (22/11/2026 a 24/11/2026)
@@ -27,8 +27,10 @@
 
 ## Pendências do Diretor
 
-1. Candidatas que seguem: M-001, M-002, M-009(b) e M-010 (7b no template de tasks); reavaliar após a 004. Ocorrências: T02 M-002 (TS7006 em cascata) e M-010 (via 7b em 3 pontos); T03 M-010 (refazível montado à mão: na T04 a API alcançou tudo, sem ocorrência, verificar na T06); T04 M-010 de outro tipo (RED sem refazer por tipo, lacuna achada só no Stryker, via 7b; candidata: refazer por tipo em "Testes esperados").
-2. Proteção da `main` + regra de quem cria tags `v*` (adiada em 23/11/2026: "depois").
+1. Candidatas que seguem: M-001, M-002, M-009(b) e M-010 (7b no template de tasks); reavaliar após a 004. Ocorrências: T02 M-002 (TS7006 em cascata) e M-010 (via 7b em 3 pontos); T03 M-010 (refazível montado à mão: na T04 a API alcançou tudo, sem ocorrência, verificar na T06); T05: sem ocorrência de 7b; T04 M-010 de outro tipo (RED sem refazer por tipo, lacuna achada só no Stryker, via 7b; candidata: refazer por tipo em "Testes esperados").
+2. **T05, CA-004-33:** ok manter o literal 7 onde o correto é 3 (sem conflito, com fixture `sevenForThreeInput`), em vez do desvio 2/1 que a `eng-testes` propôs?
+3. **T05, fronteira de vitória:** "81 certas com uma pista" lida como `won` (contando pistas), não `full-incorrect`; confirma?
+4. Proteção da `main` + regra de quem cria tags `v*` (adiada em 23/11/2026: "depois").
 
 ## Débitos
 

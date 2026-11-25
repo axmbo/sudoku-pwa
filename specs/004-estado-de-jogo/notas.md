@@ -22,3 +22,10 @@ Decisões e descobertas durante a execução. Curto: uma linha por item, com dat
 - 24/11 · T04 · M-010 de outro tipo: o RED não pediu refazer de cada tipo de jogada (só desfazer, CA-004-17); a lacuna só apareceu no Stryker (3 sobreviventes e 1 NoCoverage no `redo` de `history.ts`) e exigiu a via 7b (01276a9). Candidata a reforçar "Testes esperados" com refazer por tipo. O M-010 original (refazível montado à mão) não ocorreu: a API alcançou tudo.
 - 24/11 · T04 · A `eng-testes` incluiu teste de CA-004-18 fora da lista da T04; aceito pelo orquestrador, está no escopo do CA.
 - 24/11 · T04 · Real pelo log 88,9k (eng-testes 55,4k, dev 33,5k) contra 196k prováveis (0,45x); 3 min de relógio contra 45; Stryker `history.ts` 90,24% para 100%, `game.ts` 100%; 507 testes, branches 100%.
+- 25/11 · T05 · CA-004-33 literal (7 onde o correto é 3, sem conflito) exige fixture própria `sevenForThreeInput`, que esvazia os 7 da linha, coluna e bloco; a fixture padrão quase cheia faria qualquer valor errado conflitar. A `eng-testes` desviou primeiro para 2/1; o coordenador corrigiu para 7/3. Pergunta ao Diretor no estado.
+- 25/11 · T05 · `game-over` vs `nothing-to-undo` é inalcançável pela API (toda vitória vem de jogada aceita no histórico): sem teste. `game-over` vs `nothing-to-redo` está coberto.
+- 25/11 · T05 · Fronteira "81 certas com uma pista" lida como `won`, contando pistas (completar a fixture padrão), e não como `full-incorrect`. Pendente de confirmação do Diretor.
+- 25/11 · T05 · M-010: sem ocorrência de 7b; 7a usado em CA-004-33, fronteira de `won` e precedência de `game-over` (10 casos).
+- 25/11 · T05 · Mutante equivalente (OptionalChaining em `getGameStatus`) eliminado por refactor `solution.flat()` (ed02e0c), sem `Stryker disable`; `game.ts` 100% (188 mortos).
+- 25/11 · T05 · commitlint: aviso não bloqueante `footer-leading-blank` quando o corpo cita a linha da falha; duas recusas por linha > 100 caracteres no corpo. Candidata a melhoria (só registro).
+- 25/11 · T05 · Real pelo log 145,1k (eng-testes 89,5k, dev 55,6k) contra 140k prováveis (1,04x); 14 min de relógio contra 35; 530 testes, branches 146/146.

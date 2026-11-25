@@ -199,6 +199,5 @@ function commit(
 
 /** Estado derivado da partida (fake it: triangulado nos próximos ciclos). */
 export function getGameStatus(game: Game): GameStatus {
-  void game;
-  return 'won';
+  return game.board.cells.some((cell) => cell.value === null) ? 'incomplete' : 'won';
 }

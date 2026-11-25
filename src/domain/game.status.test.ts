@@ -12,6 +12,7 @@ import {
   gameErase,
   gamePlace,
   gameToggleNote,
+  gameUndo,
   getGameConflicts,
   getGameStatus,
   type Game,
@@ -78,6 +79,8 @@ describe('game (estado derivado e vitória)', () => {
     ['gameToggleNote', (g: Game) => gameToggleNote(g, 3, 1, 5)],
     // sem o guard, devolveria `ok` sem efeito (célula sem anotações)
     ['gameClearNotes', (g: Game) => gameClearNotes(g, 3, 1)],
+    // sem o guard, desfaria a vitória com sucesso (há uma jogada no histórico)
+    ['gameUndo', (g: Game) => gameUndo(g)],
   ])('CA-004-23: %s em partida vencida é recusado com game-over', (_nome, operation) => {
     const won = gamePlace(oneMissing(), 3, 1, 3);
     if (!won.ok) throw new Error('fixture inválida');

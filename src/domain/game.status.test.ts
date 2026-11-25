@@ -10,6 +10,7 @@ import {
   createGame,
   gameErase,
   gamePlace,
+  gameToggleNote,
   getGameConflicts,
   getGameStatus,
   type Game,
@@ -72,6 +73,8 @@ describe('game (estado derivado e vitória)', () => {
   it.each([
     ['gamePlace', (g: Game) => gamePlace(g, 3, 1, 5)],
     ['gameErase', (g: Game) => gameErase(g, 3, 1)],
+    // sem o guard, a recusa seria `cell-has-value` (grade vencida não tem vazia)
+    ['gameToggleNote', (g: Game) => gameToggleNote(g, 3, 1, 5)],
   ])('CA-004-23: %s em partida vencida é recusado com game-over', (_nome, operation) => {
     const won = gamePlace(oneMissing(), 3, 1, 3);
     if (!won.ok) throw new Error('fixture inválida');

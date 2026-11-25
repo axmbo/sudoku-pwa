@@ -38,3 +38,17 @@ export function almostSolvedInput(row: number, col: number): ReturnType<typeof v
     ),
   };
 }
+
+/**
+ * Entrada em que só as células com 1 ou 2 na solução estão vazias. Trocar 1 por 2 em todas
+ * elas dá uma grade cheia, válida (sem conflito) e diferente da solução; e colocar 2 onde a
+ * solução tem 1 não gera conflito enquanto o 2 daquela unidade segue vazio.
+ */
+export function swapPairInput(): ReturnType<typeof validPuzzleInput> {
+  return {
+    ...validPuzzleInput(),
+    givens: solutionGrid.map((line) =>
+      line.map((value) => (value === 1 || value === 2 ? null : value)),
+    ),
+  };
+}

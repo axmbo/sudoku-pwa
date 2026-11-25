@@ -33,7 +33,7 @@ export type NoteRefusal =
 export type ClearNotesRefusal = 'game-over' | 'cell-not-found' | 'cell-is-given';
 
 export type UndoRefusal = 'game-over' | 'nothing-to-undo';
-export type RedoRefusal = 'nothing-to-redo';
+export type RedoRefusal = 'game-over' | 'nothing-to-redo';
 
 export type GameStatus = 'incomplete' | 'full-incorrect' | 'won';
 
@@ -194,6 +194,9 @@ export function gameUndo(game: Game): Result<Game, UndoRefusal> {
 
 /** Refaz a jogada desfeita mais recentemente. */
 export function gameRedo(game: Game): Result<Game, RedoRefusal> {
+  if (getGameStatus(game) === 'won') {
+    return { ok: false, reason: 'game-over' };
+  }
   const redone = redo(game);
   return redone === null ? { ok: false, reason: 'nothing-to-redo' } : { ok: true, value: redone };
 }

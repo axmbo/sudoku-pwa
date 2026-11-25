@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { almostSolvedInput, solutionGrid, validPuzzleInput } from './__arbitraries__/puzzle';
-import { createGame, gamePlace, gameToggleNote, type Game } from './game';
+import { canRedo, createGame, gamePlace, gameToggleNote, gameUndo, type Game } from './game';
 import { deserializeGame, serializeGame } from './serialize';
 
 /** Partida pequena e conhecida: anotações 7 e 2 em (2,7), depois o 1 em (0,0). */
@@ -185,4 +185,50 @@ describe('deserializeGame (dado incoerente)', () => {
   ])('CA-004-29: %s é recusado como inconsistent-data', (_nome, input) => {
     expect(deserializeGame(input)).toEqual({ ok: false, reason: 'inconsistent-data' });
   });
+});
+
+describe('deserializeGame (formato das jogadas e das grades)', () => {
+  const withMoves = (moves: unknown): string => withPatch((d) => (d.moves = moves));
+  it.each<[string, string]>([
+    ['kind de jogada fora de 0..3', withMoves([[9, 0, 1]])],
+    ['kind de jogada negativo', withMoves([[-1, 0, 1]])],
+    ['jogada que não é lista', withMoves([5])],
+    ['jogada nula', withMoves([null])],
+    ['jogada com 2 elementos', withMoves([[0, 0]])],
+    ['jogada com 4 elementos', withMoves([[0, 0, 1, 1]])],
+    ['jogada com índice texto', withMoves([[0, '0', 1]])],
+    ['jogada com dígito texto', withMoves([[0, 0, '1']])],
+    ['jogada com índice não inteiro', withMoves([[0, 0.5, 1]])],
+    ['jogada com índice negativo', withMoves([[0, -1, 1]])],
+    ['jogada com índice 81', withMoves([[0, 81, 1]])],
+    ['givens com 80 caracteres', withPuzzle((p) => (p.givens = (p.givens as string).slice(1)))],
+    [
+      'givens com caractere fora de .1-9',
+      withPuzzle((p) => (p.givens = setChar(p.givens as string, 3, '0'))),
+    ],
+    [
+      'solution com caractere fora de .1-9',
+      withPuzzle((p) => (p.solution = setChar(p.solution as string, 3, 'x'))),
+    ],
+    ['solution que não é texto', withPuzzle((p) => (p.solution = 5))],
+  ])('CA-004-28: %s é recusado como invalid-data, sem lançar', (_nome, input) => {
+    expect(deserializeGame(input)).toEqual({ ok: false, reason: 'invalid-data' });
+  });
+});
+
+describe('deserializeGame (refazíveis)', () => {
+  it.each([1, 2, 3])(
+    'CA-004-25: partida com %i jogada(s) desfeita(s) volta igual, com refazíveis',
+    (undone) => {
+      let game = sample();
+      for (let i = 0; i < undone; i++) {
+        const result = gameUndo(game);
+        if (!result.ok) throw new Error('fixture inválida');
+        game = result.value;
+      }
+      const read = deserializeGame(serializeGame(game));
+      expect(read).toEqual({ ok: true, value: game });
+      expect(read.ok && canRedo(read.value)).toBe(true);
+    },
+  );
 });

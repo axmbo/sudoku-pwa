@@ -184,6 +184,7 @@ A spec 001 entrega o tabuleiro com valores e conflitos, mas o jogador ainda não
   - Dado entradas como texto vazio, texto que não é do formato, campo obrigatório ausente, tipo errado, versão ausente ou não inteira
   - Quando se tenta ler
   - Então a leitura é recusada com o motivo "dado inválido", sem lançar falha inesperada.
+  - "Tipo errado" é a forma de cada campo, detalhada no `plan.md` (ordem de recusa do `deserializeGame`, item 3); valor do tipo certo que o jogo recusa é CA-004-29 (revisão r1, R1-03; ponteiro incluído na revisão r2, R2-01, por decisão do Diretor de 24/11/2026).
 
 - **CA-004-29** — Dado bem formado mas incoerente
   - Dado um dado serializado com formato correto, mas incoerente: valor sobre pista diferente do dado, anotação em célula com valor, solução que contradiz as pistas, histórico que não leva ao estado gravado, ponto atual do histórico fora dos limites

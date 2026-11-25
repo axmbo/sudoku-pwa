@@ -24,10 +24,11 @@ import {
 } from './__arbitraries__/moves';
 
 /** Oráculo independente: grade cheia, sem conflito e igual à solução. */
+const solutionFlat = solutionGrid.flat();
+
 function oracleWon(game: Game): boolean {
-  const flat = solutionGrid.flat();
   return (
-    game.board.cells.every((c, i) => c.value !== null && c.value === flat[i]) &&
+    game.board.cells.every((c, i) => c.value !== null && c.value === solutionFlat[i]) &&
     getConflicts(game.board).length === 0
   );
 }
@@ -209,6 +210,8 @@ describe('game (propriedades)', () => {
     );
   });
 
+  // Timeout explícito: ~1,1 s local, mas a instrumentação do Stryker no runner do CI (job mutation)
+  // estoura os 5 s padrão no dry run.
   it('CA-004-22: won se e só se a grade está cheia, sem conflito e igual à solução', () => {
     const fillAll = (initial: Game, values: readonly number[]): void => {
       const empties = initial.board.cells.flatMap((c, i) => (c.value === null ? [i] : []));
@@ -217,9 +220,12 @@ describe('game (propriedades)', () => {
         const placed = gamePlace(current, Math.floor(index / 9), index % 9, values[n]);
         expect(placed.ok).toBe(true);
         current = (placed as { value: Game }).value;
-        expect(getGameStatus(current) === 'won').toBe(oracleWon(current));
-        if (getGameStatus(current) === 'won') expect(getGameConflicts(current)).toEqual([]);
-        if (getGameConflicts(current).length > 0) expect(getGameStatus(current)).not.toBe('won');
+        // status e conflitos calculados uma vez por passo (custo da propriedade)
+        const won = getGameStatus(current) === 'won';
+        const conflicts = getGameConflicts(current);
+        expect(won).toBe(oracleWon(current));
+        if (won) expect(conflicts).toEqual([]);
+        if (conflicts.length > 0) expect(won).toBe(false);
       });
       expect(getGameStatus(current) === 'won').toBe(oracleWon(current));
     };
@@ -262,7 +268,7 @@ describe('game (propriedades)', () => {
     }
     expect(getConflicts(current.board)).toEqual([]);
     expect(getGameStatus(current)).toBe('full-incorrect');
-  });
+  }, 20_000);
 
   it('INV: conflito é derivado: getGameConflicts(g) = getConflicts(g.board) em todo jogo gerado', () => {
     fc.assert(

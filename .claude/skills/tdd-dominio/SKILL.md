@@ -32,8 +32,7 @@ Fonte das metas e isenções: `PROCESSO.md` §6. Princípios 5–7 da `docs/cons
 ## Mutation (Stryker)
 - Só `src/domain/`. Meta ≥ 70%; no PR, incremental (arquivos alterados).
 - Mutante sobrevivente em código novo é **major**: escreva o teste que o mata ou justifique como equivalente em `notas.md`.
-- O Stryker usa `vitest.stryker.config.ts`, que estende o `vitest.config.ts`: limite por teste de 120 s, propriedades com no máximo 10 rodadas (`tests/stryker.setup.ts`) e o teste de regressão de tempo fora da rodada (decisão do Diretor, 25/11/2026, PR #16; o cache incremental no CI está na issue #17).
-- Propriedade nova roda sob a config do Stryker (limite de rodadas); teste de tempo fica fora dela.
+- O Stryker usa `vitest.stryker.config.ts`, que estende o `vitest.config.ts`: limite por teste de 120 s, propriedades com no máximo 10 rodadas (`tests/stryker.setup.ts`) e o teste de regressão de tempo fora da rodada; propriedade nova também tem de passar sob essa config (decisão do Diretor, 25/11/2026, PR #16; o cache incremental no CI está na issue #17).
 - Mutação local só vale como evidência no mesmo escopo do CI. `--mutate <arquivo>` com `related: true` roda só os testes relacionados ao arquivo e não reproduz timeout nem custo da rodada completa.
 
 ## Cobertura

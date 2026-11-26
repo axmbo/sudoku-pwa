@@ -1,13 +1,6 @@
 import { render } from 'preact';
-
-function App() {
-  return (
-    <main>
-      <h1>Sudoku</h1>
-      <p>Em construção.</p>
-    </main>
-  );
-}
+import { App } from './ui/App';
+import { fixedGame } from './ui/fixed-puzzle';
 
 const root = document.getElementById('app');
-if (root) render(<App />, root);
+if (root) render(<App game={fixedGame()} />, root);

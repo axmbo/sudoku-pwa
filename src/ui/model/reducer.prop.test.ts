@@ -23,6 +23,9 @@ import { gameReducer, initialState, type UiAction, type UiState } from './reduce
 // descrito no commit): se o gerador perde o prefixo ou as macros, esse teste falha.
 
 const SEED = 20260601;
+// Timeout próprio (#23, precedente 55c4efa): isoladas levam de 1 a 4,7 s, mas com a suíte
+// em paralelo estouram os 5 s padrão. Mesmas rodadas e seeds; só o limite muda.
+const PROP_TIMEOUT = 30_000;
 
 const indexArb: fc.Arbitrary<Index> = fc.constantFrom<Index>(0, 1, 2, 3, 4, 5, 6, 7, 8);
 const digitArb: fc.Arbitrary<Digit> = fc.constantFrom<Digit>(1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -145,177 +148,209 @@ function replay(actions: readonly UiAction[]): { initial: UiState; steps: Step[]
 }
 
 describe('gameReducer (propriedades)', () => {
-  it('INV: o gerador alcança conflito, vitória e grade cheia errada (sem usar o reducer)', () => {
-    // Interpretador mínimo só com o domínio, para provar o alcance do gerador de forma independente.
-    const reached = { conflict: false, won: false, fullIncorrect: false };
-    const samples = fc.sample(actionsArb, { seed: SEED, numRuns: 300 });
-    for (const actions of samples) {
-      let game: Game = fixedGame();
-      let selected: Selection = { row: 0, col: 0 };
-      for (const action of actions) {
-        if (action.type === 'select') selected = action.to;
-        else if (action.type === 'move')
-          selected = moveSelection(selected, action.key, action.ctrl);
-        else {
-          const result =
-            action.type === 'digit'
-              ? gamePlace(game, selected.row, selected.col, action.digit)
-              : gameErase(game, selected.row, selected.col);
-          if (result.ok) game = result.value;
+  it(
+    'INV: o gerador alcança conflito, vitória e grade cheia errada (sem usar o reducer)',
+    () => {
+      // Interpretador mínimo só com o domínio, para provar o alcance do gerador de forma independente.
+      const reached = { conflict: false, won: false, fullIncorrect: false };
+      const samples = fc.sample(actionsArb, { seed: SEED, numRuns: 300 });
+      for (const actions of samples) {
+        let game: Game = fixedGame();
+        let selected: Selection = { row: 0, col: 0 };
+        for (const action of actions) {
+          if (action.type === 'select') selected = action.to;
+          else if (action.type === 'move')
+            selected = moveSelection(selected, action.key, action.ctrl);
+          else {
+            const result =
+              action.type === 'digit'
+                ? gamePlace(game, selected.row, selected.col, action.digit)
+                : gameErase(game, selected.row, selected.col);
+            if (result.ok) game = result.value;
+          }
+          if (getGameConflicts(game).length > 0) reached.conflict = true;
+          const status = getGameStatus(game);
+          if (status === 'won') reached.won = true;
+          if (status === 'full-incorrect') reached.fullIncorrect = true;
         }
-        if (getGameConflicts(game).length > 0) reached.conflict = true;
-        const status = getGameStatus(game);
-        if (status === 'won') reached.won = true;
-        if (status === 'full-incorrect') reached.fullIncorrect = true;
       }
-    }
-    expect(reached).toEqual({ conflict: true, won: true, fullIncorrect: true });
-  });
+      expect(reached).toEqual({ conflict: true, won: true, fullIncorrect: true });
+    },
+    PROP_TIMEOUT,
+  );
 
-  it('CA-005-31: para qualquer sequência o reducer é total e o anúncio, quando existe, é um só e bem formado', () => {
-    fc.assert(
-      fc.property(actionsArb, (actions) => {
-        const { steps } = replay(actions); // lançar derruba a propriedade
-        for (const { after } of steps) {
-          if (after.announcement !== null) {
-            expect(Number.isInteger(after.announcement.id)).toBe(true);
-            expect(after.announcement.id).toBeGreaterThanOrEqual(1);
-            expect(typeof after.announcement.text).toBe('string');
-            expect(after.announcement.text).not.toBe('');
-          }
-        }
-      }),
-      { seed: SEED + 1, numRuns: 100 },
-    );
-  });
-
-  it('CA-005-31: ids de anúncios em ações seguidas crescem estritamente (de 1 em 1)', () => {
-    fc.assert(
-      fc.property(actionsArb, (actions) => {
-        for (const { before, after } of replay(actions).steps) {
-          if (before.announcement !== null && after.announcement !== null) {
-            expect(after.announcement.id).toBe(before.announcement.id + 1);
-          }
-        }
-      }),
-      { seed: SEED + 2, numRuns: 100 },
-    );
-  });
-
-  it('CA-005-31: o anúncio de cada ação segue a precedência e nunca é herdado do estado anterior', () => {
-    fc.assert(
-      fc.property(actionsArb, (actions) => {
-        for (const { before, action, after } of replay(actions).steps) {
-          const text = after.announcement?.text ?? null;
-          if (action.type === 'select' || action.type === 'move') {
-            expect(after.announcement).toBeNull();
-            continue;
-          }
-          const { row, col } = before.selected;
-          if (getGameStatus(before.game) === 'won') {
-            expect(after.announcement).toBeNull(); // game-over: sem anúncio
-            continue;
-          }
-          if (before.game.board.cells[row * 9 + col]?.given) {
-            expect(text).toBe(messages.givenImmutable);
-            continue;
-          }
-          if (after.game === before.game) {
-            expect(after.announcement).toBeNull(); // jogada sem efeito
-            continue;
-          }
-          const status = getGameStatus(after.game);
-          const conflictsBefore = getGameConflicts(before.game);
-          const conflictsAfter = getGameConflicts(after.game);
-          const mine = conflictsAfter.find((c) => c.row === row && c.col === col);
-          const wasMine = conflictsBefore.some((c) => c.row === row && c.col === col);
-          if (status === 'won') {
-            expect(text).toBe(messages.won);
-          } else if (status === 'full-incorrect') {
-            expect(text).toBe(messages.fullWithErrors);
-          } else if (mine !== undefined && !wasMine) {
-            expect(text).toBe(conflictMessage(mine));
-          } else if (conflictsBefore.length > 0 && conflictsAfter.length === 0) {
-            expect(text).toBe(messages.noConflicts);
-          } else {
-            expect(text).not.toBeNull();
-            expect(text).not.toMatch(/^Conflito:/);
-            expect(text).not.toBe(messages.noConflicts);
-            expect(text).not.toBe(messages.won);
-            expect(text).not.toBe(messages.fullWithErrors);
-            expect(text).not.toBe(messages.givenImmutable);
-          }
-        }
-      }),
-      { seed: SEED + 3, numRuns: 150 },
-    );
-  });
-
-  it('INV: pistas ficam inalteradas e selected fica sempre em 0-8', () => {
-    fc.assert(
-      fc.property(actionsArb, (actions) => {
-        const { initial, steps } = replay(actions);
-        for (const { after } of [{ after: initial }, ...steps]) {
-          expect(Number.isInteger(after.selected.row)).toBe(true);
-          expect(Number.isInteger(after.selected.col)).toBe(true);
-          expect(after.selected.row).toBeGreaterThanOrEqual(0);
-          expect(after.selected.row).toBeLessThanOrEqual(8);
-          expect(after.selected.col).toBeGreaterThanOrEqual(0);
-          expect(after.selected.col).toBeLessThanOrEqual(8);
-          after.game.board.cells.forEach((cell: CellState, i: number) => {
-            const given = givenAt(Math.floor(i / 9), i % 9);
-            expect(cell.given).toBe(given !== null);
-            if (given !== null) expect(cell.value).toBe(given);
-          });
-        }
-      }),
-      { seed: SEED + 4, numRuns: 100 },
-    );
-  });
-
-  it('INV: conflito nunca fica no estado, só derivado do tabuleiro (invariante 9)', () => {
-    fc.assert(
-      fc.property(actionsArb, (actions) => {
-        for (const { after } of replay(actions).steps) {
-          expect(Object.keys(after).sort()).toEqual(['announcement', 'game', 'selected']);
-          expect(getGameConflicts(after.game)).toEqual(getConflicts(after.game.board));
-        }
-      }),
-      { seed: SEED + 5, numRuns: 100 },
-    );
-  });
-
-  it('CA-005-29: depois de won, digit e erase não alteram o Game nem anunciam', () => {
-    fc.assert(
-      fc.property(actionsArb, (actions) => {
-        for (const { before, action, after } of replay(actions).steps) {
-          if (getGameStatus(before.game) === 'won') {
-            expect(after.game).toBe(before.game);
-            expect(getGameStatus(after.game)).toBe('won');
-            if (action.type === 'digit' || action.type === 'erase') {
-              expect(after.announcement).toBeNull();
+  it(
+    'CA-005-31: para qualquer sequência o reducer é total e o anúncio, quando existe, é um só e bem formado',
+    () => {
+      fc.assert(
+        fc.property(actionsArb, (actions) => {
+          const { steps } = replay(actions); // lançar derruba a propriedade
+          for (const { after } of steps) {
+            if (after.announcement !== null) {
+              expect(Number.isInteger(after.announcement.id)).toBe(true);
+              expect(after.announcement.id).toBeGreaterThanOrEqual(1);
+              expect(typeof after.announcement.text).toBe('string');
+              expect(after.announcement.text).not.toBe('');
             }
           }
-        }
-      }),
-      { seed: SEED + 6, numRuns: 100 },
-    );
-  });
+        }),
+        { seed: SEED + 1, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
 
-  it('INV: o reducer é puro (mesmo estado e ação, mesmo resultado, sem alterar a entrada)', () => {
-    fc.assert(
-      fc.property(actionsArb, macroArb, (actions, extra) => {
-        const { steps } = replay(actions);
-        const state = steps.at(-1)?.after ?? initialState(fixedGame());
-        const snapshot = structuredClone(state);
-        for (const action of extra) {
-          const first = gameReducer(state, action);
-          const second = gameReducer(state, action);
-          expect(second).toEqual(first);
-          expect(state).toEqual(snapshot);
-        }
-      }),
-      { seed: SEED + 7, numRuns: 100 },
-    );
-  });
+  it(
+    'CA-005-31: ids de anúncios em ações seguidas crescem estritamente (de 1 em 1)',
+    () => {
+      fc.assert(
+        fc.property(actionsArb, (actions) => {
+          for (const { before, after } of replay(actions).steps) {
+            if (before.announcement !== null && after.announcement !== null) {
+              expect(after.announcement.id).toBe(before.announcement.id + 1);
+            }
+          }
+        }),
+        { seed: SEED + 2, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-31: o anúncio de cada ação segue a precedência e nunca é herdado do estado anterior',
+    () => {
+      fc.assert(
+        fc.property(actionsArb, (actions) => {
+          for (const { before, action, after } of replay(actions).steps) {
+            const text = after.announcement?.text ?? null;
+            if (action.type === 'select' || action.type === 'move') {
+              expect(after.announcement).toBeNull();
+              continue;
+            }
+            const { row, col } = before.selected;
+            if (getGameStatus(before.game) === 'won') {
+              expect(after.announcement).toBeNull(); // game-over: sem anúncio
+              continue;
+            }
+            if (before.game.board.cells[row * 9 + col]?.given) {
+              expect(text).toBe(messages.givenImmutable);
+              continue;
+            }
+            if (after.game === before.game) {
+              expect(after.announcement).toBeNull(); // jogada sem efeito
+              continue;
+            }
+            const status = getGameStatus(after.game);
+            const conflictsBefore = getGameConflicts(before.game);
+            const conflictsAfter = getGameConflicts(after.game);
+            const mine = conflictsAfter.find((c) => c.row === row && c.col === col);
+            const wasMine = conflictsBefore.some((c) => c.row === row && c.col === col);
+            if (status === 'won') {
+              expect(text).toBe(messages.won);
+            } else if (status === 'full-incorrect') {
+              expect(text).toBe(messages.fullWithErrors);
+            } else if (mine !== undefined && !wasMine) {
+              expect(text).toBe(conflictMessage(mine));
+            } else if (conflictsBefore.length > 0 && conflictsAfter.length === 0) {
+              expect(text).toBe(messages.noConflicts);
+            } else {
+              expect(text).not.toBeNull();
+              expect(text).not.toMatch(/^Conflito:/);
+              expect(text).not.toBe(messages.noConflicts);
+              expect(text).not.toBe(messages.won);
+              expect(text).not.toBe(messages.fullWithErrors);
+              expect(text).not.toBe(messages.givenImmutable);
+            }
+          }
+        }),
+        { seed: SEED + 3, numRuns: 150 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'INV: pistas ficam inalteradas e selected fica sempre em 0-8',
+    () => {
+      fc.assert(
+        fc.property(actionsArb, (actions) => {
+          const { initial, steps } = replay(actions);
+          for (const { after } of [{ after: initial }, ...steps]) {
+            expect(Number.isInteger(after.selected.row)).toBe(true);
+            expect(Number.isInteger(after.selected.col)).toBe(true);
+            expect(after.selected.row).toBeGreaterThanOrEqual(0);
+            expect(after.selected.row).toBeLessThanOrEqual(8);
+            expect(after.selected.col).toBeGreaterThanOrEqual(0);
+            expect(after.selected.col).toBeLessThanOrEqual(8);
+            after.game.board.cells.forEach((cell: CellState, i: number) => {
+              const given = givenAt(Math.floor(i / 9), i % 9);
+              expect(cell.given).toBe(given !== null);
+              if (given !== null) expect(cell.value).toBe(given);
+            });
+          }
+        }),
+        { seed: SEED + 4, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'INV: conflito nunca fica no estado, só derivado do tabuleiro (invariante 9)',
+    () => {
+      fc.assert(
+        fc.property(actionsArb, (actions) => {
+          for (const { after } of replay(actions).steps) {
+            expect(Object.keys(after).sort()).toEqual(['announcement', 'game', 'selected']);
+            expect(getGameConflicts(after.game)).toEqual(getConflicts(after.game.board));
+          }
+        }),
+        { seed: SEED + 5, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-29: depois de won, digit e erase não alteram o Game nem anunciam',
+    () => {
+      fc.assert(
+        fc.property(actionsArb, (actions) => {
+          for (const { before, action, after } of replay(actions).steps) {
+            if (getGameStatus(before.game) === 'won') {
+              expect(after.game).toBe(before.game);
+              expect(getGameStatus(after.game)).toBe('won');
+              if (action.type === 'digit' || action.type === 'erase') {
+                expect(after.announcement).toBeNull();
+              }
+            }
+          }
+        }),
+        { seed: SEED + 6, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'INV: o reducer é puro (mesmo estado e ação, mesmo resultado, sem alterar a entrada)',
+    () => {
+      fc.assert(
+        fc.property(actionsArb, macroArb, (actions, extra) => {
+          const { steps } = replay(actions);
+          const state = steps.at(-1)?.after ?? initialState(fixedGame());
+          const snapshot = structuredClone(state);
+          for (const action of extra) {
+            const first = gameReducer(state, action);
+            const second = gameReducer(state, action);
+            expect(second).toEqual(first);
+            expect(state).toEqual(snapshot);
+          }
+        }),
+        { seed: SEED + 7, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
 });

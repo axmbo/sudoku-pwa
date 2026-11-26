@@ -7,7 +7,7 @@ import type { Selection } from './navigation';
 import { gridView, type GridCellView } from './view';
 
 // Puzzle fixo (src/ui/fixed-puzzle.ts), células em base 0 (linha, coluna):
-//  - (0,0) = 5 e (7,8) = 5 são pistas (o mesmo valor em unidades diferentes).
+//  - (0,0) = 5, (1,5) = 5 e (7,8) = 5 são pistas (o mesmo valor em unidades diferentes).
 //  - (0,2) é vazia; o 5 ali repete a linha e a caixa de (0,0): conflito entre (0,0) e (0,2).
 //  - (4,4) é vazia, usada como selecionada sem valor e sem conflito.
 
@@ -64,7 +64,10 @@ describe('gridView', () => {
   it('CA-005-05: sameValue marca as outras células com o valor da selecionada', () => {
     const view = gridView(fixedGame(), sel(0, 0)); // 5
     const same = view.filter((c: GridCellView) => c.sameValue);
-    expect(same.map((c: GridCellView) => [c.row, c.col])).toEqual([[7, 8]]);
+    expect(same.map((c: GridCellView) => [c.row, c.col])).toEqual([
+      [1, 5],
+      [7, 8],
+    ]);
     expect(view[0]?.sameValue).toBe(false); // nunca a própria selecionada
   });
 
@@ -82,10 +85,11 @@ describe('gridView', () => {
     expect(same).toEqual(
       expect.arrayContaining([
         [0, 0],
+        [1, 5],
         [7, 8],
       ]),
     );
-    expect(same).toHaveLength(2);
+    expect(same).toHaveLength(3);
   });
 
   it('CA-005-05: a seleção muda selected, peer e sameValue na mesma visão', () => {

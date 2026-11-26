@@ -1,0 +1,16 @@
+/* Tokens do tema claro (T07 da 005a). Só hexadecimal: o teste de contraste lê este bloco. */
+:root {
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-given: #111111;
+  --color-player: #1e40af;
+  --color-selected-bg: #bfdbfe;
+  --color-peer-bg: #e5e7eb;
+  --color-same-value-bg: #cbd5e1;
+  --color-conflict-bg: #fecaca;
+  --color-selected-outline: #1e3a8a;
+  --color-focus: #7c2d12;
+  --color-grid-line: #6b7280;
+  --color-box-line: #1a1a1a;
+  --color-conflict-mark: #7f1d1d;
+}

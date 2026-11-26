@@ -122,3 +122,9 @@ Formato:
 - Proposta (diff): dar `timeout` explícito (ex.: 15 s) ou reduzir `numRuns` nessa propriedade, em item de backlog próprio (não na tarefa da UI); avaliar issue `débito` para o Diretor. Sem regra nova no processo.
 - Lugar de promoção: teste/config (`vitest.config.ts`), fora de skill e agente
 - Estado: corrigida em `55c4efa` (timeout próprio de 30 s na CA-004-22, rodadas e seeds intactas; Diretor, 26/11/2026); issue [#23](https://github.com/axmbo/sudoku-pwa/issues/23) fecha com o merge do PR da 005a
+
+## M-017 — Template de teste de propriedade já nasce com timeout próprio (005a T04, 26/11/2026)
+- Lição: as 8 propriedades fast-check do `reducer` (UI) estouraram os 5 s no `npm run check` completo, mesmo defeito do #23 / `55c4efa`; o `dev` parou o GREEN, o orquestrador tirou o `reducer.ts`, a eng-testes ajustou o RED (`9dbd375`) e o `dev` recolocou o arquivo: uma rodada extra de cada um (T04 1,35x o provável).
+- Proposta (diff): no template de propriedade (skill `tdd-ciclo` ou o exemplo do agente `eng-testes`), declarar `const PROP_TIMEOUT = 30_000` e passá-lo a toda propriedade já no RED. Sem regra nova de processo; M-016 corrige só a CA-004-22.
+- Lugar de promoção: template/skill (o mais barato que garante); alternativa: teste estático que rejeite `fc.assert` sem timeout
+- Estado: candidata, aguarda o Diretor

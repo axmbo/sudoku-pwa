@@ -266,7 +266,9 @@ describe('game (propriedades)', () => {
     }
     expect(getConflicts(current.board)).toEqual([]);
     expect(getGameStatus(current)).toBe('full-incorrect');
-  });
+    // Timeout próprio (#23): ~1,2 s isolado, até ~5,6 s com a suíte inteira em paralelo,
+    // acima dos 5 s padrão. Mesmas rodadas e seeds; só o limite muda.
+  }, 30_000);
 
   it('INV: conflito é derivado: getGameConflicts(g) = getConflicts(g.board) em todo jogo gerado', () => {
     fc.assert(

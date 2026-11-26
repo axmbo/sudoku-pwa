@@ -121,4 +121,4 @@ Formato:
 - Lição: `game.prop.test.ts` > "CA-004-22: won se e só se..." levou 5167 ms com a suíte inteira em paralelo (load average ~3,6) e falhou o gate; isolado leva ~1,2 s e a 2ª rodada passou. Teste instável por tempo trava o `npm run check` sem defeito real.
 - Proposta (diff): dar `timeout` explícito (ex.: 15 s) ou reduzir `numRuns` nessa propriedade, em item de backlog próprio (não na tarefa da UI); avaliar issue `débito` para o Diretor. Sem regra nova no processo.
 - Lugar de promoção: teste/config (`vitest.config.ts`), fora de skill e agente
-- Estado: aprovada como débito [#23](https://github.com/axmbo/sudoku-pwa/issues/23) (Diretor, 26/11/2026)
+- Estado: corrigida em `55c4efa` (timeout próprio de 30 s na CA-004-22, rodadas e seeds intactas; Diretor, 26/11/2026); issue [#23](https://github.com/axmbo/sudoku-pwa/issues/23) fecha com o merge do PR da 005a

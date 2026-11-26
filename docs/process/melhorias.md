@@ -116,3 +116,9 @@ Formato:
 - Proposta (diff): skill `git-fluxo` (modelo do corpo do PR): "a linha de fechamento usa `Closes #N` (em inglês)"; conferir `closingIssuesReferences` ao abrir o PR.
 - Lugar de promoção: skill `git-fluxo` (46 de 80 linhas)
 - Estado: **promovida** em 25/11/2026 (v0.8) à skill `git-fluxo`
+
+## M-016 — Propriedade da 004 estoura o timeout de 5 s sob carga (005a T02, 26/11/2026)
+- Lição: `game.prop.test.ts` > "CA-004-22: won se e só se..." levou 5167 ms com a suíte inteira em paralelo (load average ~3,6) e falhou o gate; isolado leva ~1,2 s e a 2ª rodada passou. Teste instável por tempo trava o `npm run check` sem defeito real.
+- Proposta (diff): dar `timeout` explícito (ex.: 15 s) ou reduzir `numRuns` nessa propriedade, em item de backlog próprio (não na tarefa da UI); avaliar issue `débito` para o Diretor. Sem regra nova no processo.
+- Lugar de promoção: teste/config (`vitest.config.ts`), fora de skill e agente
+- Estado: candidata, aguardando o Diretor

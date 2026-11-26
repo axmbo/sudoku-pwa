@@ -27,6 +27,7 @@ Fonte das metas e isenções: `PROCESSO.md` §6. Princípios 5–7 da `docs/cons
 - ≥ 1 propriedade por invariante: solução única do gerado; solver devolve grade válida e consistente com as pistas; `deserialize(serialize(x)) = x`; `undo(do(s)) = s`; mesma seed ⇒ mesmo puzzle.
 - Fixe `seed` ao reproduzir falha e registre-a no teste de regressão.
 - `numRuns` padrão no `check`; valores maiores no CI agendado.
+- Toda propriedade nasce, já no RED, com timeout próprio (`const PROP_TIMEOUT = 30_000` passado ao `it`/`test`): com a suíte em paralelo, os 5 s padrão estouram (M-017).
 - Geradores (`Arbitrary`) do domínio ficam em `src/domain/__arbitraries__/` e são reutilizados.
 
 ## Mutation (Stryker)

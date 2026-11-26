@@ -127,4 +127,4 @@ Formato:
 - Lição: as 8 propriedades fast-check do `reducer` (UI) estouraram os 5 s no `npm run check` completo, mesmo defeito do #23 / `55c4efa`; o `dev` parou o GREEN, o orquestrador tirou o `reducer.ts`, a eng-testes ajustou o RED (`9dbd375`) e o `dev` recolocou o arquivo: uma rodada extra de cada um (T04 1,35x o provável).
 - Proposta (diff): no template de propriedade (skill `tdd-ciclo` ou o exemplo do agente `eng-testes`), declarar `const PROP_TIMEOUT = 30_000` e passá-lo a toda propriedade já no RED. Sem regra nova de processo; M-016 corrige só a CA-004-22.
 - Lugar de promoção: template/skill (o mais barato que garante); alternativa: teste estático que rejeite `fc.assert` sem timeout
-- Estado: candidata, aguarda o Diretor
+- Estado: **promovida** em 26/11/2026 (v0.9) à skill `tdd-dominio` (seção property-based); o teste estático ficou de fora

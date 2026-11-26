@@ -2,6 +2,12 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.9 — 26/11/2026
+
+Aprovado pelo Diretor depois da T04 da 005a ([melhorias.md](melhorias.md)):
+
+- M-017, skill `tdd-dominio`: toda propriedade fast-check nasce no RED com timeout próprio (`PROP_TIMEOUT = 30_000`).
+
 ## v0.8 — 25/11/2026
 
 Aprovado pelo Diretor na `/retro 004` ([ciclo-02](retro/ciclo-02.md); candidatas em [melhorias.md](melhorias.md)):

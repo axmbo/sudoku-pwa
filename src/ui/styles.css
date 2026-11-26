@@ -1,0 +1,151 @@
+/* Layout e realces (T07 da 005a). Sem estilo inline nem recurso externo (CSP). */
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  box-sizing: border-box;
+  width: min(100%, 26.75rem);
+  margin-inline: auto;
+  padding: 0.5rem;
+}
+
+h1 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.banner {
+  margin: 0 0 0.5rem;
+  padding: 0.5rem;
+  border: 2px solid var(--color-selected-outline);
+  font-weight: 700;
+}
+
+.grid {
+  width: min(100%, 24.75rem);
+  margin-inline: auto;
+  border: 2px solid var(--color-box-line);
+  box-sizing: content-box;
+}
+
+.grid-row {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+
+.cell {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  container-type: inline-size;
+  background: var(--color-bg);
+  border-right: 1px solid var(--color-grid-line);
+  border-bottom: 1px solid var(--color-grid-line);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.cell.box-end-col {
+  border-right: 2px solid var(--color-box-line);
+}
+
+.cell.box-end-row {
+  border-bottom: 2px solid var(--color-box-line);
+}
+
+.cell-digit {
+  font-size: 60cqi;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-player);
+}
+
+.cell.is-given .cell-digit {
+  color: var(--color-given);
+}
+
+.is-given .cell-digit {
+  font-weight: 700;
+}
+
+.cell.is-peer {
+  background: var(--color-peer-bg);
+}
+
+.cell.is-same-value {
+  background: var(--color-same-value-bg);
+}
+
+.cell.is-selected {
+  background: var(--color-selected-bg);
+  outline: 3px solid var(--color-selected-outline);
+  outline-offset: -3px;
+}
+
+.cell.is-conflict {
+  background: var(--color-conflict-bg);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0,
+    transparent 4px,
+    var(--color-conflict-mark) 4px,
+    var(--color-conflict-mark) 5px
+  );
+}
+
+.cell.is-conflict::after {
+  content: '!';
+  position: absolute;
+  top: 0;
+  right: 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-conflict-mark);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cell:focus-visible {
+  outline-offset: -3px;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(2.75rem, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.keypad button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  font: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

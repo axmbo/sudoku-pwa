@@ -7,7 +7,7 @@ Redigido pelo `arquiteto` e refinado pela `eng-testes` (testes) e pelo `curador-
 
 Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própria de UI. Manifestos: ~4 caracteres por token, medidos com `wc -c` quando o arquivo existe (`estado.md` ≈ 1,5k; `constituicao.md` ≈ 0,5k; `game.ts` ≈ 1,9k; `board.ts` ≈ 1,1k; `puzzle.ts` ≈ 0,6k; `conflicts.ts` ≈ 0,3k; `units.ts` ≈ 0,3k; `digit.ts` ≈ 0,1k; `result.ts` ≈ 0,1k; spec inteira ≈ 3,3k, por isso só os CA cobertos, ~0,2k cada); arquivos de saída de tarefa anterior seguem a projeção. Todos os totais abaixo de 15k.
 
-**Manifestos fechados (curador-pdca, passo 3 do `/planejar`).** Conferidos por `wc -c` (~4 car./token): nenhum estoura os 15k; o maior é T05 (~9,3k, ~10,2k com L0 de ~0,85k), margem ≥ 4k (valores revistos na análise r1). `qualidade-web` mede ~0,7k (a lista usa 1,2k, folga). `ctx_inicial_est` por tarefa em `metrics.csv`: T01 4,7k · T02 3,2k · T03 4,2k · T04 8,9k · T05 9,3k · T06 7,3k · T07 8,9k · T08 9,1k. Risco: T05, T07 e T08 ficam perto de 9k mais leituras do código recém-escrito (Grid/Cell/CSS); se o agente reportar leituras fora do manifesto, o manifesto está pobre. Estimativa por tarefa × agente (split 62/38; T07 50/50; T08 só `eng-testes`) em `docs/process/metrics.csv`; a coluna `Estimativa` abaixo é o total da tarefa. **Incerteza:** primeira UI, sem histórico; âncora do ciclo 860k / 1,47M / 2,74M (provável: tarefas 850k).
+**Manifestos fechados (curador-pdca, passo 3 do `/planejar`).** Conferidos por `wc -c` (~4 car./token): nenhum estoura os 15k; o maior é T05 (~9,6k, ~10,5k com L0 de ~0,85k), margem ≥ 4k (valores revistos na análise r1; T03 a T06 +0,3k pela decisão 16). `qualidade-web` mede ~0,7k (a lista usa 1,2k, folga). `ctx_inicial_est` por tarefa em `metrics.csv`: T01 4,7k · T02 3,2k · T03 4,5k · T04 9,2k · T05 9,6k · T06 7,6k · T07 8,9k · T08 9,1k. Risco: T05, T07 e T08 ficam perto de 9k mais leituras do código recém-escrito (Grid/Cell/CSS); se o agente reportar leituras fora do manifesto, o manifesto está pobre. Estimativa por tarefa × agente (split 62/38; T07 50/50; T08 só `eng-testes`) em `docs/process/metrics.csv`; a coluna `Estimativa` abaixo é o total da tarefa. **Incerteza:** primeira UI, sem histórico; âncora do ciclo 860k / 1,47M / 2,74M (provável: tarefas 850k).
 
 ## T01 — Puzzle fixo e `fixedGame()`
 
@@ -63,7 +63,8 @@ Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própr
   - `src/domain/conflicts.ts#L1-12` (`CellConflict`) (~0,2k)
   - `src/domain/units.ts#L1-12` (`Index`, `UnitKind`, `Unit`) (~0,2k)
   - `src/domain/digit.ts` (~0,1k)
-  - Total ≈ 4,2k (sem L0)
+  - `vitest.config.ts#L14` (projeto `ui`) e convenção de `seed` em `src/domain/game.prop.test.ts#L105-112` (~0,3k; decisão 16 do Diretor, 26/11/2026)
+  - Total ≈ 4,5k (sem L0)
 - **Estimativa:** tokens 30k/60k/120k · minutos 10/20/40
 - **Agentes:** `eng-testes` → `dev`
 
@@ -84,7 +85,8 @@ Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própr
   - `src/domain/game.ts#L21-60` (`Game`, refusals, `GameStatus`), `#L59-62`, `#L136-186` (`gamePlace`, `gameErase`), `#L222-end` (`getGameStatus`) (~1,3k)
   - `src/domain/result.ts` (~0,1k) · `src/domain/conflicts.ts#L1-12` (~0,2k) · `src/domain/board.ts#L57-65` (`cellAt`, para o anúncio de conteúdo) (~0,2k)
   - `src/ui/fixed-puzzle.ts` (saída de T01, só `fixedGame` na assinatura) (~0,2k)
-  - Total ≈ 8,9k (sem L0)
+  - `vitest.config.ts#L14` (projeto `ui`) e convenção de `seed` em `src/domain/game.prop.test.ts#L105-112` (~0,3k; decisão 16 do Diretor, 26/11/2026)
+  - Total ≈ 9,2k (sem L0)
 - **Estimativa:** tokens 70k/130k/260k · minutos 25/45/90
 - **Agentes:** `eng-testes` → `dev`
 
@@ -106,7 +108,8 @@ Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própr
   - `src/ui/model/reducer.ts`, `messages.ts`, `navigation.ts` (saídas T02 a T04, só exports) (~1,5k)
   - `specs/005a-grade-acessivel/plan.md#Tipos públicos` (bloco `view.ts`) (~0,3k)
   - `src/domain/board.ts#L1-20` e `#L57-65` (`CellState`, `Board`, `cellAt`) (~0,5k) · `src/domain/units.ts#L1-12` (~0,2k) · `src/domain/conflicts.ts#L1-12` (~0,2k) · assinatura de `getGameConflicts` em `game.ts` (~0,2k) · `view.ts` a escrever, projeção (~0,3k)
-  - Total ≈ 9,3k (sem L0)
+  - `vitest.config.ts#L14` (projeto `ui`) e convenção de `seed` em `src/domain/game.prop.test.ts#L105-112` (~0,3k; decisão 16 do Diretor, 26/11/2026)
+  - Total ≈ 9,6k (sem L0)
 - **Estimativa:** tokens 90k/170k/340k · minutos 30/60/120
 - **Agentes:** `eng-testes` → `dev`
 
@@ -125,7 +128,8 @@ Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própr
   - `specs/005a-grade-acessivel/plan.md#Decisões de projeto` itens 2 e 5 e `#Tipos públicos` (~1,3k)
   - `src/ui/model/reducer.ts`, `messages.ts`, `fixed-puzzle.ts`, `Grid.tsx` (saídas anteriores, só exports e props) (~2,0k)
   - `src/main.tsx` (~0,2k) · `index.html` (~0,2k)
-  - Total ≈ 7,3k (sem L0)
+  - `vitest.config.ts#L14` (projeto `ui`) e convenção de `seed` em `src/domain/game.prop.test.ts#L105-112` (~0,3k; decisão 16 do Diretor, 26/11/2026)
+  - Total ≈ 7,6k (sem L0)
 - **Estimativa:** tokens 70k/130k/260k · minutos 25/45/90
 - **Agentes:** `eng-testes` → `dev`
 

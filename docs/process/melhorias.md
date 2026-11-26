@@ -128,3 +128,9 @@ Formato:
 - Proposta (diff): no template de propriedade (skill `tdd-ciclo` ou o exemplo do agente `eng-testes`), declarar `const PROP_TIMEOUT = 30_000` e passá-lo a toda propriedade já no RED. Sem regra nova de processo; M-016 corrige só a CA-004-22.
 - Lugar de promoção: template/skill (o mais barato que garante); alternativa: teste estático que rejeite `fc.assert` sem timeout
 - Estado: **promovida** em 26/11/2026 (v0.9) à skill `tdd-dominio` (seção property-based); o teste estático ficou de fora
+
+## M-018 — Teste que depende de contagem no puzzle fixo deriva a contagem do `FIXED_PUZZLE` (005a T05, 26/11/2026)
+- Lição: 2 testes de `sameValue` (CA-005-05) assumiram dois 5 no puzzle fixo, mas há três (o terceiro, dado em (1,5)); o `dev` pegou no GREEN, desfez a produção e voltou ao RED: uma rodada extra de eng-testes e dev (T05 fechou em 0,72x, mas a rodada custou ~1 passe de cada). Ocorrência única.
+- Proposta (diff): em `eng-testes` ou na skill `tdd-dominio`/de UI, uma linha: "teste que depende de contagem ou posição no puzzle fixo calcula o valor a partir de `FIXED_PUZZLE` (ou confere no arquivo antes), nunca de memória".
+- Lugar de promoção: skill de teste de UI ou agente `eng-testes`; alternativa: manifesto de testes de UI traz as contagens por dígito do puzzle fixo
+- Estado: candidata (aguarda o Diretor; reavaliar se repetir na T06)

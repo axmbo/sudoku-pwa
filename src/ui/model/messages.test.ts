@@ -94,14 +94,13 @@ describe('messages: constantes', () => {
     expect(messages.givenImmutable).toBe('pista, não pode ser alterada');
   });
 
-  it('CA-005-29: won declara vitória e não menciona erro', () => {
-    expect(messages.won).toMatch(/vit[óo]ria|parab[ée]ns/i);
-    expect(messages.won).not.toMatch(/erro/i);
+  // Textos exatos aprovados pelo Diretor em 26/11/2026 (T03 da 005a).
+  it('CA-005-29: won é o texto aprovado de vitória', () => {
+    expect(messages.won).toBe('Parabéns, você venceu!');
   });
 
-  it('CA-005-30: fullWithErrors avisa de erros sem declarar vitória', () => {
-    expect(messages.fullWithErrors).toMatch(/erro/i);
-    expect(messages.fullWithErrors).not.toMatch(/vit[óo]ria|parab[ée]ns/i);
+  it('CA-005-30: fullWithErrors é o texto aprovado de grade cheia com erros', () => {
+    expect(messages.fullWithErrors).toBe('Grade completa, mas há erros. Corrija para vencer.');
   });
 
   it('CA-005-36: constantes sem placeholder e sem palavra inglesa da lista fixa', () => {

@@ -211,6 +211,29 @@ Criada pela decisão 19 do Diretor (27/11/2026).
 - **Estimativa:** tokens 50k/100k/200k · minutos 15/30/60 (hipótese: corrida de efeito, depuração possível)
 - **Agentes:** `eng-testes` → `dev`
 
+## T11 — Acabamento visual: teclado na tela e dígitos da grade (defeitos da inspeção visual)
+
+Criada pela decisão 21 do Diretor (27/11/2026), antes do merge do PR #25. A inspeção visual do build (`vite preview`, capturas em 390×844 e 1280×800) achou defeitos que os testes não pegam, porque conferem só tamanhos mínimos.
+
+- **CA cobertos:** CA-005-28 (aparência do teclado na tela), CA-005-34 (layout, dígito inteiro), CA-005-02 (aparência dos dígitos)
+- **tdd:** isento, por ser ajuste puramente visual em CSS (`PROCESSO.md` §6), verificado por inspeção visual com capturas antes e depois. Isenção **válida** só se a tarefa mexer apenas em CSS e, no máximo, em nomes de classe sem lógica. Se precisar de lógica, volta como tarefa `tdd: sim`.
+- **Defeitos a corrigir:**
+  1. O rótulo "Apagar" vaza para fora do botão de 44 px. Corrigir com largura mínima, sem cortar o texto nem reduzir o alvo abaixo de 44×44 px.
+  2. O teclado na tela quebra em fileiras irregulares (7 + 3 a 390 px, 8 + 2 a 1280 px) e, no desktop, fica desalinhado da grade. Corrigir com distribuição regular e alinhada à largura da grade, por exemplo 5 + 5 ou uma linha única quando couber.
+  3. Os dígitos das colunas 3 e 6 (e possivelmente das linhas 3 e 6), vizinhas da borda grossa da caixa, saem menores que os demais. Causa provável: o `font-size` em `cqi` medido numa célula que a borda grossa encolhe. O dígito deve ter o mesmo tamanho em todas as células.
+  4. Linhas finas desalinhadas na última fileira a 390 px, se persistirem depois do item 3.
+- **Verificação:** `npm run check` e `npm run e2e` verdes, sem mexer nos testes existentes. Capturas antes e depois do build (`npm run build` + `vite preview`) em 320, 390 e 1280 px de largura, e em 390 px com texto a 200%, gravadas fora do repositório e descritas no corpo do commit.
+- **via 7b para mutantes:** não
+- **Arquivos a criar/alterar:** `src/ui/styles.css` e, se necessário, `src/ui/theme.css`. Nomes de classe em `Keypad.tsx`/`Cell.tsx` só se faltar gancho de estilo, sem lógica.
+- **Manifesto de contexto** (lista fechada):
+  - `CLAUDE.md` (L0, automático) · `docs/estado.md` (~1,5k)
+  - `specs/005a-grade-acessivel/spec.md#CA-005-28` e `#CA-005-34` (~0,6k)
+  - `src/ui/styles.css` (~1,5k) · `src/ui/theme.css` (~0,2k) · `src/ui/Keypad.tsx` e `src/ui/Cell.tsx` (~0,7k)
+  - `src/ui/styles.rules.test.ts` (ganchos que não podem quebrar; ~0,8k)
+  - Total ≈ 5,3k (sem L0)
+- **Estimativa:** tokens 30k/60k/120k · minutos 10/20/40 (hipótese: CSS localizado, com iteração por captura)
+- **Agentes:** `dev`
+
 ## Cobertura dos CA (30)
 
 | CA | Tarefas | CA | Tarefas |
@@ -220,12 +243,12 @@ Criada pela decisão 19 do Diretor (27/11/2026).
 | 03 | T03, T05 | 22 | T04 |
 | 05 | T05, T07 | 26 | T04, T05 |
 | 06 | T04, T05, T08 | 27 | T06 |
-| 07 | T02, T05, T10 | 28 | T07, T08 |
+| 07 | T02, T05, T10 | 28 | T07, T08, T11 |
 | 08 | T02, T05 | 29 | T04, T06, T08 |
 | 09 | T02, T05 | 30 | T04, T06 |
 | 10 | T05 (parte), T08 | 31 | T04, T06 |
 | 11 | T05, T07, T08 | 33 | T07, T08 |
-| 12 a 15 | T04, T05 | 34 | T07, T08, T09 |
+| 12 a 15 | T04, T05 | 34 | T07, T08, T09, T11 |
 | 19 | T03, T05, T07 | 35 | T08 |
 | 36 | T03, T06, T08 | 37 | T01, T06, T08 |
 | 39 | T07, T08 | | |

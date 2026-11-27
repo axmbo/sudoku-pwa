@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 1. `npm run check`. Vermelho: volte ao `dev`, sem chamar LLM de revisão.
 2. Acione o `revisor` com: base e head (`git merge-base main HEAD`..`HEAD`; na rodada N>1, só o delta da rodada anterior), a spec/plan/tasks ativos e os ADRs citados.
-3. Se o ciclo tocou UI ou PWA, acione o `qa-auditor` em paralelo.
+3. Se o ciclo tocou UI ou PWA, acione o `qa-auditor` em paralelo. Ao acionar qualquer agente, **não passe `model`**: o do frontmatter vale (o `qa-auditor` rodou sonnet por herança da sessão na 005a, apesar de declarar haiku).
 4. Grave os pareceres em `specs/NNN-*/revisao-rN.md` e `qa.md`.
 5. Antes de abrir o PR, rode a mutação completa (`full-ci` ou local) no que mudou; o incremental só serve para iterar e não fecha tarefa.
 6. **Critério de saída: 0 blocker, 0 major, ≤ 3 minor.** Não atingido: achados voltam ao dono (teste → `eng-testes`, código → `dev`) e nova rodada. Na 4ª rodada, pare e escale ao Diretor.

@@ -29,5 +29,8 @@ Fontes: princípios 1–4 e 8 da `docs/constituicao.md`; orçamento e ferramenta
 - Sem fontes web externas; imagens e ícones otimizados; CSS crítico pequeno.
 - Medir no CI: tamanho do bundle e do Worker e teto de nós da geração a cada PR (determinísticos); Lighthouse mobile e tempo real de geração no CI agendado e na tag.
 
+## Tarefa de CSS/layout (M-019)
+A tarefa de CSS (isenta de TDD) só fecha com capturas do build em 320, 390 e 1280 px e em 390 px com texto a 200%, gravadas com Playwright e citadas em `notas.md`; o `revisor` as lê com o diff. Sem as capturas, a tarefa não fecha.
+
 ## Segurança web
 CSP restritiva (`default-src 'self'`, sem `unsafe-inline` em script), sem scripts/analytics de terceiros, sem dados pessoais, dependências mínimas.

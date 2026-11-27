@@ -18,6 +18,7 @@ Fonte das regras: `PROCESSO.md` §4.
 ## Montar um manifesto
 1. Comece pelo que a tarefa altera (arquivos listados) e pelos testes da tarefa.
 2. Liste todos os tipos/contratos importados pela tarefa (ex.: `Result`, `Unit`, `CellConflict`), por arquivo e por linhas (`src/domain/board.ts#L1-40`), para o agente não ler fora do manifesto (M-009a).
+2b. Tarefa de UI também inclui (M-020): os exports de `src/domain/game.ts` usados (`getGameStatus`/`GameStatus`) por linhas; o projeto `ui` de `vitest.config.ts` e a convenção de `seed`; os CA de texto fixo; para E2E/CSS, as classes e ganchos da tarefa anterior.
 3. Da spec, só os CA cobertos (`spec.md#CA-001-02`); do plano, só a seção do módulo.
 4. Estime: ~4 caracteres por token; some e compare com **15k tokens** (sem contar L0). Passou? Corte ou divida a tarefa.
 5. Registre `ctx_inicial_est` em `metrics.csv`.

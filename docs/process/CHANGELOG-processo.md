@@ -2,6 +2,18 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.10 — 27/11/2026
+
+Aprovado em bloco pelo Diretor na retro do ciclo 03 e na revisão estrutural ([estrutural-ciclo-03](revisoes/estrutural-ciclo-03.md), [melhorias.md](melhorias.md)):
+
+- M-022, `metricas.md`: `min_real` = minutos de trabalho do subagente, sem a espera do Diretor (definição única).
+- M-009(b), skill `pdca`: `min_est` provável = tokens prováveis ÷ 0,7M tokens/h, revista a cada retro.
+- M-019 (alternativa B), skill `qualidade-web`: tarefa de CSS só fecha com capturas a 320, 390, 1280 px e 390 px a 200% de texto.
+- M-020, skill `gestao-contexto`: manifesto de tarefa de UI traz exports de `game.ts`, projeto `ui` e seed, CA de texto fixo e ganchos da tarefa anterior.
+- M-021, skills `pdca` e `retro`: toda retro mede o orquestrador pelas sessões de topo; trocar seu modelo só depois de 2 ciclos medidos, por decisão do Diretor.
+- Skill `revisar`: o orquestrador não passa `model` ao acionar agente; vale o do frontmatter (o `qa-auditor` rodou sonnet por herança, apesar de declarar haiku).
+- M-001 e M-018 descartadas. M-023 (teste de tamanho e links em `tests/repo/`) aprovada, implementação pendente em item próprio.
+
 ## v0.9 — 26/11/2026
 
 Aprovado pelo Diretor depois da T04 da 005a ([melhorias.md](melhorias.md)):

@@ -53,12 +53,16 @@ h1 {
   background: var(--color-bg);
   border-right: 1px solid var(--color-grid-line);
   border-bottom: 1px solid var(--color-grid-line);
+  /* Largura útil igual em toda célula (borda 1px + padding 1px = borda grossa 2px + 0),
+     para o cqi do dígito dar o mesmo tamanho em todas. */
+  padding-right: 1px;
   cursor: pointer;
   transition: background-color 0.15s;
 }
 
 .cell.box-end-col {
   border-right: 2px solid var(--color-box-line);
+  padding-right: 0;
 }
 
 .cell.box-end-row {
@@ -126,18 +130,29 @@ h1 {
 }
 
 .keypad {
+  /* Mesma largura da grade (conteúdo + borda de 2px), 5 + 5 regular. */
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(2.75rem, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.5rem;
-  margin-top: 0.75rem;
+  box-sizing: content-box;
+  width: min(100%, 24.75rem);
+  margin: 0.75rem auto 0;
+  border: 2px solid transparent;
+  container-type: inline-size;
 }
 
 .keypad button {
-  min-width: 2.75rem;
-  min-height: 2.75rem;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.25rem 0;
   font: inherit;
   font-size: 1.25rem;
   cursor: pointer;
+}
+
+.keypad button:last-child {
+  font-size: min(0.875rem, 3.8cqi);
 }
 
 @media (prefers-reduced-motion: reduce) {

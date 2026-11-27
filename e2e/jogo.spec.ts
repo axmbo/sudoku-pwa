@@ -39,10 +39,7 @@ test.describe('jogo: jornadas por teclado', () => {
     await expect(cell(page, 2, 2)).toBeFocused();
   });
 
-  // DEFEITO (T08, notas.md): em rajada de setas o foco real fica para trás da seleção.
-  // `Grid` guarda `focusPending` num ref consumido pelo primeiro efeito; se o segundo keydown chega
-  // antes do re-render, o efeito do segundo render não foca. Intermitente (reproduz em cerca de 1 de cada 3 execuções), por isso fixme e não fail; trocar por test ao corrigir.
-  test.fixme('CA-005-07: em rajada de setas o foco real acompanha a célula selecionada', async ({
+  test('CA-005-07: em rajada de setas o foco real acompanha a célula selecionada', async ({
     page,
   }) => {
     await page.goto('/');

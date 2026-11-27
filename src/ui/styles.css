@@ -151,8 +151,17 @@ h1 {
   cursor: pointer;
 }
 
-.keypad button:last-child {
+.keypad .keypad-erase {
   font-size: min(0.875rem, 3.8cqi);
+}
+
+/* Contêiner estreito em relação ao texto (rem): com texto ampliado o "Apagar"
+   ocupa a própria fileira e a fonte volta a escalar com o texto (WCAG 1.4.4). */
+@container (max-width: 14rem) {
+  .keypad .keypad-erase {
+    grid-column: 1 / -1;
+    font-size: 1.25rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -21,7 +21,7 @@ export function Keypad({ dispatch }: KeypadProps): JSX.Element {
           {digit}
         </button>
       ))}
-      <button type="button" onClick={() => dispatch({ type: 'erase' })}>
+      <button type="button" class="keypad-erase" onClick={() => dispatch({ type: 'erase' })}>
         Apagar
       </button>
     </div>

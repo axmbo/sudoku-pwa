@@ -61,3 +61,9 @@
 
 ## T09 (27/11/2026)
 - Defeito 1 corrigido: `.keypad` passou de `repeat(5, minmax(2.75rem, 1fr))` para `repeat(auto-fit, minmax(2.75rem, 1fr))`; o teclado quebra em mais linhas em 320 px e a 200%, botões seguem ≥ 2.75rem. Isto substitui "teclado em 5 colunas" da seção T07. Commits `8437f66` (RED) e `9322f66` (GREEN); sem REFACTOR; 0 leituras fora do manifesto.
+
+## T10 (27/11/2026)
+- Defeito 2 corrigido (CA-005-07, rajada de setas): em `src/ui/Grid.tsx`, `focusPending` virou `byKeyboard`, mais o ref `lastSelected`; a marca só cai quando a seleção não mudou desde o efeito anterior. Commits `c1d3304` (RED de componente), `3441cc3` (GREEN) e `0c5bcd4` (reativa o cenário E2E); sem REFACTOR.
+- **Descoberta:** o efeito de foco do Preact roda após a pintura e pode ser adiado para o render seguinte numa rajada; por isso a marca de "veio do teclado" precisa persistir até um render sem mudança de seleção, em vez de cair no primeiro efeito.
+- **Risco aceito (sem teste):** se a seleção mudar por outro meio (ex.: clique) logo depois de uma tecla, antes de algum render sem mudança de seleção, o foco segue a seleção nova. É inofensivo, pois o clique já foca a célula.
+- Leituras fora do manifesto: `dev` 2 (`src/ui/Cell.tsx` e `src/ui/model/view.ts`, por grep, para confirmar `selected`/`tabIndex`); `eng-testes` 0.

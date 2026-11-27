@@ -234,6 +234,22 @@ Criada pela decisão 21 do Diretor (27/11/2026), antes do merge do PR #25. A ins
 - **Estimativa:** tokens 30k/60k/120k · minutos 10/20/40 (hipótese: CSS localizado, com iteração por captura)
 - **Agentes:** `dev`
 
+## T12 — Rótulo "Apagar" acompanha o texto a 200% (minor 1 da revisão r2)
+
+Criada pela decisão 22 do Diretor (27/11/2026), antes do merge do PR #25. Achado em `revisao-r2.md`, minor 1 e nit 3.
+
+- **CA cobertos:** CA-005-34 (texto a 200%, sem corte e sem rolagem), CA-005-28 (alvo ≥ 44×44 px)
+- **tdd:** isento, por ser ajuste puramente visual em CSS (`PROCESSO.md` §6), com nome de classe sem lógica em `Keypad.tsx` e verificado por capturas antes e depois.
+- **O que corrigir:**
+  1. Com texto a 200%, o rótulo "Apagar" fica no teto de `min(0.875rem, 3.8cqi)` e não cresce (WCAG 1.4.4). O rótulo deve acompanhar a ampliação do texto, como os dígitos do teclado, sem corte, sem rolagem horizontal a 320 px e com alvo ≥ 44×44 px. Sugestão da r2: com o contêiner do teclado estreito em relação ao texto (`@container`, medido em `rem`), o botão ocupa uma fileira própria de largura total e a fonte volta a escalar. A 100%, o 5 + 5 continua.
+  2. Trocar o seletor `:last-child` por uma classe no botão Apagar em `Keypad.tsx` (só o nome de classe, sem lógica).
+- **Verificação:** `npm run check` e `npm run e2e` verdes, sem mexer nos testes existentes. Capturas do build em 320, 390 e 1280 px e em 320 e 390 px com texto a 200%, conferidas visualmente.
+- **via 7b para mutantes:** não
+- **Arquivos a criar/alterar:** `src/ui/styles.css`, `src/ui/Keypad.tsx` (classe).
+- **Manifesto de contexto** (lista fechada): `CLAUDE.md` (L0) · `specs/005a-grade-acessivel/spec.md#CA-005-28` e `#CA-005-34` (~0,6k) · `specs/005a-grade-acessivel/revisao-r2.md` (~1k) · `src/ui/styles.css` (~1,7k) · `src/ui/Keypad.tsx` (~0,3k) · `src/ui/styles.rules.test.ts` (~0,8k). Total ≈ 4,4k (sem L0).
+- **Estimativa:** tokens 20k/40k/80k · minutos 5/10/20
+- **Agentes:** `dev`
+
 ## Cobertura dos CA (30)
 
 | CA | Tarefas | CA | Tarefas |
@@ -243,12 +259,12 @@ Criada pela decisão 21 do Diretor (27/11/2026), antes do merge do PR #25. A ins
 | 03 | T03, T05 | 22 | T04 |
 | 05 | T05, T07 | 26 | T04, T05 |
 | 06 | T04, T05, T08 | 27 | T06 |
-| 07 | T02, T05, T10 | 28 | T07, T08, T11 |
+| 07 | T02, T05, T10 | 28 | T07, T08, T11, T12 |
 | 08 | T02, T05 | 29 | T04, T06, T08 |
 | 09 | T02, T05 | 30 | T04, T06 |
 | 10 | T05 (parte), T08 | 31 | T04, T06 |
 | 11 | T05, T07, T08 | 33 | T07, T08 |
-| 12 a 15 | T04, T05 | 34 | T07, T08, T09, T11 |
+| 12 a 15 | T04, T05 | 34 | T07, T08, T09, T11, T12 |
 | 19 | T03, T05, T07 | 35 | T08 |
 | 36 | T03, T06, T08 | 37 | T01, T06, T08 |
 | 39 | T07, T08 | | |

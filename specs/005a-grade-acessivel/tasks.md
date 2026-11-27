@@ -3,7 +3,7 @@
 - **Spec:** [spec.md](spec.md) · **Plano:** [plan.md](plan.md)
 - **Autores:** `arquiteto` + `eng-testes` · **Análise de consistência:** ok em 25/11/2026 (2 rodadas, [analise.md](analise.md))
 
-Redigido pelo `arquiteto` e refinado pela `eng-testes` (testes) e pelo `curador-pdca` (manifestos, fechados abaixo); revisado na análise r1. **8 tarefas** (no teto; avaliação e alternativa de divisão em `plan.md#Avaliação do tamanho`). Ordem: contratos e lógica pura antes de componentes; estilo e E2E por último. Todos os CA da spec (30) aparecem em ao menos uma tarefa; ver tabela de cobertura no fim.
+Redigido pelo `arquiteto` e refinado pela `eng-testes` (testes) e pelo `curador-pdca` (manifestos, fechados abaixo); revisado na análise r1. **8 tarefas** mais T09 e T10, de correção dos defeitos da T08 (decisão 19 do Diretor, 27/11/2026) (no teto; avaliação e alternativa de divisão em `plan.md#Avaliação do tamanho`). Ordem: contratos e lógica pura antes de componentes; estilo e E2E por último. Todos os CA da spec (30) aparecem em ao menos uma tarefa; ver tabela de cobertura no fim.
 
 Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própria de UI. Manifestos: ~4 caracteres por token, medidos com `wc -c` quando o arquivo existe (`estado.md` ≈ 1,5k; `constituicao.md` ≈ 0,5k; `game.ts` ≈ 1,9k; `board.ts` ≈ 1,1k; `puzzle.ts` ≈ 0,6k; `conflicts.ts` ≈ 0,3k; `units.ts` ≈ 0,3k; `digit.ts` ≈ 0,1k; `result.ts` ≈ 0,1k; spec inteira ≈ 3,3k, por isso só os CA cobertos, ~0,2k cada); arquivos de saída de tarefa anterior seguem a projeção. Todos os totais abaixo de 15k.
 
@@ -172,6 +172,45 @@ Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própr
 - **Estimativa:** tokens 60k/110k/230k · minutos 25/45/90
 - **Agentes:** `eng-testes` (só; defeito que o E2E revelar vira item novo `tdd: sim` com `dev`, fora desta tarefa) · `qa-auditor` fora desta lista, após o PR (roteiro manual com TalkBack e zoom real)
 
+## T09 — Teclado na tela sem rolagem em 320 px e a 200% (fix do defeito 1 da T08)
+
+Criada pela decisão 19 do Diretor (27/11/2026): defeitos da T08 viram tarefas `tdd: sim` antes do `/revisar 005a`.
+
+- **CA cobertos:** CA-005-34 (sem rolagem horizontal a partir de 320 px CSS, também com texto a 200%), mantendo CA-005-28 (botões do teclado sempre ≥ 44×44 px)
+- **tdd:** sim
+- **Testes esperados** (camada: E2E, que já existe): RED = tirar o `test.fail` dos dois cenários "sem rolagem horizontal ..." de `e2e/a11y.spec.ts` (L191-207); o vermelho é o `scrollWidth` 337 (320 px) e 584 (200%) contra `clientWidth`. Os cenários de CA-005-28 (botões ≥ 44×44) e o resto de CA-005-34 continuam verdes. Sem teste estático novo, salvo se o `dev` precisar de gancho que os testes de `src/ui/styles.rules.test.ts` não cobrem.
+- **via 7b para mutantes:** não
+- **Arquivos a criar/alterar:** `e2e/a11y.spec.ts` (só o marcador, pela `eng-testes`); `src/ui/styles.css` (regra `.keypad`: hoje 5 colunas de `minmax(2.75rem, 1fr)`, que a 200% não cabem em 320 px; o `dev` escolhe a solução, ex.: colunas que quebram em mais linhas), pelo `dev`. Sem lógica em `.tsx`.
+- **Manifesto de contexto** (lista fechada):
+  - `CLAUDE.md` (L0, automático) · `docs/estado.md` (~1,5k) · `docs/constituicao.md` (~0,5k)
+  - `specs/005a-grade-acessivel/spec.md#CA-005-28` e `#CA-005-34` e item 11 das decisões de UX (~0,6k)
+  - `specs/005a-grade-acessivel/notas.md#T07` (layout) e `#T08` (defeito 1) (~1,2k)
+  - `src/ui/styles.css` (~0,7k) · `src/ui/Keypad.tsx` (~0,2k)
+  - `e2e/a11y.spec.ts#L150-230` (geometria) e `e2e/helpers.ts` (~1,5k) · `playwright.config.ts` (~0,2k)
+  - Total ≈ 6,4k (sem L0)
+- **Estimativa:** tokens 40k/80k/160k · minutos 10/20/40 (hipótese: par eng-testes + dev das T06/T07, ~95k a 107k, com RED trivial)
+- **Agentes:** `eng-testes` → `dev`
+
+## T10 — Foco real acompanha a seleção em rajada de setas (fix do defeito 2 da T08)
+
+Criada pela decisão 19 do Diretor (27/11/2026).
+
+- **CA cobertos:** CA-005-07 (setas movem a seleção e o foco real), CA-005-06 (exatamente uma célula tabulável, que é a selecionada)
+- **tdd:** sim
+- **Testes esperados** (camada: componente, determinístico): em `src/ui/Grid.test.tsx`, uma rajada de teclas de seta disparadas sem esperar os efeitos (várias `keydown` seguidas antes de o Preact rodar o efeito de foco) termina com `document.activeElement` na célula selecionada final; o teste tem de falhar hoje de forma estável (provar o vermelho repetindo a execução, não por sorte). Depois do GREEN, tirar o `test.fixme` do cenário CA-005-07 de `e2e/jogo.spec.ts` (L45) e confirmar verde em pelo menos 5 execuções seguidas (`--repeat-each=5`).
+- **via 7b para mutantes:** não
+- **Arquivos a criar/alterar:** `src/ui/Grid.test.tsx`, `e2e/jogo.spec.ts` (só o marcador), pela `eng-testes`; `src/ui/Grid.tsx` (`focusPending`, L35-48: consumido pelo primeiro efeito, a causa provável), pelo `dev`.
+- **Manifesto de contexto** (lista fechada):
+  - `CLAUDE.md` (L0, automático) · `docs/estado.md` (~1,5k) · `docs/constituicao.md` (~0,5k)
+  - `specs/005a-grade-acessivel/spec.md#CA-005-06` e `#CA-005-07` (~0,4k)
+  - `specs/005a-grade-acessivel/notas.md#T08` (defeito 2) (~0,4k)
+  - `src/ui/Grid.tsx` (~0,6k) · `src/ui/Grid.test.tsx` (cabeçalho, `Harness` e testes de CA-005-07, por grep; ~1,5k)
+  - `e2e/jogo.spec.ts#L30-70` (~0,6k)
+  - `vitest.config.ts#L14` (projeto `ui`) (~0,1k)
+  - Total ≈ 5,6k (sem L0)
+- **Estimativa:** tokens 50k/100k/200k · minutos 15/30/60 (hipótese: corrida de efeito, depuração possível)
+- **Agentes:** `eng-testes` → `dev`
+
 ## Cobertura dos CA (30)
 
 | CA | Tarefas | CA | Tarefas |
@@ -181,12 +220,12 @@ Estimativas: hipótese (calibração da 004 já com ×1,4), sem medição própr
 | 03 | T03, T05 | 22 | T04 |
 | 05 | T05, T07 | 26 | T04, T05 |
 | 06 | T04, T05, T08 | 27 | T06 |
-| 07 | T02, T05 | 28 | T07, T08 |
+| 07 | T02, T05, T10 | 28 | T07, T08 |
 | 08 | T02, T05 | 29 | T04, T06, T08 |
 | 09 | T02, T05 | 30 | T04, T06 |
 | 10 | T05 (parte), T08 | 31 | T04, T06 |
 | 11 | T05, T07, T08 | 33 | T07, T08 |
-| 12 a 15 | T04, T05 | 34 | T07, T08 |
+| 12 a 15 | T04, T05 | 34 | T07, T08, T09 |
 | 19 | T03, T05, T07 | 35 | T08 |
 | 36 | T03, T06, T08 | 37 | T01, T06, T08 |
 | 39 | T07, T08 | | |

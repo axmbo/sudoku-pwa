@@ -58,3 +58,6 @@
 - **Observação:** `.cell-digit` tem `scrollHeight` 1 px acima de `clientHeight` (line-height = font-size); o E2E tolera 2 px só no dígito, e a célula é estrita. Sem corte visível; avaliar na revisão.
 - **Observação:** após a vitória, mover a seleção troca o anúncio (move zera `announcement`), então "Parabéns, você venceu!" some da região viva ao primeiro movimento; o banner permanece. Conferir se é a intenção do CA-005-29.
 - Leituras fora do manifesto: `src/ui/Grid.tsx`, `Cell.tsx`, `Keypad.tsx`, `App.tsx`, `Announcer.tsx`, `model/messages.ts`, `model/reducer.ts`, `styles.css` (seletores, ganchos e depuração dos defeitos); `index.html`.
+
+## T09 (27/11/2026)
+- Defeito 1 corrigido: `.keypad` passou de `repeat(5, minmax(2.75rem, 1fr))` para `repeat(auto-fit, minmax(2.75rem, 1fr))`; o teclado quebra em mais linhas em 320 px e a 200%, botões seguem ≥ 2.75rem. Isto substitui "teclado em 5 colunas" da seção T07. Commits `8437f66` (RED) e `9322f66` (GREEN); sem REFACTOR; 0 leituras fora do manifesto.

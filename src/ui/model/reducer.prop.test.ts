@@ -151,9 +151,13 @@ describe('gameReducer (propriedades)', () => {
   it(
     'INV: o gerador alcança conflito, vitória e grade cheia errada (sem usar o reducer)',
     () => {
+      // 50 amostras (seed fixa, determinísticas) bastam para alcançar os três estados; eram 300, que
+      // estouram o PROP_TIMEOUT sob o Stryker, onde `fc.sample` não é limitado pelo mock de
+      // tests/stryker.setup.ts (limitá-lo derrubaria outros testes que dependem de 100 amostras).
+      // Decisão do Diretor, 27/11/2026 (revisão da 005a).
       // Interpretador mínimo só com o domínio, para provar o alcance do gerador de forma independente.
       const reached = { conflict: false, won: false, fullIncorrect: false };
-      const samples = fc.sample(actionsArb, { seed: SEED, numRuns: 300 });
+      const samples = fc.sample(actionsArb, { seed: SEED, numRuns: 50 });
       for (const actions of samples) {
         let game: Game = fixedGame();
         let selected: Selection = { row: 0, col: 0 };

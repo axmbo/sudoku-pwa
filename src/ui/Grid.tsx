@@ -32,12 +32,21 @@ function actionFor(event: KeyboardEvent): UiAction | null {
 
 export function Grid({ cells, dispatch }: GridProps): JSX.Element {
   const root = useRef<HTMLDivElement>(null);
-  const focusPending = useRef(false);
+  const byKeyboard = useRef(false);
+  const lastSelected = useRef(-1);
 
   // Depois de uma ação de teclado, o foco real acompanha a célula selecionada.
+  // O efeito roda após a pintura e pode ser adiado para o render seguinte numa
+  // rajada de teclas; por isso a marca só cai quando a seleção não mudou (T10).
   useEffect(() => {
-    if (!focusPending.current) return;
-    focusPending.current = false;
+    const selected = cells.findIndex((cell) => cell.selected);
+    const changed = selected !== lastSelected.current;
+    lastSelected.current = selected;
+    if (!byKeyboard.current) return;
+    if (!changed) {
+      byKeyboard.current = false;
+      return;
+    }
     root.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')?.focus();
   });
 
@@ -45,7 +54,7 @@ export function Grid({ cells, dispatch }: GridProps): JSX.Element {
     const action = actionFor(event);
     if (action === null) return;
     event.preventDefault();
-    focusPending.current = true;
+    byKeyboard.current = true;
     dispatch(action);
   };
 

@@ -20,7 +20,7 @@ Base: ciclos 01, 02 e 03 (27 tarefas, 3 specs); `metrics.csv`, retros, `melhoria
 - Uso por linha de `metrics.csv` (specs 001, 004, 005a): eng-testes 30, dev 27, revisor 12, curador-pdca 5, produto-ux 3, arquiteto 3, qa-auditor 2, `devsecops` 0 (só 3 linhas na Fase 0). **Sem fusão ou divisão:** `devsecops` é papel raro por desenho (custo zero parado); eng-testes e dev precisam das fronteiras do hook; `produto-ux`/`arquiteto` rodam 1 a 2 vezes por spec. Sem candidata.
 
 ## 4. Tamanho (`wc -l`, 27/11/2026)
-- `CLAUDE.md` 61/80. Agentes (arquivo inteiro, frontmatter incluso): máximo 37 (`dev`), logo corpo < 40 em todos. Skills: máximo 47 (`git-fluxo`), `pdca` 45, `dominio-sudoku` 44, `sdd` e `tdd-dominio` 43, `gestao-contexto` e `revisao` 42; todas < 80.
+- `CLAUDE.md` 61/80. Agentes (arquivo inteiro, frontmatter incluso): máximo 37 (`dev`), logo corpo < 40 em todos. Skills: máximo 47 (`git-fluxo`), `pdca` 45, `dominio-sudoku` 44, `sdd` e `tdd-dominio` 43, `gestao-contexto` e `revisao` 42; todas < 80. Medido antes das promoções do v0.10; depois delas, `pdca` 47 e `gestao-contexto` 43.
 - `docs/estado.md` 40/40 antes desta retro: no limite; as decisões de spec concluída (13 a 22) migram para o `RESUMO.md` da 005a. M-020 e M-021 somam 3 linhas cada a `gestao-contexto` (45) e `pdca` (48), abaixo do limite. Sem poda proposta.
 
 ## 5. Checklist que pode virar lint

@@ -1,0 +1,16 @@
+# Revisão r2 — spec 005a — 27/11/2026
+Base: d28bf6f · Head: 085c153 (T11, só `src/ui/styles.css`) · check: verde (871 testes, cobertura 100%)
+Veredito: sai (0 blocker, 0 major, 2 minor, 1 nit)
+
+| # | Sev. | Arquivo:linha | Achado | Sugestão |
+|---|---|---|---|---|
+| 1 | minor | src/ui/styles.css:155-157 | `.keypad button:last-child { font-size: min(0.875rem, 3.8cqi) }`: a 200% de texto (390-200.png) o teto em `cqi` (~14 px) vence o `rem` (28 px), então "Apagar" não cresce enquanto os dígitos crescem. Não quebra CA-005-34 (sem rolagem, sem corte, alvo ≥ 44 px), mas é falha estrita de WCAG 1.4.4 (texto não redimensiona) e regressão em relação ao "antes", em que o rótulo escalava (embora vazasse). Não é major: o rótulo continua legível e inteiro, e o tamanho é o do corpo padrão. | Só CSS, mantendo 5+5 a 100%: container query em rem, `@container (max-width: 15rem) { .keypad button:last-child { grid-column: 1 / -1; font-size: 1.25rem } }`. Em 320 px a 100% o teclado tem ~18 rem (5+5 intacto); a 200% (qualquer largura) cai abaixo de 15 rem e Apagar vai para uma terceira fileira de largura total, com fonte que escala. Alternativas: ícone ⌫ com `aria-label` (mudaria o texto visível: precisa de spec) ou aceitar como débito. Recapturar 320, 390 e 390-200. |
+| 2 | minor | src/ui/styles.css:46-70 (`.cell`/`.grid-row`) | Degrau de ~1 px nas linhas finas entre as fileiras 8 e 9 a 390 px persiste (390.png). A causa NÃO é o `padding-right: 1px`: ele é horizontal e não altera a altura da caixa (`aspect-ratio` sobre border-box). O degrau está idêntico em prev-mobile.png (antes da T11): é arredondamento de subpixel (coluna de 370/9 ≈ 41,1 px, altura fracionária). Perceptível se você procurar, mas é 1 px e só a 390 px. O item 4 da T11 ("se persistirem") ficou sem correção e sem registro no corpo do commit. | Registrar como débito (issue `débito`) ou, se couber na T11: desenhar as linhas finas com `gap: 1px` sobre fundo da cor da linha (em vez de `border-bottom` por célula), ou tornar a largura da grade múltiplo de 9 px. Se a decisão for não tratar, anotar a causa em `docs/estado.md`. |
+| 3 | nit | src/ui/styles.css:155 | `:last-child` acopla o estilo à ordem do DOM (Apagar ser o último). | Se `Keypad.tsx` ganhar uma classe (ex.: `.keypad-erase`), usar a classe. Sem pressa. |
+
+## Respostas às perguntas
+- Isenção de TDD: válida. O diff é só CSS declarativo, sem lógica nem nome de classe novo, e a T11 declara a isenção (`PROCESSO.md` §6, ajuste visual/CSS verificado por inspeção). Verificação por capturas feita (320, 390, 1280, 390-200).
+- `styles.rules.test.ts`: os ganchos continuam válidos e verdes: `.cell` sem `overflow: hidden`, `container-type: inline-size` presente, `font-size` em `cqi` só no `.cell-digit` (60cqi), e `.cell` sem `cqi`. O `.keypad` com `container-type` e o `cqi` do último botão não ferem o gancho (que filtra `.cell`). Lacuna: nenhum gancho cobre o teclado 5+5 nem o `padding-right` das células; aceitável pela isenção, mas o achado 1 é o tipo de regressão que um gancho pegaria.
+- Dígitos: iguais em todas as colunas (checado em 320/390/1280); o defeito 3 está corrigido. Teclado 5+5 alinhado à largura da grade em 320, 390 e 1280; Apagar cabe dentro do botão em todas.
+
+Rastreabilidade: CA-005-02, CA-005-28, CA-005-34 → T11 (isenta, inspeção visual) · testes existentes inalterados e verdes · órfãos: nenhum

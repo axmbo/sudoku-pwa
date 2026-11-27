@@ -141,6 +141,24 @@ describe('Grid: foco e seleção', () => {
     expect(document.activeElement).toBe(cellAtRC(0, 0));
   });
 
+  it('CA-005-07: rajada de setas sem esperar os efeitos termina com o foco real na selecionada final', async () => {
+    render(<Harness />);
+    cellAtRC(0, 0).focus();
+    // Eventos nativos fora de act(): o Preact renderiza entre as teclas (microtarefa), mas o
+    // efeito de foco (pós-pintura) só roda depois, como numa rajada real do navegador.
+    const press = async (target: HTMLElement, key: string): Promise<void> => {
+      target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+      for (let i = 0; i < 5; i += 1) await Promise.resolve();
+    };
+    await press(cellAtRC(0, 0), 'ArrowRight');
+    await press(cellAtRC(0, 1), 'ArrowRight');
+    await press(cellAtRC(0, 2), 'ArrowDown');
+    await press(cellAtRC(1, 2), 'ArrowDown');
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(tabbable()).toEqual([cellAtRC(2, 2)]);
+    expect(document.activeElement).toBe(cellAtRC(2, 2));
+  });
+
   it('CA-005-08: seta contra a borda não move nem dá a volta', () => {
     render(<Harness />);
     cellAtRC(0, 0).focus();

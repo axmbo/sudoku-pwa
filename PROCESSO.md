@@ -1,6 +1,6 @@
 # Processo de engenharia — Sudoku PWA
 
-Fonte única do processo (versão **v0.9**, ver [CHANGELOG-processo](docs/process/CHANGELOG-processo.md)). Agentes, skills, `CLAUDE.md` e `CONTRIBUTING.md` detalham ou resumem e apontam para cá; não copiam. Mudança neste arquivo só via PDCA (seção 9) com aprovação do Diretor.
+Fonte única do processo (versão **v0.10**, ver [CHANGELOG-processo](docs/process/CHANGELOG-processo.md)). Agentes, skills, `CLAUDE.md` e `CONTRIBUTING.md` detalham ou resumem e apontam para cá; não copiam. Mudança neste arquivo só via PDCA (seção 9) com aprovação do Diretor.
 
 ## 1. Papéis
 

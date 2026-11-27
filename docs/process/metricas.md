@@ -21,7 +21,7 @@ Fonte única das definições das colunas de [metrics.csv](metrics.csv). A estim
 ## Tempo
 
 - `min_est_otim`, `min_est`, `min_est_pess`: minutos de trabalho estimados, sem contar a espera pelo Diretor.
-- `min_real`: minutos de relógio entre o início e o commit do passo, **incluindo** a espera pelo Diretor, porque o log não separa as duas coisas; `obs` registra isso. A estimativa não inclui a espera, e a diferença entre as duas entra na calibração.
+- `min_real` (definição única, M-022): minutos de **trabalho do subagente** (duração do log do subagente ou da notificação), **sem** a espera do Diretor; espera e relógio, se forem conhecidos, vão em `obs`. Outros arquivos apontam para cá. A estimativa não inclui a espera, e a diferença entre as duas entra na calibração.
 
 ## Contexto
 

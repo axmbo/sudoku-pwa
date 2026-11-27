@@ -20,7 +20,8 @@ Formato:
 - Lugar de promoção: hook
 - Evidência do ciclo (retro 24/11/2026): sem nova ocorrência registrada em `notas.md` nas T02–T07; o `extra-pre-commit-v0.4` (63k) tratou só o vermelho de símbolo novo, não o stage. Amostra única.
 - Reavaliação (retro 25/11/2026, ciclo 02): nenhuma ocorrência nas 8 tarefas da 004 (15 tarefas sem recorrência). **Recomendação: manter até a revisão estrutural do ciclo 03 e descartar se seguir sem ocorrência** (regra de 5 ciclos sem uso; o custo de manter é nulo, o de implementar um hook por filtro de stage não se paga sem recorrência).
-- Estado: candidata (mantida pelo Diretor em 24/11/2026 e em 25/11/2026). Critério: descartar na revisão estrutural do ciclo 03 se não houver ocorrência até lá
+- Reavaliação (revisão estrutural do ciclo 03, 27/11/2026): nenhuma ocorrência nas 12 tarefas da 005a (27 tarefas sem recorrência em 3 ciclos; `notas.md` da 005a não cita stage fora do índice). **Recomendação: descartar**, conforme o critério fixado; reabre-se com uma ocorrência nova. Ver [estrutural-ciclo-03](revisoes/estrutural-ciclo-03.md).
+- Estado: **descartada** em 27/11/2026 (Diretor, revisão estrutural do ciclo 03): sem ocorrência em 27 tarefas
 
 ## M-002 — Tolerar TS7006 no vermelho (ciclo 01, 23/11/2026)
 - Lição: símbolo inexistente gera TS7006 em cascata; a `eng-testes` anotou o tipo à mão.
@@ -77,8 +78,9 @@ Formato:
 - Lição: minutos de subagentes nas tarefas somam 59, mas só o log de tokens é confiável; o orquestrador mediu vazão ~1,04M tokens/h ativa (não reverificada). T05 teve 5 leituras fora do manifesto (`Result`, `units`, `conflicts`, `package.json`, `stryker.config.json`).
 - Proposta (diff): na skill `pdca` (Estimar), `min_est` provável = tokens prováveis / vazão medida, com a vazão revista a cada ciclo; na skill `gestao-contexto`, manifesto de tarefa que usa `Result`/`Unit`/`CellConflict` inclui esses contratos por linhas.
 - Lugar de promoção: skill `pdca` e skill `gestao-contexto`
-- Estado: **promovida** em 24/11/2026 (v0.6) só a parte (a), à skill `gestao-contexto`; parte (b) (`min_est` pela vazão) segue candidata, uma amostra só, reavaliar após a 004
+- Estado: **promovida** em 24/11/2026 (v0.6) só a parte (a), à skill `gestao-contexto`; parte (b) (`min_est` pela vazão) **promovida** em 27/11/2026 (v0.10) à skill `pdca` (Estimar, passo 3), vazão 0,7M tokens/h
 - Reavaliação (retro 25/11/2026, ciclo 02): vazão de `eng-testes` com tokens e minutos medidos na 004 (T01 a T08, relógio): 0,16M a 1,13M tokens/h, mediana ~0,67M (a informada de ~1,04M no ciclo 01 fica no topo); os minutos estimados (320) ficaram 2,6× acima dos 124,6 medidos, e 6 de 17 linhas têm `min_real` n/d. Dispersão de 7× não permite uma vazão única. **Recomendação: manter como candidata** (mantida pelo Diretor em 25/11/2026); reavaliar na revisão estrutural do ciclo 03, exigindo `min_real` em todas as linhas (hoje n/d demais) e, se promover, `min_est = tokens_est / 0,67M por hora` por agente, e não uma constante global.
+- Reavaliação (revisão estrutural do ciclo 03, 27/11/2026): 005a tem `min_real` em todas as linhas de tarefa; vazão = 1,03M / 69,8 min = 0,88M tokens/h (004: 1,19M / 124,6 min = 0,57M/h); os minutos estimados (385) ficaram 5,5× acima dos medidos (004: 2,6×). A dispersão entre ciclos caiu a 1,5× (era 7× por linha). **Recomendação (aprovada em 27/11/2026, v0.10): promover (b)** com vazão única de 0,7M tokens/h, revista a cada ciclo, não por agente (a amostra por agente é pequena), e só depois de M-022 alinhar a definição de `min_real`. Alternativa: manter candidata mais um ciclo (custo: estimativa de minutos segue 3× a 5× alta).
 
 ## M-010 — Prever a via 7b no template de tasks.md para mutantes (ciclo 02, 24/11/2026)
 - Lição: na T01 da 004, mutantes sobreviventes em `canUndo`/`canRedo` só se mataram com `Game` montado à mão, num `test` isolado nascido verde (via 7b, commit 51b359e, aceito pelo Diretor em 24/11/2026); a tarefa era `tdd: sim` e não declarava isso. Origem: `specs/_arquivo/004-estado-de-jogo/notas.md`, descoberta 3.
@@ -133,4 +135,40 @@ Formato:
 - Lição: 2 testes de `sameValue` (CA-005-05) assumiram dois 5 no puzzle fixo, mas há três (o terceiro, dado em (1,5)); o `dev` pegou no GREEN, desfez a produção e voltou ao RED: uma rodada extra de eng-testes e dev (T05 fechou em 0,72x, mas a rodada custou ~1 passe de cada). Ocorrência única.
 - Proposta (diff): em `eng-testes` ou na skill `tdd-dominio`/de UI, uma linha: "teste que depende de contagem ou posição no puzzle fixo calcula o valor a partir de `FIXED_PUZZLE` (ou confere no arquivo antes), nunca de memória".
 - Lugar de promoção: skill de teste de UI ou agente `eng-testes`; alternativa: manifesto de testes de UI traz as contagens por dígito do puzzle fixo
-- Estado: candidata (aguarda o Diretor; reavaliar se repetir na T06)
+- Reavaliação (ciclo 03, 27/11/2026): não repetiu de T06 a T12 (`notas.md`); ocorrência única em 12 tarefas. **Recomendação: descartar** (custo de manter é nulo, mas uma linha no agente `eng-testes`, 35 de 40, não se paga sem recorrência).
+- Estado: **descartada** em 27/11/2026 (Diretor): ocorrência única
+
+## M-019 — Inspeção visual do build antes da primeira revisão (ciclo 03, 27/11/2026)
+- Lição: depois da r1 saída, a inspeção visual do Diretor achou defeitos de acabamento (teclado, "Apagar" a 200%, degrau de 1 px) que a revisão de código não pega: T11, T12, r2, r3 custaram 151,6k (8% do real de subagentes) e geraram #26 e #27. A r2 só achou os minors porque usou capturas (320, 390, 1280, 390-200).
+- Proposta (diff): skill `revisar`, antes da r1 de spec com UI: o `qa-auditor` (ou o `dev` na T07) gera capturas do build em 320, 390, 1280 px e 390 px com texto a 200%, grava em `specs/NNN-*/capturas/` fora do git (ou no diretório de artefatos do CI) e o `revisor` as lê junto do diff. Alternativa B: tarefa de CSS (isenta de TDD) fecha com as mesmas capturas anexadas à `notas.md`. Alternativa C: nada (a inspeção segue com o Diretor).
+- Prós/contras: A e B antecipam o defeito para uma rodada só (economia estimada de 1 a 2 revisões, 30k a 70k); custo ~10k a 15k de qa-auditor por ciclo de UI; C não custa nada e depende do Diretor. **Recomendação: B** (o mais barato: a T07 já existe e o E2E já abre o build; a captura é um passo do Playwright).
+- Lugar de promoção: skill `revisar` (A) ou template de tasks para tarefa de CSS (B)
+- Estado: **promovida** em 27/11/2026 (v0.10), alternativa B, à skill `qualidade-web` (seção "Tarefa de CSS/layout"): o lugar mais barato, pois o `dev` e o `qa-auditor` já a carregam e ela já trata zoom e acessibilidade
+
+## M-020 — Checklist de manifesto para tarefa de UI (ciclo 03, 27/11/2026)
+- Lição: `notas.md` da 005a registra leituras fora do manifesto repetidas: exports de `game.ts` (`getGameStatus`/`GameStatus`) em T04, T05 e T06; `vitest.config.ts` (projeto `ui`) e a convenção de seed em T01 e T02; CA com texto fixo na T03; seletores e ganchos na T08 (9 arquivos). A M-009(a) cobriu só `Result`/`Unit`/`CellConflict`.
+- Proposta (diff): skill `gestao-contexto`, "Montar um manifesto": passo 2b "tarefa de UI inclui: assinaturas dos exports de `src/domain/game.ts` usados (por linhas), o projeto `ui` de `vitest.config.ts`, a convenção de seed, os CA de texto fixo e, para E2E/CSS, a lista de classes e ganchos da tarefa anterior".
+- Prós/contras: três linhas na skill (42 de 80), corta ~2 a 3 leituras por tarefa de UI; risco: manifesto maior (+0,3k a 1k), ainda longe dos 15k. Alternativa: um manifesto-base de UI em `docs/process/` que os manifestos referenciam (mais um arquivo para manter). **Recomendação: as 3 linhas na skill.**
+- Lugar de promoção: skill `gestao-contexto`
+- Estado: **promovida** em 27/11/2026 (v0.10) à skill `gestao-contexto` (passo 2b)
+
+## M-021 — Medir o orquestrador na retro (ciclo 03, 27/11/2026)
+- Lição: nos 3 ciclos o orquestrador foi `n/d`, mas o log de topo existe. Medição do ciclo 03 (sessões de topo de 25/11 13:08Z a 27/11 19:30Z, dedup por `message.id`, modelo `claude-opus-5-5`): 1,86M tokens (in 928 + cache write 1.647.923 + out 213.991 = 1.862.842), contra 1,84M de todos os subagentes rastreados. É teto: a janela inclui a retro do ciclo 02 e o v0.8/v0.9. O custo do orquestrador é metade do ciclo e nunca entrou na âncora.
+- Proposta (diff): skill `pdca`, "Coletar o real": passo "orquestrador: some as sessões de topo do intervalo do ciclo (jq da skill, um arquivo por sessão), em linha `orquestrador` de `metrics.csv`, com a ressalva de que a janela pode incluir trabalho fora da spec". Alternativa B: trocar o modelo do orquestrador para sonnet em ciclos de implementação (decisão do Diretor, custo menor, risco de pior coordenação); C: não medir.
+- Prós/contras: A custa uma consulta `jq` por retro (~2k de tokens) e conserta a âncora; B é a maior alavanca de custo, mas sem dado de qualidade; C mantém o ponto cego. **Recomendação: A agora; B só depois de 2 ciclos medidos** (decisão sobre o modelo é do Diretor).
+- Lugar de promoção: skill `pdca` e `metricas.md`
+- Estado: **promovida** em 27/11/2026 (v0.10) à skill `pdca` (Coletar o real, passo 4) e à skill `retro`; troca de modelo do orquestrador só após 2 ciclos medidos, por decisão do Diretor
+
+## M-022 — `min_real` com uma definição só (ciclo 03, 27/11/2026)
+- Lição: `metricas.md` define `min_real` como relógio com a espera do Diretor; a 005a registrou o tempo de trabalho do subagente (duração da notificação ou do log), e a 004 misturou as duas formas. Sem definição única, a vazão da M-009(b) não é comparável.
+- Proposta (diff): `metricas.md` (Tempo): "`min_real` = minutos de trabalho do subagente (duração do log ou da notificação), sem a espera do Diretor; espera e relógio vão em `obs`". Alternativa: manter o relógio e medir a espera à parte (o log não separa).
+- Prós/contras: a primeira casa com `min_est` (trabalho, sem espera) e com a prática de 2 ciclos; a segunda exige dado que o log não dá. **Recomendação: a primeira**, antes de promover M-009(b).
+- Lugar de promoção: `docs/process/metricas.md`
+- Estado: **promovida** em 27/11/2026 (v0.10) a `docs/process/metricas.md` (definição única de `min_real`)
+
+## M-023 — Teste estático de tamanho e de links dos arquivos de processo (ciclo 03, 27/11/2026)
+- Lição: a higiene de tamanho (`wc -l`, `estado.md` já em 40 de 40) e a conferência de links relativos (o arquivamento da 005a exigiu corrigir `../../docs/` e `../005b-...` à mão) são checklist manual a cada retro. Nenhum teste em `tests/repo/` cobre isso.
+- Proposta (diff): `tests/repo/processo.test.ts` (vitest, mesmo projeto de `readme-unico.test.ts`): `CLAUDE.md` ≤ 80, `estado.md` ≤ 40, corpo de agente ≤ 40, skill ≤ 80 linhas; e todo link markdown relativo em `docs/`, `specs/`, `.claude/` aponta para arquivo existente. Alternativa B: script no `npm run check`; C: manter manual.
+- Prós/contras: A usa a infraestrutura que já roda no `check` e no CI, sem ferramenta nova (regra global de documentação); custo de escrever ~1 tarefa pequena (TDD aplica); risco: links com âncora e fora de `docs/` geram falso positivo, resolvido ignorando `#`. **Recomendação: A**, como item de backlog próprio, não nesta retro.
+- Lugar de promoção: teste (`tests/repo/`)
+- Estado: **aprovada em 27/11/2026, implementação pendente** (item de backlog próprio: [#28](https://github.com/axmbo/sudoku-pwa/issues/28))

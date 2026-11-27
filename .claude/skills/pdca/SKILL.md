@@ -10,14 +10,16 @@ Fontes: `PROCESSO.md` §8–9; definições de coluna em `docs/process/metricas.
 ## Estimar (antes do ciclo)
 1. Por tarefa e por agente, faixa **otimista / provável / pessimista** de tokens (in + cache write + out) e minutos.
 2. Base: média do real de tarefas parecidas em `metrics.csv`. Sem histórico, use a tabela da Fase 0 como âncora e diga isso em `obs`.
-3. Some o contexto inicial do manifesto (`ctx_inicial_est`) ao provável.
-4. Grave uma linha por tarefa × agente em `metrics.csv` **antes** de começar; `limpeza_antes` = `sim`/`nao`.
+3. Minutos: `min_est` provável = tokens prováveis ÷ vazão de 0,7M tokens/h (faixa medida 0,57 a 0,88M/h nos ciclos 02 e 03; M-009b), revista a cada retro; `min_real` segue a definição de `metricas.md`.
+4. Some o contexto inicial do manifesto (`ctx_inicial_est`) ao provável.
+5. Grave uma linha por tarefa × agente em `metrics.csv` **antes** de começar; `limpeza_antes` = `sim`/`nao`.
 
 ## Coletar o real (depois)
 1. Recorte o log `~/.claude/projects/<projeto>/<sessão>.jsonl` do commit anterior ao commit da tarefa.
 2. Some `message.usage` deduplicando por `message.id`; subagentes em `<sessão>/subagents/agent-<id>.jsonl`, em linha própria.
 3. `tokens_real = in + cache_write + out`; `cache_read_real` à parte; `usd_real` = `n/d`.
-4. Sem dado: `n/d`. **Nunca estime o real.**
+4. Orquestrador (M-021), em toda retro: some as sessões de topo do período do ciclo (mesmo `jq`, um arquivo por sessão) em linha `orquestrador` de `metrics.csv`, anotando em `obs` o que a janela inclui. Trocar o modelo do orquestrador só depois de 2 ciclos medidos, por decisão do Diretor.
+5. Sem dado: `n/d`. **Nunca estime o real.**
 
 Script de apoio (jq), sobre um arquivo e janela de tempo:
 ```bash

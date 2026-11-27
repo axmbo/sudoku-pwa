@@ -1,7 +1,7 @@
 # Plano 005a — Grade acessível (primeira UI jogável)
 
-- **Spec:** [spec.md](spec.md) · **Autor:** `arquiteto` · **Irmã (não planejada aqui):** [005b](../005b-anotacoes-e-tema/spec.md)
-- **ADRs:** [0001](../../docs/adr/0001-stack-e-ferramentas.md) (orçamento), [0003](../../docs/adr/0003-framework-de-ui.md) (Preact, roving tabindex, `useReducer` sobre o domínio, sem `preact/compat`), [0007](../../docs/adr/0007-convencoes-do-dominio.md) (recusa como valor, índices 0–8). **Nenhum ADR novo:** tudo cabe no 0003; o conflito CA-005-28 × CA-005-34 foi resolvido pela pergunta 1 (decidida (a), 25/11/2026; spec, não arquitetura). ADR 0004 não se aplica (CA-005-37: sem persistência).
+- **Spec:** [spec.md](spec.md) · **Autor:** `arquiteto` · **Irmã (não planejada aqui):** [005b](../../005b-anotacoes-e-tema/spec.md)
+- **ADRs:** [0001](../../../docs/adr/0001-stack-e-ferramentas.md) (orçamento), [0003](../../../docs/adr/0003-framework-de-ui.md) (Preact, roving tabindex, `useReducer` sobre o domínio, sem `preact/compat`), [0007](../../../docs/adr/0007-convencoes-do-dominio.md) (recusa como valor, índices 0–8). **Nenhum ADR novo:** tudo cabe no 0003; o conflito CA-005-28 × CA-005-34 foi resolvido pela pergunta 1 (decidida (a), 25/11/2026; spec, não arquitetura). ADR 0004 não se aplica (CA-005-37: sem persistência).
 
 ## Módulos e fronteiras
 

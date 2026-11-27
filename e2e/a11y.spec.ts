@@ -187,23 +187,17 @@ test.describe('a11y: geometria', () => {
     }
   }
 
-  // DEFEITO (T08, notas.md): o teclado (5 colunas, botões >= 2,75rem) estoura a largura em 320 px
-  // (scrollWidth 337) e a 200% de texto (584). Remover `test.fail` ao corrigir (CA-005-34).
-  test.fail(
-    'CA-005-34: sem rolagem horizontal em 320 px CSS (equivale a 640 px a 200% de zoom)',
-    async ({ page }) => {
-      await open320(page, false);
-      await expectNoHorizontalScroll(page);
-    },
-  );
+  test('CA-005-34: sem rolagem horizontal em 320 px CSS (equivale a 640 px a 200% de zoom)', async ({
+    page,
+  }) => {
+    await open320(page, false);
+    await expectNoHorizontalScroll(page);
+  });
 
-  test.fail(
-    'CA-005-34: sem rolagem horizontal com texto a 200% em 320 px CSS',
-    async ({ page }) => {
-      await open320(page, true);
-      await expectNoHorizontalScroll(page);
-    },
-  );
+  test('CA-005-34: sem rolagem horizontal com texto a 200% em 320 px CSS', async ({ page }) => {
+    await open320(page, true);
+    await expectNoHorizontalScroll(page);
+  });
 
   test('CA-005-34: em 320 px CSS as nove células cabem lado a lado, teclado abaixo e dígito inteiro', async ({
     page,

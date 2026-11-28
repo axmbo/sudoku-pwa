@@ -141,6 +141,7 @@ function applyTuple(scratch: Scratch, [code, index, digit]: MoveTuple): boolean 
         pruned: pruneTargets(scratch.notes, index, digit as Digit),
       }),
     };
+    // Stryker disable next-line ArrayDeclaration: mutante equivalente; applyPrune indexa por memo.index, e um item sem índice dá o conjunto {undefined}, que nenhuma célula 0-80 integra, igual a [].
     scratch.notes.splice(0, 81, ...applyPrune(scratch.notes, entry.pruned ?? [], digit as Digit));
     scratch.cells[index] = Object.freeze({ value: digit as Digit, given: false });
     scratch.notes[index] = emptyNotes;

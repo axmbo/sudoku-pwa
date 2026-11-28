@@ -90,3 +90,42 @@ export function at<T>(value: T | undefined): T {
   if (value === undefined) throw new Error('índice fora do esperado');
   return value;
 }
+
+/** Liga ou desliga o modo anotação pelo atalho `N` (pegajoso). */
+export async function toggleNoteMode(page: Page): Promise<void> {
+  await page.keyboard.press('n');
+}
+
+/** Estado do botão Anotar (`aria-pressed`). */
+export async function noteModeOn(page: Page): Promise<boolean> {
+  return (
+    (await page.getByRole('button', { name: /^Anotar/ }).getAttribute('aria-pressed')) === 'true'
+  );
+}
+
+/** Dígitos anotados na célula (1-indexada), em ordem crescente. */
+export async function notesOf(page: Page, row: number, col: number): Promise<string> {
+  const spans = await cell(page, row, col).locator('.cell-notes > span').allTextContents();
+  return spans.join('');
+}
+
+/** Move a seleção da célula atual para (row, col), a partir do canto (1,1), só por setas. */
+export async function goTo(page: Page, row: number, col: number): Promise<void> {
+  if ((await page.locator('[role="gridcell"]:focus').count()) === 0) await focusGrid(page);
+  await page.keyboard.press('Control+Home');
+  for (let i = 1; i < row; i += 1) await page.keyboard.press('ArrowDown');
+  for (let i = 1; i < col; i += 1) await page.keyboard.press('ArrowRight');
+  await expect(cell(page, row, col)).toBeFocused();
+}
+
+/** Liga o modo anotação e anota `digits` na célula (1-indexada), partindo de (1,1). */
+export async function annotate(
+  page: Page,
+  row: number,
+  col: number,
+  digits: string,
+): Promise<void> {
+  await goTo(page, row, col);
+  if (!(await noteModeOn(page))) await toggleNoteMode(page);
+  for (const d of digits) await page.keyboard.press(d);
+}

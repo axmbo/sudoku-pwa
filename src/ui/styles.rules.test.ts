@@ -2,7 +2,7 @@
 // Seletores usados (existem em Cell.tsx/Grid.tsx): .cell, .cell-digit, .is-given, .is-selected,
 // .is-conflict, :focus-visible. Declarações lidas por regra plana (sem aninhamento CSS).
 import { describe, expect, it } from 'vitest';
-import { parseRules, readUiCss, type CssRule } from './tests/css';
+import { mediaBody, parseRules, readUiCss, type CssRule } from './tests/css';
 
 function rules(): CssRule[] {
   return parseRules(readUiCss('styles.css'));
@@ -129,5 +129,44 @@ describe('styles.css: cores só por token (CA-005-32)', () => {
         .map(([prop, value]) => `${r.selectors.join(', ')} { ${prop}: ${value} }`),
     );
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('styles.css: layout lado a lado e anotações (CA-005-40, 04)', () => {
+  it('CA-005-40: há consulta de mídia de largura e de paisagem para o lado a lado', () => {
+    const css = readUiCss('styles.css');
+    expect(mediaBody(css, /min-width/)).toBeTypeOf('string');
+    expect(mediaBody(css, /orientation:\s*landscape/)).toBeTypeOf('string');
+  });
+
+  it('CA-005-40: nenhuma regra usa order (a ordem do DOM é a ordem visual)', () => {
+    expect(rules().filter((r) => r.declarations.has('order'))).toEqual([]);
+  });
+
+  it('CA-005-40: na consulta larga, grade e controles ocupam colunas distintas', () => {
+    const body = mediaBody(readUiCss('styles.css'), /min-width/) ?? '';
+    const inMedia = parseRules(body);
+    const col = (re: RegExp) =>
+      inMedia.find((r) => r.selectors.some((s) => re.test(s)))?.declarations.get('grid-column');
+    expect(col(/^\.grid$/)).toBe('1');
+    expect(col(/^\.controls$/)).toBe('2');
+  });
+
+  it('CA-005-04: .cell-notes é grade 3×3 com fonte por cqi', () => {
+    const notes = matching(/^\.cell-notes$/).map((m) => m.decls);
+    expect(notes.some((d) => d.get('display') === 'grid')).toBe(true);
+    expect(
+      notes.some((d) => /repeat\(3,[^)]*\)\s*\/\s*repeat\(3,/.test(d.get('grid-template') ?? '')),
+    ).toBe(true);
+    expect(notes.some((d) => /cqi/.test(d.get('font-size') ?? ''))).toBe(true);
+  });
+
+  it('CA-005-04: cada .note-N ocupa a vaga fixa (linha, coluna) do dígito N', () => {
+    for (let n = 1; n <= 9; n += 1) {
+      const area = matching(new RegExp(`^\\.note-${n}$`)).map((m) => m.decls.get('grid-area'));
+      const row = Math.floor((n - 1) / 3) + 1;
+      const col = ((n - 1) % 3) + 1;
+      expect(area, `note-${n}`).toContain(`${row} / ${col}`);
+    }
   });
 });

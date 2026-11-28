@@ -1,5 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { cell, focusGrid, solveByKeyboard } from './helpers';
+import {
+  annotate,
+  cell,
+  focusGrid,
+  goTo,
+  noteModeOn,
+  notesOf,
+  solveByKeyboard,
+  toggleNoteMode,
+} from './helpers';
 
 test.describe('jogo: jornadas por teclado', () => {
   test('CA-005-01: abre com a grade 9×9 do puzzle fixo (30 pistas) e o resto vazio', async ({
@@ -158,5 +167,86 @@ test.describe('jogo: jornadas por teclado', () => {
     await page.goto('/');
     await solveByKeyboard(page);
     expect(problems).toEqual([]);
+  });
+});
+
+test.describe('jogo: anotações e desfazer por teclado (005b)', () => {
+  test('CA-005-16: N liga o modo, pegajoso entre células, e 1 a 9 anotam sem colocar valor', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await goTo(page, 1, 3);
+    expect(await noteModeOn(page)).toBe(false);
+    await toggleNoteMode(page);
+    expect(await noteModeOn(page)).toBe(true);
+    await page.keyboard.press('1');
+    await page.keyboard.press('9');
+    await page.keyboard.press('ArrowRight');
+    await expect(cell(page, 1, 4)).toBeFocused();
+    expect(await noteModeOn(page)).toBe(true);
+    for (const d of '123456789') await page.keyboard.press(d);
+    expect(await notesOf(page, 1, 3)).toBe('19');
+    expect(await notesOf(page, 1, 4)).toBe('123456789');
+    await expect(cell(page, 1, 3).locator('.cell-digit')).toHaveText('');
+    await toggleNoteMode(page);
+    expect(await noteModeOn(page)).toBe(false);
+  });
+
+  test('CA-005-43: colocar o valor remove a anotação dele das vizinhas', async ({ page }) => {
+    await page.goto('/');
+    await annotate(page, 1, 4, '46');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowLeft');
+    await expect(cell(page, 2, 3)).toBeFocused();
+    await page.keyboard.press('4');
+    await page.keyboard.press('n');
+    await goTo(page, 1, 3);
+    expect(await noteModeOn(page)).toBe(false);
+    await page.keyboard.press('4');
+    await expect(cell(page, 1, 3).locator('.cell-digit')).toHaveText('4');
+    expect(await notesOf(page, 1, 4)).toBe('6');
+  });
+
+  test('CA-005-23: Ctrl+Z reverte o valor e as anotações podadas, com foco na célula afetada', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await annotate(page, 1, 4, '46');
+    await toggleNoteMode(page);
+    await goTo(page, 1, 3);
+    await page.keyboard.press('4');
+    expect(await notesOf(page, 1, 4)).toBe('6');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+    await expect(cell(page, 3, 3)).toBeFocused();
+    await page.keyboard.press('Control+z');
+    await expect(cell(page, 1, 3)).toBeFocused();
+    await expect(cell(page, 1, 3).locator('.cell-digit')).toHaveText('');
+    expect(await notesOf(page, 1, 4)).toBe('46');
+  });
+
+  test('CA-005-24: Ctrl+Y reaplica a jogada, com foco na célula afetada', async ({ page }) => {
+    await page.goto('/');
+    await annotate(page, 1, 4, '46');
+    await toggleNoteMode(page);
+    await goTo(page, 1, 3);
+    await page.keyboard.press('4');
+    await page.keyboard.press('Control+z');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+    await expect(cell(page, 3, 3)).toBeFocused();
+    await page.keyboard.press('Control+y');
+    await expect(cell(page, 1, 3)).toBeFocused();
+    await expect(cell(page, 1, 3).locator('.cell-digit')).toHaveText('4');
+    expect(await notesOf(page, 1, 4)).toBe('6');
+  });
+
+  test('CA-005-23: Ctrl+Z também desfaz uma anotação', async ({ page }) => {
+    await page.goto('/');
+    await annotate(page, 1, 3, '7');
+    expect(await notesOf(page, 1, 3)).toBe('7');
+    await page.keyboard.press('Control+z');
+    expect(await notesOf(page, 1, 3)).toBe('');
+    await expect(cell(page, 1, 3)).toBeFocused();
   });
 });

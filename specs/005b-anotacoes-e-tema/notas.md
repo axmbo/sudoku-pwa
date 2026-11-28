@@ -88,3 +88,4 @@ Capturas do build (`vite preview`), Playwright/Chromium, em `specs/005b-anotacoe
 - O tema escuro passou no axe (sem violação séria/crítica) e `color-contrast` avalia e passa com anotações e conflito.
 
 - **D1, decisão (28/11/2026):** opção A, decisão 31 do plano. As vagas já eram `aria-hidden`, mas o axe-core 4.14.1 avalia o texto visível sem considerar `aria-hidden`. Correção na T09: espaço entre as vagas, provado no Playwright (com espaço, nenhuma violação séria).
+- **D1: resolvido** no commit 5af97be (espaço entre as vagas em `Cell.tsx`; E2E CA-005-41 do modo anotação verde, suíte E2E 38/38).

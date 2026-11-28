@@ -7,6 +7,7 @@ import {
   applyGameAction,
   cellGameAction,
   nearlyCompleteGame,
+  prunedGame,
   swapPairGame,
 } from './moves';
 
@@ -45,11 +46,11 @@ describe('moves (geradores de jogo)', () => {
     });
   });
 
-  it('INV: anyGameAction cobre as seis operações, recusas, sem efeito, undo e redo aceitos', () => {
+  it('INV: anyGameAction cobre as sete operações, recusas, sem efeito, undo e redo aceitos', () => {
     const [game] = fc.sample(anyGame, { numRuns: 1, seed: 20260403 });
     const actions = fc.sample(anyGameAction, { numRuns: 600, seed: 20260404 });
     expect(new Set(actions.map((a) => a.op))).toEqual(
-      new Set(['place', 'erase', 'toggle', 'clear', 'undo', 'redo']),
+      new Set(['place', 'place-prune', 'erase', 'toggle', 'clear', 'undo', 'redo']),
     );
     let current = game as Game;
     let refused = 0;
@@ -72,6 +73,40 @@ describe('moves (geradores de jogo)', () => {
     expect(undone).toBeGreaterThan(0);
     expect(redone).toBeGreaterThan(0);
     expect(typeof canRedo(current)).toBe('boolean');
+  });
+
+  it('INV: anyGameAction gera a operação place-prune em sequências a partir de anyGame', () => {
+    const cases = fc.sample(
+      fc.tuple(anyGame, fc.array(anyGameAction, { minLength: 40, maxLength: 80 })),
+      { numRuns: 100, seed: 20261127 },
+    );
+    let withPrune = 0;
+    for (const [start, actions] of cases) {
+      const end = actions.reduce((game, action) => {
+        const next = applyGameAction(game, action);
+        return next.ok ? next.value : game;
+      }, start);
+      for (const entry of end.history) {
+        if (entry.move.kind === 'place-prune') withPrune += 1;
+      }
+    }
+    expect(withPrune).toBeGreaterThan(0);
+  });
+
+  it('INV: prunedGame sempre tem place-prune com poda real (pruned não vazio) no histórico', () => {
+    fc.assert(
+      fc.property(prunedGame, (game) => {
+        expect(
+          game.history.some(
+            (entry) =>
+              entry.move.kind === 'place-prune' &&
+              entry.pruned !== undefined &&
+              entry.pruned.length > 0,
+          ),
+        ).toBe(true);
+      }),
+      { seed: 20261129 },
+    );
   });
 
   it('INV: cellGameAction nunca gera undo nem redo', () => {

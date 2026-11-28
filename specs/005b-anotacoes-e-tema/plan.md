@@ -127,3 +127,4 @@ Numeração contínua com as da 005a (13 a 22, no RESUMO dela).
 27. **Cobertura de E2E** (revisão da `eng-testes`): CA-005-25 e CA-005-42 saem do E2E e ficam em unitário e componente; os testes estáticos de CSS do CA-005-40 e do CA-005-04 vão para a T08, preservando a isenção da T07.
 28. **Estimativa do ciclo completo da 005b** (análise, revisão, `qa-auditor`, retro) é feita na `/analisar 005b`, pelo `curador-pdca`, a partir da 005a.
     Estimativa registrada em 27/11/2026: ciclo completo 775k / 1,32M / 2,39M tokens e 54 / 112 / 252 min (T01-T08 730k provável + analisar 256k + revisar 140k + qa-auditor 85k + retro 111k; fora planejar já real 218,7k, orquestrador e CI); linhas em `docs/process/metrics.csv`.
+29. **Caudas de `historyMessage` (T03, 27/11/2026):** "valor N" para `place` e `place-prune`, "apagar" para `erase`, "anotação N" para `toggle-note`, "apagar anotações" para `clear-notes`, no molde "Desfeito|Refeito: <cauda> na linha R, coluna C".

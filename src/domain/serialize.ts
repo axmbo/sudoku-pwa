@@ -13,6 +13,7 @@ const MOVE_KIND_CODE: Record<Move['kind'], number> = {
   erase: 1,
   'toggle-note': 2,
   'clear-notes': 3,
+  'place-prune': 4,
 };
 
 function gridText(cells: readonly (number | null)[]): string {
@@ -50,7 +51,13 @@ export function serializeGame(game: Game): string {
 
 export type DeserializeRefusal = 'invalid-data' | 'future-version' | 'inconsistent-data';
 
-const MOVE_KINDS: readonly Move['kind'][] = ['place', 'erase', 'toggle-note', 'clear-notes'];
+/** Tipos lidos hoje; `place-prune` (código 4) entra na leitura na T02 da spec 005b (ADR 0008). */
+const MOVE_KINDS: readonly Exclude<Move['kind'], 'place-prune'>[] = [
+  'place',
+  'erase',
+  'toggle-note',
+  'clear-notes',
+];
 
 function parseGrid(text: unknown): (number | null)[][] | null {
   if (typeof text !== 'string' || !/^[.1-9]{81}$/.test(text)) {
@@ -117,7 +124,7 @@ interface Scratch {
 function applyTuple(scratch: Scratch, [code, index, digit]: MoveTuple): boolean {
   const cell = scratch.cells[index] as CellState;
   const current = scratch.notes[index] as Notes;
-  const kind = MOVE_KINDS[code] as Move['kind'];
+  const kind = MOVE_KINDS[code] as (typeof MOVE_KINDS)[number];
   const needsDigit = kind === 'place' || kind === 'toggle-note';
   if (cell.given || (needsDigit && !isDigit(digit))) {
     return false;

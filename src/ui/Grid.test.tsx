@@ -374,6 +374,16 @@ describe('Grid: anotações na célula', () => {
     );
   });
 
+  it('CA-005-41: o texto visível das anotações separa os dígitos por espaço e está contido no nome acessível', () => {
+    render(<NotesHarness game={gameWithNotes([{ row: 4, col: 4, digits: [1, 2, 5, 9] }])} />);
+    const cell = cellAtRC(4, 4);
+    const visible = (cell.querySelector('.cell-notes')?.textContent ?? '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    expect(visible).toBe('1 2 5 9');
+    expect(cell.getAttribute('aria-label')).toContain(visible);
+  });
+
   it.each(['Backspace', 'Delete', '0'])(
     'CA-005-44: %s em célula vazia com anotações apaga todas',
     (key) => {

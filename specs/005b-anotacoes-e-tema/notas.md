@@ -48,3 +48,12 @@ Consequências para a T02:
 - Fechamento: RED `feb5388` (44 testes novos, 39 vermelhos; `Actions.test.tsx` é módulo novo e não carregava, exceção do §6 declarada no commit; fixture `src/ui/tests/fixed-notes.ts`), GREEN `c93b725`, sem REFACTOR (código já limpo); 1014/1014 testes, cobertura 100% (330/330 statements, 266/266 branches, 92/92 funções, 305/305 linhas), Stryker não rodado.
 - **Deriva tasks×spec, a decidir na `/revisar` (não é defeito):** a `tasks.md` da T05 pede "os três botões `aria-disabled`" na vitória, mas o CA-005-42 só exige "nada muda" e `ControlsView` (plan) não tem `won`. Por isso o Anotar não fica `aria-disabled` e só ignora o clique; a RED segue a spec.
 - Lições candidatas ao PDCA (para a retro, não são regra): cabeçalho de commit com mais de 100 caracteres é barrado pelo commitlint (um commit da GREEN foi refeito).
+
+## T06 -> T07/T08: recado (28/11/2026)
+
+- `theme.css` ganhou `color-scheme: light dark` no `:root` e o bloco `@media (prefers-color-scheme: dark)`. Cor só por token; `styles.css` não pode ter cor literal (teste de regra).
+- Tokens novos: `--color-note`; `--color-action-bg|text|border`; `--color-action-on-bg|text` (Anotar ligado); `--color-action-disabled-bg|text`. Todos existem nos dois temas.
+- Anotar ligado no tema claro usa `#93c5fd` com texto `#111111`: o foco `#7c2d12` não teria 3:1 sobre `#1e3a8a`.
+- Desabilitado = `[aria-disabled="true"]` (T05); a T07 aplica `--color-action-disabled-*` nele.
+- Para a `/revisar`: a eng-testes exigiu 4,5:1 no texto do botão desabilitado (letra da tarefa), embora o WCAG isente componente desabilitado; decidir se mantém.
+- Fechamento: RED `1cbf8f0` (82 testes, 61 vermelhos), GREEN `320e2da` (só `theme.css`), sem REFACTOR; 1096/1096 testes, cobertura 100%, Stryker não rodado.

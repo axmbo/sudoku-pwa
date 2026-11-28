@@ -1,5 +1,6 @@
-/* Tokens do tema claro (T07 da 005a). Só hexadecimal: o teste de contraste lê este bloco. */
+/* Tokens dos temas claro e escuro (005a T07, 005b T06). Só hexadecimal: o teste de contraste lê os blocos. */
 :root {
+  color-scheme: light dark;
   --color-bg: #ffffff;
   --color-text: #1a1a1a;
   --color-given: #111111;
@@ -13,4 +14,38 @@
   --color-grid-line: #6b7280;
   --color-box-line: #1a1a1a;
   --color-conflict-mark: #7f1d1d;
+  --color-note: #374151;
+  --color-action-bg: #f3f4f6;
+  --color-action-text: #1a1a1a;
+  --color-action-border: #6b7280;
+  --color-action-on-bg: #93c5fd;
+  --color-action-on-text: #111111;
+  --color-action-disabled-bg: #e5e7eb;
+  --color-action-disabled-text: #4b5563;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #121212;
+    --color-text: #f3f4f6;
+    --color-given: #ffffff;
+    --color-player: #93c5fd;
+    --color-selected-bg: #1e3a8a;
+    --color-peer-bg: #2a2a2e;
+    --color-same-value-bg: #334155;
+    --color-conflict-bg: #7f1d1d;
+    --color-selected-outline: #93c5fd;
+    --color-focus: #fcd34d;
+    --color-grid-line: #9ca3af;
+    --color-box-line: #e5e7eb;
+    --color-conflict-mark: #fecaca;
+    --color-note: #d1d5db;
+    --color-action-bg: #27272a;
+    --color-action-text: #f3f4f6;
+    --color-action-border: #9ca3af;
+    --color-action-on-bg: #1e3a8a;
+    --color-action-on-text: #ffffff;
+    --color-action-disabled-bg: #1f1f23;
+    --color-action-disabled-text: #a1a1aa;
+  }
 }

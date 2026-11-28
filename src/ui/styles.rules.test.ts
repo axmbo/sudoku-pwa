@@ -102,3 +102,32 @@ describe('styles.css: layout de 320 px a 44 px (CA-005-34)', () => {
     expect(readUiCss('styles.css')).toBeTypeOf('string');
   });
 });
+
+describe('styles.css: cores só por token (CA-005-32)', () => {
+  const COLOR_PROPS =
+    /^(color|background|background-color|background-image|border(-[a-z]+)*|outline(-color)?|box-shadow|text-shadow|fill|stroke|caret-color|accent-color)$/;
+  const LITERAL =
+    /#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(|\b(white|black|red|green|blue|gray|grey|yellow|orange|purple|pink|navy|teal|silver)\b/i;
+
+  /** Valor sem os `var(--…)`: o que sobra não pode conter cor literal. */
+  function literalIn(value: string): boolean {
+    return LITERAL.test(value.replace(/var\([^)]*\)/g, ''));
+  }
+
+  it('CA-005-32: o detector acusa hexadecimal, rgb() e nome de cor, e aceita var()', () => {
+    expect(literalIn('1px solid #fff')).toBe(true);
+    expect(literalIn('rgb(0 0 0 / 50%)')).toBe(true);
+    expect(literalIn('white')).toBe(true);
+    expect(literalIn('2px solid var(--color-focus)')).toBe(false);
+    expect(literalIn('transparent')).toBe(false);
+  });
+
+  it('CA-005-32: nenhuma regra de styles.css usa cor literal (só var(--…))', () => {
+    const offenders = rules().flatMap((r) =>
+      [...r.declarations]
+        .filter(([prop, value]) => COLOR_PROPS.test(prop) && literalIn(value))
+        .map(([prop, value]) => `${r.selectors.join(', ')} { ${prop}: ${value} }`),
+    );
+    expect(offenders).toEqual([]);
+  });
+});

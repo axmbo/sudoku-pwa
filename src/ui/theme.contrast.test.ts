@@ -15,7 +15,7 @@
 //   --color-focus           anel de foco (componente, 3:1)
 // Limiares WCAG 2.x: texto 4,5:1; componente de interface e foco 3:1.
 import { describe, expect, it } from 'vitest';
-import { parseRules, readUiCss } from './tests/css';
+import { mediaBody, parseRules, readUiCss } from './tests/css';
 
 export function parseHex(hex: string): [number, number, number] {
   const h = hex.trim().toLowerCase();
@@ -116,6 +116,114 @@ describe('theme.css: tema claro', () => {
       const v = lightTheme();
       expect(contrastRatio(color(v, '--color-focus'), color(v, bg))).toBeGreaterThanOrEqual(
         COMPONENT,
+      );
+    });
+  }
+});
+
+// ---- T06 (005b): tema escuro, anotações e botões (CA-005-32, CA-005-04) ----
+//
+// CONTRATO para o `dev` (além dos tokens acima, que continuam no primeiro `:root`):
+//   - o `:root` claro declara `color-scheme: light dark`;
+//   - `@media (prefers-color-scheme: dark) { :root { ... } }` redeclara TODOS os tokens `--color-*`
+//     do tema claro com hexadecimais próprios (inclusive os novos abaixo);
+//   - tokens novos, nos dois temas:
+//       --color-note               dígitos de anotação (texto, 4,5:1 sobre cada fundo de célula)
+//       --color-action-bg          fundo de botão de ação (Apagar, Anotar, Desfazer, Refazer)
+//       --color-action-text        texto do botão de ação
+//       --color-action-border      borda do botão de ação (componente, 3:1 sobre --color-bg)
+//       --color-action-on-bg       fundo do botão Anotar ligado (.is-on)
+//       --color-action-on-text     texto do botão Anotar ligado
+//       --color-action-disabled-bg   fundo do botão [aria-disabled="true"]
+//       --color-action-disabled-text texto do botão desabilitado (mantém 4,5:1 por decisão do projeto)
+
+function darkOverrides(): ReadonlyMap<string, string> {
+  const body = mediaBody(readUiCss('theme.css'), /prefers-color-scheme:\s*dark/);
+  if (body === undefined) throw new Error('theme.css sem @media (prefers-color-scheme: dark)');
+  const root = parseRules(body).find((r) => r.selectors.includes(':root'));
+  if (!root) throw new Error('bloco escuro sem :root');
+  return root.declarations;
+}
+
+const THEMES: readonly (readonly [string, () => ReadonlyMap<string, string>])[] = [
+  ['claro', lightTheme],
+  ['escuro', darkOverrides],
+];
+
+const NOTE_TOKEN = '--color-note';
+const ACTION_NEW_TOKENS = [
+  NOTE_TOKEN,
+  '--color-action-bg',
+  '--color-action-text',
+  '--color-action-border',
+  '--color-action-on-bg',
+  '--color-action-on-text',
+  '--color-action-disabled-bg',
+  '--color-action-disabled-text',
+] as const;
+
+const TEXT_PAIRS: readonly (readonly [string, string])[] = [
+  ['--color-text', '--color-bg'],
+  ['--color-action-text', '--color-action-bg'],
+  ['--color-action-on-text', '--color-action-on-bg'],
+  ['--color-action-disabled-text', '--color-action-disabled-bg'],
+  ...(['given', 'player'] as const).flatMap((fg) =>
+    BACKGROUNDS.map((bg) => [`--color-${fg}`, bg] as const),
+  ),
+  ['--color-conflict-mark', '--color-conflict-bg'],
+];
+
+const COMPONENT_PAIRS: readonly (readonly [string, string])[] = [
+  ['--color-selected-outline', '--color-bg'],
+  ['--color-selected-outline', '--color-peer-bg'],
+  ['--color-action-border', '--color-bg'],
+  ...BACKGROUNDS.map((bg) => ['--color-focus', bg] as const),
+  ['--color-focus', '--color-action-bg'],
+  ['--color-focus', '--color-action-on-bg'],
+];
+
+describe('theme.css: tema escuro e tokens novos (CA-005-32)', () => {
+  it('CA-005-32: o :root claro declara color-scheme: light dark', () => {
+    expect(lightTheme().get('color-scheme')).toBe('light dark');
+  });
+
+  it('CA-005-32: o bloco escuro existe e redeclara todos os tokens --color-* do claro', () => {
+    const light = [...lightTheme().keys()].filter((k) => k.startsWith('--color-'));
+    const dark = darkOverrides();
+    expect(light.length).toBeGreaterThan(ACTION_NEW_TOKENS.length);
+    expect(light.filter((k) => !dark.has(k))).toEqual([]);
+  });
+
+  it.each(ACTION_NEW_TOKENS)('CA-005-32: o token novo %s existe no tema claro', (token) => {
+    expect(lightTheme().has(token)).toBe(true);
+  });
+
+  for (const [theme, vars] of THEMES) {
+    describe(`tema ${theme}`, () => {
+      it.each(TEXT_PAIRS)('CA-005-32: texto %s sobre %s tem pelo menos 4,5:1', (fg, bg) => {
+        const v = vars();
+        expect(contrastRatio(color(v, fg), color(v, bg))).toBeGreaterThanOrEqual(TEXT);
+      });
+
+      it.each(COMPONENT_PAIRS)('CA-005-32: componente %s sobre %s tem pelo menos 3:1', (fg, bg) => {
+        const v = vars();
+        expect(contrastRatio(color(v, fg), color(v, bg))).toBeGreaterThanOrEqual(COMPONENT);
+      });
+
+      it.each(BACKGROUNDS)(
+        'CA-005-04: anotação (--color-note) sobre %s tem pelo menos 4,5:1',
+        (bg) => {
+          const v = vars();
+          expect(contrastRatio(color(v, NOTE_TOKEN), color(v, bg))).toBeGreaterThanOrEqual(TEXT);
+        },
+      );
+
+      it.each(BACKGROUNDS)(
+        'CA-005-32: anotação (--color-note) sobre %s tem pelo menos 4,5:1',
+        (bg) => {
+          const v = vars();
+          expect(contrastRatio(color(v, NOTE_TOKEN), color(v, bg))).toBeGreaterThanOrEqual(TEXT);
+        },
       );
     });
   }

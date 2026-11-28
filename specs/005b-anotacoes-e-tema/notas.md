@@ -75,3 +75,9 @@ Capturas do build (`vite preview`), Playwright/Chromium, em `specs/005b-anotacoe
 - Extra: os botões do teclado numérico ficaram cinza do navegador no escuro; passaram a usar os tokens `--color-action-*`.
 - Tamanho do build (gzip): JS 11,04 kB, CSS 1,59 kB (`dist/assets/index-*.js` 28,48 kB, `index-*.css` 5,37 kB brutos).
 - `npm run check`: 1096/1096 testes, cobertura 100%.
+
+## T07 -> T08: recado (28/11/2026)
+
+- Layout lado a lado: `@media (min-width: 50rem), (orientation: landscape) and (min-width: 36rem)` em `src/ui/styles.css` (grade e `.controls` lado a lado); abaixo disso, retrato em coluna.
+- Ganchos para os E2E: `.controls > .keypad`, `.controls > .actions` (3 botões em `flex-wrap`), `.is-on` (Anotar ligado), `.cell-notes` e `.note-N`; desabilitado = `[aria-disabled="true"]`.
+- Capturas de referência (320, 390, 1280, 390 com texto a 200%, 800x360 paisagem, 390 escuro) em `capturas/`; a cena usa anotações 1, 2, 3, 5, 9 na célula (1,3) e 1 a 9 na (1,4).

@@ -124,3 +124,5 @@ Numeração contínua com as da 005a (13 a 22, no RESUMO dela).
 24. **Textos de anúncio** da decisão de projeto 10 aprovados como estão; a `eng-testes` pode refinar na T03 sem mudar o sentido.
 25. **Após a vitória**, a tecla `N` e o botão Anotar ficam **sem efeito e sem anúncio** (coerente com CA-005-42).
 26. **Cmd+Z e Ctrl+Shift+Z ficam fora desta spec**; abrir item no backlog se houver demanda.
+27. **Cobertura de E2E** (revisão da `eng-testes`): CA-005-25 e CA-005-42 saem do E2E e ficam em unitário e componente; os testes estáticos de CSS do CA-005-40 e do CA-005-04 vão para a T08, preservando a isenção da T07.
+28. **Estimativa do ciclo completo da 005b** (análise, revisão, `qa-auditor`, retro) é feita na `/analisar 005b`, pelo `curador-pdca`, a partir da 005a.

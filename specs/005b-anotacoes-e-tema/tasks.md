@@ -3,7 +3,7 @@
 - **Spec:** [spec.md](spec.md) · **Plano:** [plan.md](plan.md)
 - **Autores:** `arquiteto` + `eng-testes` · **Análise de consistência:** ok em 27/11/2026 (2 rodadas; [analise.md](analise.md))
 
-Rascunho do `arquiteto` (etapa 1 do `/planejar`); testes e manifestos a refinar por `eng-testes` e `curador-pdca`. **9 tarefas** (T09 veio do D1, decisão 31). T01 e T02 implementam o [ADR 0008](../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), aceito (decisão 23 do plano). Ordem: domínio, contratos e lógica pura, componentes, CSS, E2E.
+Rascunho do `arquiteto` (etapa 1 do `/planejar`); testes e manifestos a refinar por `eng-testes` e `curador-pdca`. **10 tarefas** (T09 veio do D1, decisão 31; T10 veio do diagnóstico do E2E intermitente do CA-005-16, decisão do Diretor de 28/11/2026). T01 e T02 implementam o [ADR 0008](../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), aceito (decisão 23 do plano). Ordem: domínio, contratos e lógica pura, componentes, CSS, E2E.
 
 Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03 em 0,91×); minutos = tokens prováveis ÷ 0,7M tokens/h (M-009(b)). Manifestos em ~4 caracteres por token (`wc -c` dos arquivos atuais: `estado.md` ≈ 1,6k; `constituicao.md` ≈ 0,5k; `game.ts` ≈ 1,9k; `history.ts` ≈ 0,7k; `serialize.ts` ≈ 2,2k; `reducer.ts` ≈ 0,85k; `styles.css` ≈ 0,9k). Todos abaixo de 15k. **Manifesto de UI** (M-020, passo 2b da `gestao-contexto`) já incluído nas tarefas de UI: exports de `game.ts` usados, projeto `ui` de `vitest.config.ts` (linhas 10 a 16) e a convenção de `seed`, CA de texto fixo e ganchos da tarefa anterior.
 
@@ -182,12 +182,29 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 - **Estimativa:** tokens 40k/80k/160k · minutos 3/7/15 (escala da T06 e da T07)
 - **Agentes:** `eng-testes` (RED) e depois `dev` (GREEN)
 
+## T10 — Correção do foco da grade na rajada dígito + seta (E2E intermitente do CA-005-16)
+
+- **CA cobertos:** CA-005-16 (o E2E da jornada de anotação falha em `toBeFocused()`); o CA de foco da 005a que o diagnóstico cita, CA-005-07 (setas movem seleção e foco real), sem mudá-lo
+- **tdd:** sim (defeito de produção achado na revisão r1; [diagnóstico](diagnostico-e2e-ca-005-16.md))
+- **Testes esperados:** RED pela `eng-testes`: em `src/ui/Grid.test.tsx` (acrescentar), `CA-005-16:` com a grade focada numa célula vazia, dispara `keydown` de um dígito e, depois de deixar o render (microtarefa) mas não os efeitos rodarem, `keydown` de `ArrowRight`, sem `act`/`fireEvent` entre as teclas; depois de os efeitos rodarem, `document.activeElement` é a célula de destino (a mesma de `is-selected`). Os testes atuais (CA-005-07, 10) seguem verdes. GREEN pelo `dev`: não depender de marca mutável limpa por efeito; ação que não move a seleção não pode apagar a marca de uma tecla de movimento posterior (opções no diagnóstico, "Correção proposta" 2). Depois do GREEN, suíte completa do E2E umas 5 vezes e com `--workers=8`.
+- **via 7b para mutantes:** não (UI fica fora do Stryker)
+- **Arquivos a criar/alterar:** `src/ui/Grid.test.tsx`, `src/ui/Grid.tsx`
+- **Manifesto de contexto** (lista fechada):
+  - `CLAUDE.md` (L0, automático)
+  - `docs/estado.md` · `docs/constituicao.md` (~2,1k)
+  - `specs/005b-anotacoes-e-tema/diagnostico-e2e-ca-005-16.md` (~1,3k)
+  - `src/ui/Grid.tsx` (~1,7k) · `src/ui/Grid.test.tsx#L1-60` e o teste CA-005-07 (~1,5k)
+  - `src/ui/model/reducer.ts#UiState,initialState` (~0,4k)
+  - Total ≈ 7k (sem L0)
+- **Estimativa:** tokens 30k/60k/120k · minutos 2/5/10 (menor que a T09: um teste e um arquivo de produção); custo real n/d
+- **Agentes:** `eng-testes` (RED) e depois `dev` (GREEN)
+
 ## Cobertura de CA (spec: CA-005-04, 16, 17, 18, 23, 24, 25, 32, 38, 40, 41, 42, 43, 44, 45)
 
 | CA | Tarefas |
 |---|---|
 | CA-005-04 | T03, T05, T06, T07, T08 |
-| CA-005-16 | T03, T04, T05, T08 |
+| CA-005-16 | T03, T04, T05, T08, T10 |
 | CA-005-17 | T03, T04, T05 |
 | CA-005-18 | T03, T04, T05 |
 | CA-005-23 | T01, T03, T04, T05, T08 |

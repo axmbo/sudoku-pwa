@@ -24,3 +24,14 @@ Consequências para a T02:
 - `gridView.notes` vem de `notesAt`, congelado e ordenado.
 - Fechamento: RED `ab2cf5a`, RED de correção `94e5783` (teste antigo CA-005-36 exigia 4 chaves em `messages`), GREEN `10382a9`; 925/925 testes, cobertura 100%.
 - Lição candidata ao PDCA: a RED não previu teste existente de "conjunto exato" sobre exports e chaves dos módulos tocados; sugestão para o checklist da `eng-testes` (a levar à retro, não é regra).
+
+## T04 -> T05: recado (27/11/2026)
+
+- `UiState` ganhou `noteMode` e `focusTick`. `UiAction` ganhou `toggle-mode`, `undo` e `redo`.
+- `travel` atende undo e redo. A célula afetada vem de `history[min(cursor antes, depois)].move.index`. `focusTick` só sobe quando a ação é aplicada.
+- Anúncio de histórico = `historyMessage` + ". " + frase de conflito. Vitória anuncia só `messages.won`.
+- `toggle-mode` em partida vencida é silencioso. `erase` em célula vazia com anotações usa `gameClearNotes`. A jogada `place` sem poda não sai mais do reducer.
+- Os testes usam `act(type)` com cast (pode virar literal).
+- Pendência para a revisão: provar o INV "gerador estendido alcança ..." por mutante manual (tirar `TOGGLE`/`UNDO`/`REDO` do gerador e ver falhar).
+- Fechamento: RED `472cc97`, REDs de correção `a5eb4b9` e `4e6aee3`, GREEN `cc39bac`, REFACTOR `a16814d`; 970/970 testes, cobertura 100%, Stryker não rodado.
+- Lição candidata ao PDCA (para a retro, não é regra): a RED de propriedade deve rodar a prop nova isolada com meta de tempo (~≤ 3 s) e conferir as chaves de alcance do gerador com a seed fixa antes de commitar; sem isso custou duas idas e voltas RED↔GREEN. A lição da T03 (conjunto exato) foi aplicada e funcionou.

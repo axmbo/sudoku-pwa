@@ -7,6 +7,7 @@ import {
   gamePlace,
   getGameConflicts,
   getGameStatus,
+  notesAt,
   type Game,
 } from '../../domain/game';
 import type { Index } from '../../domain/units';
@@ -306,7 +307,13 @@ describe('gameReducer (propriedades)', () => {
       fc.assert(
         fc.property(actionsArb, (actions) => {
           for (const { after } of replay(actions).steps) {
-            expect(Object.keys(after).sort()).toEqual(['announcement', 'game', 'selected']);
+            expect(Object.keys(after).sort()).toEqual([
+              'announcement',
+              'focusTick',
+              'game',
+              'noteMode',
+              'selected',
+            ]);
             expect(getGameConflicts(after.game)).toEqual(getConflicts(after.game.board));
           }
         }),
@@ -353,6 +360,298 @@ describe('gameReducer (propriedades)', () => {
           }
         }),
         { seed: SEED + 7, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+});
+
+// ---------------------------------------------------------------------------------------------
+// 005b T04: ações novas (toggle-mode, undo, redo) e modo anotação. `act` porque o tipo `UiAction`
+// ainda não as declara (símbolo novo, PROCESSO.md §6). O gerador estendido reaproveita `macroArb` e
+// acrescenta macros das ações novas; a prova de que alcança o estado coberto é o teste
+// "INV: o gerador estendido alcança ..." (mutante manual descrito no commit).
+// ---------------------------------------------------------------------------------------------
+
+const act = (type: string): UiAction => ({ type }) as UiAction;
+const TOGGLE = act('toggle-mode');
+const UNDO = act('undo');
+const REDO = act('redo');
+
+const extMacroArb: fc.Arbitrary<UiAction[]> = fc.oneof(
+  { weight: 10, arbitrary: macroArb },
+  { weight: 4, arbitrary: fc.constant<UiAction[]>([TOGGLE]) },
+  { weight: 4, arbitrary: fc.constant<UiAction[]>([UNDO]) },
+  { weight: 3, arbitrary: fc.constant<UiAction[]>([REDO]) },
+  {
+    weight: 4,
+    arbitrary: fc
+      .record({ row: indexArb, col: indexArb, digit: digitArb })
+      .map(({ row, col, digit }): UiAction[] => [
+        select(row, col),
+        TOGGLE,
+        { type: 'digit', digit },
+      ]),
+  },
+);
+
+const extActionsArb: fc.Arbitrary<UiAction[]> = fc
+  .record({
+    prefix: fc.constantFrom<keyof typeof PREFIXES>('none', 'none', 'almost', 'almostWrong'),
+    tail: fc.array(extMacroArb, { maxLength: 30 }),
+  })
+  .map(({ prefix, tail }) => [...PREFIXES[prefix], ...tail.flat()]);
+
+/** Tipo da ação como `string`: o union `UiAction` ainda não declara as ações novas. */
+const kind = (action: UiAction): string => action.type;
+
+const isWon = (state: UiState): boolean => getGameStatus(state.game) === 'won';
+
+/** Valores do tabuleiro, sem anotações nem histórico. */
+function values(game: Game): (Digit | null)[] {
+  return game.board.cells.map((cell: CellState) => cell.value);
+}
+
+/** Parte do `Game` que `undo`/`redo` devem devolver (o histórico acompanha só o cursor). */
+function position(game: Game): { board: unknown; notes: unknown; cursor: number } {
+  return { board: game.board, notes: game.notes, cursor: game.cursor };
+}
+
+const EMPTY_CELLS: readonly number[] = Array.from({ length: 81 }, (_, i) => i).filter(
+  (i) => givenAt(Math.floor(i / 9), i % 9) === null,
+);
+
+describe('gameReducer (propriedades da 005b T04)', () => {
+  it(
+    'INV: o gerador estendido alcança modo anotação com anotação, undo e redo aplicados e "nada para..."',
+    () => {
+      const reached = {
+        noteDigit: false,
+        undoApplied: false,
+        redoApplied: false,
+        nothingToUndo: false,
+        nothingToRedo: false,
+        wonThenExtra: false,
+      };
+      for (const actions of fc.sample(extActionsArb, { seed: SEED + 20, numRuns: 100 })) {
+        for (const { before, action, after } of replay(actions).steps) {
+          if (action.type === 'digit' && before.noteMode && after.game !== before.game)
+            reached.noteDigit = true;
+          if (kind(action) === 'undo' && after.game !== before.game) reached.undoApplied = true;
+          if (kind(action) === 'redo' && after.game !== before.game) reached.redoApplied = true;
+          if (after.announcement?.text === messages.nothingToUndo) reached.nothingToUndo = true;
+          if (after.announcement?.text === messages.nothingToRedo) reached.nothingToRedo = true;
+          if (isWon(before) && (kind(action) === 'undo' || kind(action) === 'redo'))
+            reached.wonThenExtra = true;
+        }
+      }
+      expect(reached).toEqual({
+        noteDigit: true,
+        undoApplied: true,
+        redoApplied: true,
+        nothingToUndo: true,
+        nothingToRedo: true,
+        wonThenExtra: true,
+      });
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-31: com as ações novas, cada ação gera no máximo um anúncio, bem formado, com id de 1 em 1',
+    () => {
+      fc.assert(
+        fc.property(extActionsArb, (actions) => {
+          for (const { before, action, after } of replay(actions).steps) {
+            if (action.type === 'select' || action.type === 'move') {
+              expect(after.announcement).toBeNull();
+            }
+            if (after.announcement !== null) {
+              expect(Number.isInteger(after.announcement.id)).toBe(true);
+              expect(after.announcement.text).not.toBe('');
+              expect(after.announcement.id).toBe((before.announcement?.id ?? 0) + 1);
+            }
+            if (!isWon(before) && kind(action) === 'toggle-mode') {
+              expect(after.announcement?.text).toBe(
+                after.noteMode ? messages.noteModeOn : messages.noteModeOff,
+              );
+            }
+          }
+        }),
+        { seed: SEED + 21, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-23: jogada do jogo seguida de undo devolve o tabuleiro, as anotações e o cursor anteriores',
+    () => {
+      fc.assert(
+        fc.property(extActionsArb, (actions) => {
+          for (const { before, action, after } of replay(actions).steps) {
+            const isPlay = action.type === 'digit' || action.type === 'erase';
+            if (!isPlay || after.game === before.game || isWon(after)) continue;
+            const undone = gameReducer(after, UNDO);
+            expect(position(undone.game)).toEqual(position(before.game));
+          }
+        }),
+        { seed: SEED + 22, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-23: undo seguido de redo devolve o game (e o inverso), inclusive valor com poda',
+    () => {
+      fc.assert(
+        fc.property(extActionsArb, (actions) => {
+          for (const { after } of replay(actions).steps) {
+            if (isWon(after)) continue;
+            const undone = gameReducer(after, UNDO);
+            if (undone.game !== after.game) {
+              expect(gameReducer(undone, REDO).game).toEqual(after.game);
+            }
+            const redone = gameReducer(after, REDO);
+            if (redone.game !== after.game) {
+              expect(gameReducer(redone, UNDO).game).toEqual(after.game);
+            }
+          }
+        }),
+        { seed: SEED + 23, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-24: undo e redo aplicados levam a seleção à célula afetada e sobem focusTick; sem efeito não sobem',
+    () => {
+      fc.assert(
+        fc.property(extActionsArb, (actions) => {
+          for (const { before, action, after } of replay(actions).steps) {
+            if (kind(action) !== 'undo' && kind(action) !== 'redo') {
+              expect(after.focusTick).toBe(before.focusTick);
+              continue;
+            }
+            if (after.game === before.game) {
+              expect(after.focusTick).toBe(before.focusTick);
+              expect(after.selected).toEqual(before.selected);
+            } else {
+              expect(after.focusTick).toBe(before.focusTick + 1);
+              const index = after.selected.row * 9 + after.selected.col;
+              const moved = kind(action) === 'undo' ? before.game.cursor - 1 : before.game.cursor;
+              expect(index).toBe(before.game.history[moved]?.move.index);
+            }
+          }
+        }),
+        { seed: SEED + 24, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-44: erase em célula vazia com anotações zera as anotações e registra uma jogada nova',
+    () => {
+      const noted = fc.uniqueArray(
+        fc.record({ cell: fc.constantFrom(...EMPTY_CELLS), digit: digitArb }),
+        {
+          minLength: 1,
+          maxLength: 8,
+          selector: (item) => item.cell,
+        },
+      );
+      fc.assert(
+        fc.property(noted, (items) => {
+          const annotate = items.flatMap(({ cell, digit }): UiAction[] => [
+            select(Math.floor(cell / 9) as Index, (cell % 9) as Index),
+            { type: 'digit', digit },
+          ]);
+          let state = [TOGGLE, ...annotate].reduce(gameReducer, initialState(fixedGame()));
+          for (const { cell } of items) {
+            const row = Math.floor(cell / 9) as Index;
+            const col = (cell % 9) as Index;
+            const before = gameReducer(state, select(row, col));
+            expect(notesAt(before.game, row, col)).toHaveLength(1); // pré-condição: a célula tem anotação
+            state = gameReducer(before, { type: 'erase' });
+            expect(notesAt(state.game, row, col)).toEqual([]);
+            expect(state.game.cursor).toBe(before.game.cursor + 1);
+            expect(state.announcement?.text).toContain('vazia');
+          }
+        }),
+        { seed: SEED + 25, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-17: anotar o mesmo dígito duas vezes seguidas devolve tabuleiro e anotações originais',
+    () => {
+      fc.assert(
+        fc.property(extActionsArb, indexArb, indexArb, digitArb, (actions, row, col, digit) => {
+          const { steps } = replay(actions);
+          const base = steps.at(-1)?.after ?? initialState(fixedGame());
+          const inNoteMode = base.noteMode ? base : gameReducer(base, TOGGLE);
+          const start = gameReducer(inNoteMode, select(row, col));
+          const twice = gameReducer(gameReducer(start, { type: 'digit', digit }), {
+            type: 'digit',
+            digit,
+          });
+          expect(twice.game.board).toEqual(start.game.board);
+          expect(twice.game.notes).toEqual(start.game.notes);
+          const cell = start.game.board.cells[row * 9 + col];
+          if (!isWon(start) && cell?.value === null) {
+            expect(twice.game.cursor).toBe(start.game.cursor + 2); // não vacuoso: as duas anotaram
+          }
+        }),
+        { seed: SEED + 26, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-16: no modo anotação, nenhum dígito altera valores; toggle-mode não toca no jogo',
+    () => {
+      fc.assert(
+        fc.property(extActionsArb, (actions) => {
+          for (const { before, action, after } of replay(actions).steps) {
+            if (before.noteMode && action.type === 'digit') {
+              expect(values(after.game)).toEqual(values(before.game));
+            }
+            if (kind(action) === 'toggle-mode') {
+              expect(after.game).toBe(before.game);
+              expect(after.selected).toEqual(before.selected);
+              expect(after.noteMode).toBe(isWon(before) ? before.noteMode : !before.noteMode);
+            }
+          }
+        }),
+        { seed: SEED + 27, numRuns: 100 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
+
+  it(
+    'CA-005-42: depois de won, toggle-mode, anotação, undo e redo não alteram o estado nem anunciam',
+    () => {
+      fc.assert(
+        fc.property(extActionsArb, (actions) => {
+          for (const { before, action, after } of replay(actions).steps) {
+            if (!isWon(before)) continue;
+            expect(after.game).toBe(before.game);
+            expect(after.noteMode).toBe(before.noteMode);
+            expect(after.focusTick).toBe(before.focusTick);
+            if (action.type !== 'select' && action.type !== 'move') {
+              expect(after.announcement).toBeNull();
+              expect(after.selected).toEqual(before.selected);
+            }
+          }
+        }),
+        { seed: SEED + 28, numRuns: 100 },
       );
     },
     PROP_TIMEOUT,

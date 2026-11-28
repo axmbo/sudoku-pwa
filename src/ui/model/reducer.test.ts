@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { cellAt } from '../../domain/board';
 import type { Digit } from '../../domain/digit';
-import { getGameConflicts, getGameStatus } from '../../domain/game';
+import { gameRedo, getGameConflicts, getGameStatus, notesAt } from '../../domain/game';
 import type { Index } from '../../domain/units';
 import { fixedGame } from '../fixed-puzzle';
 import { messages } from './messages';
@@ -330,5 +330,337 @@ describe('gameReducer: precedência dos anúncios (CA-005-31)', () => {
       }
     }
     expect(pairs).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// 005b T04: modo anotação, anotar, apagar anotações, desfazer e refazer.
+// As três ações novas entram por `act`: o tipo `UiAction` ainda não as declara (símbolo novo,
+// PROCESSO.md §6); o cast é inofensivo depois do GREEN. Células usadas (base 0), vazias no puzzle:
+//  - (0,2) alvo (solução 4); vizinhas dela: (0,3) linha, (3,2) coluna, (1,1) caixa.
+//  - (4,4) não é vizinha de (0,2): serve de "outra célula" e para provar que a poda não a atinge.
+// ---------------------------------------------------------------------------------------------
+
+const act = (type: string): UiAction => ({ type }) as UiAction;
+const TOGGLE = act('toggle-mode');
+const UNDO = act('undo');
+const REDO = act('redo');
+
+function notes(state: UiState, row: Index, col: Index): readonly Digit[] {
+  return notesAt(state.game, row, col);
+}
+
+describe('gameReducer: modo anotação (CA-005-16)', () => {
+  it('CA-005-16: initialState começa no modo valor, com focusTick 0', () => {
+    const state = start();
+    expect(state.noteMode).toBe(false);
+    expect(state.focusTick).toBe(0);
+  });
+
+  it('CA-005-16: toggle-mode liga, anuncia "ligado" e não toca no jogo nem na seleção', () => {
+    const before = run(start(), sel(2, 3));
+    const after = run(before, TOGGLE);
+    expect(after.noteMode).toBe(true);
+    expect(ann(after).text).toBe(messages.noteModeOn);
+    expect(after.game).toBe(before.game);
+    expect(after.selected).toEqual(before.selected);
+    expect(after.focusTick).toBe(before.focusTick);
+  });
+
+  it('CA-005-16: toggle-mode de novo desliga e anuncia "desligado" com id seguinte', () => {
+    const on = run(start(), TOGGLE);
+    const off = run(on, TOGGLE);
+    expect(off.noteMode).toBe(false);
+    expect(ann(off).text).toBe(messages.noteModeOff);
+    expect(ann(off).id).toBe(ann(on).id + 1);
+    expect(off.game).toBe(on.game);
+  });
+
+  it('CA-005-16: o modo é pegajoso (select, move e anotações não o desligam)', () => {
+    const state = run(
+      start(),
+      TOGGLE,
+      sel(0, 2),
+      dig(4),
+      { type: 'move', key: 'ArrowRight', ctrl: false },
+      dig(2),
+    );
+    expect(state.noteMode).toBe(true);
+  });
+});
+
+describe('gameReducer: anotar (CA-005-17, CA-005-18)', () => {
+  it('CA-005-17: dígito no modo anotação alterna o candidato, sem valor, e anuncia as anotações', () => {
+    const first = run(start(), TOGGLE, sel(0, 2), dig(4));
+    expect(valueAt(first, 0, 2)).toBeNull();
+    expect(notes(first, 0, 2)).toEqual([4]);
+    expect(ann(first).text).toBe('anotações 4');
+    const second = run(first, dig(2));
+    expect(notes(second, 0, 2)).toEqual([2, 4]);
+    expect(ann(second).text).toBe('anotações 2 4');
+    expect(ann(second).id).toBe(ann(first).id + 1);
+  });
+
+  it('CA-005-17: repetir o dígito remove a anotação e anuncia "sem anotações"', () => {
+    const after = run(start(), TOGGLE, sel(0, 2), dig(4), dig(4));
+    expect(notes(after, 0, 2)).toEqual([]);
+    expect(ann(after).text).toBe('sem anotações');
+  });
+
+  it('CA-005-17: anotar não anuncia conflito nem altera focusTick', () => {
+    const after = run(start(), TOGGLE, sel(0, 2), dig(5)); // 5 repetiria a pista (0,0), mas é só anotação
+    expect(getGameConflicts(after.game)).toHaveLength(0);
+    expect(ann(after).text).toBe('anotações 5');
+    expect(after.focusTick).toBe(0);
+  });
+
+  it('CA-005-18: anotar em célula com valor deixa o estado igual e anuncia cellHasValue', () => {
+    const before = run(start(), sel(0, 2), dig(4), TOGGLE);
+    const after = run(before, dig(1));
+    expect(after.game).toBe(before.game);
+    expect(after.selected).toEqual(before.selected);
+    expect(ann(after).text).toBe(messages.cellHasValue);
+  });
+
+  it('CA-005-18: anotar em pista deixa o estado igual e anuncia givenImmutable', () => {
+    const before = run(start(), TOGGLE); // (0,0) é pista
+    const after = run(before, dig(1));
+    expect(after.game).toBe(before.game);
+    expect(ann(after).text).toBe(messages.givenImmutable);
+  });
+
+  it('CA-005-18: duas recusas seguidas geram anúncios novos (id cresce)', () => {
+    const first = run(start(), TOGGLE, dig(1));
+    const second = run(first, dig(2));
+    expect(ann(second).text).toBe(ann(first).text);
+    expect(ann(second).id).toBe(ann(first).id + 1);
+  });
+});
+
+describe('gameReducer: valor poda as anotações vizinhas (CA-005-43)', () => {
+  /** Anotações com 4 nas vizinhas (0,3), (3,2), (1,1), em (4,4) (não vizinha) e 2 em (0,3). */
+  function withNotes(): UiState {
+    return run(
+      start(),
+      TOGGLE,
+      sel(0, 3),
+      dig(4),
+      dig(2),
+      sel(3, 2),
+      dig(4),
+      sel(1, 1),
+      dig(4),
+      sel(4, 4),
+      dig(4),
+      TOGGLE,
+      sel(0, 2),
+    );
+  }
+
+  it('CA-005-43: colocar X no modo valor tira X das vizinhas e preserva as demais anotações', () => {
+    const after = run(withNotes(), dig(4));
+    expect(valueAt(after, 0, 2)).toBe(4);
+    expect(notes(after, 0, 3)).toEqual([2]);
+    expect(notes(after, 3, 2)).toEqual([]);
+    expect(notes(after, 1, 1)).toEqual([]);
+    expect(notes(after, 4, 4)).toEqual([4]);
+  });
+
+  it('CA-005-43: um único undo desfaz o valor e devolve todas as anotações podadas', () => {
+    const before = withNotes();
+    const after = run(before, dig(4), UNDO);
+    expect(valueAt(after, 0, 2)).toBeNull();
+    expect(notes(after, 0, 3)).toEqual([2, 4]);
+    expect(notes(after, 3, 2)).toEqual([4]);
+    expect(notes(after, 1, 1)).toEqual([4]);
+    expect(notes(after, 4, 4)).toEqual([4]);
+    expect(after.game.board).toEqual(before.game.board);
+    expect(after.game.notes).toEqual(before.game.notes);
+  });
+});
+
+describe('gameReducer: apagar anotações (CA-005-44)', () => {
+  it('CA-005-44: erase em célula vazia com anotações limpa todas, anuncia "vazia" e registra uma jogada', () => {
+    const before = run(start(), TOGGLE, sel(0, 2), dig(2), dig(4));
+    const after = run(before, ERASE);
+    expect(notes(after, 0, 2)).toEqual([]);
+    expect(valueAt(after, 0, 2)).toBeNull();
+    expect(ann(after).text).toContain('vazia');
+    expect(after.game.cursor).toBe(before.game.cursor + 1);
+  });
+
+  it('CA-005-44: erase em célula vazia sem anotações não muda o Game nem anuncia', () => {
+    const before = run(start(), TOGGLE, sel(0, 2));
+    const after = run(before, ERASE);
+    expect(after.game).toBe(before.game);
+    expect(after.announcement).toBeNull();
+  });
+
+  it('CA-005-44: erase em pista, com o modo anotação ligado, anuncia givenImmutable', () => {
+    const after = run(start(), TOGGLE, ERASE);
+    expect(ann(after).text).toBe(messages.givenImmutable);
+  });
+});
+
+describe('gameReducer: desfazer e refazer por tipo de jogada (CA-005-23, CA-005-24)', () => {
+  // [rótulo, estado com a jogada feita e a seleção em (4,4), texto sem o prefixo, verificação do efeito]
+  const cases: ReadonlyArray<readonly [string, () => UiState, string, (s: UiState) => void]> = [
+    [
+      'valor (com poda)',
+      () => run(start(), sel(0, 2), dig(4), sel(4, 4)),
+      'valor 4 na linha 1, coluna 3',
+      (s) => expect(valueAt(s, 0, 2)).toBeNull(),
+    ],
+    [
+      'apagar valor',
+      () => run(start(), sel(0, 2), dig(4), ERASE, sel(4, 4)),
+      'apagar na linha 1, coluna 3',
+      (s) => expect(valueAt(s, 0, 2)).toBe(4),
+    ],
+    [
+      'anotação',
+      () => run(start(), TOGGLE, sel(0, 2), dig(4), sel(4, 4)),
+      'anotação 4 na linha 1, coluna 3',
+      (s) => expect(notes(s, 0, 2)).toEqual([]),
+    ],
+    [
+      'apagar anotações',
+      () => run(start(), TOGGLE, sel(0, 2), dig(4), ERASE, sel(4, 4)),
+      'apagar anotações na linha 1, coluna 3',
+      (s) => expect(notes(s, 0, 2)).toEqual([4]),
+    ],
+  ];
+
+  for (const [label, build, tail, checkUndone] of cases) {
+    it(`CA-005-23: undo de ${label} reverte, seleciona a célula afetada, sobe focusTick e anuncia`, () => {
+      const before = build();
+      const after = run(before, UNDO);
+      checkUndone(after);
+      expect(after.selected).toEqual({ row: 0, col: 2 });
+      expect(after.focusTick).toBe(before.focusTick + 1);
+      expect(ann(after).text).toBe(`Desfeito: ${tail}`);
+    });
+
+    it(`CA-005-24: redo de ${label} reaplica, seleciona a célula afetada, sobe focusTick e anuncia`, () => {
+      const before = build();
+      const undone = run(before, UNDO, sel(4, 4));
+      const after = run(undone, REDO);
+      expect(after.game.board).toEqual(before.game.board);
+      expect(after.game.notes).toEqual(before.game.notes);
+      expect(after.selected).toEqual({ row: 0, col: 2 });
+      expect(after.focusTick).toBe(undone.focusTick + 1);
+      expect(ann(after).text).toBe(`Refeito: ${tail}`);
+    });
+  }
+
+  it('CA-005-23: undo que elimina o último conflito anexa "sem conflitos" ao mesmo anúncio', () => {
+    const before = run(start(), sel(0, 2), dig(5));
+    expect(getGameConflicts(before.game).length).toBeGreaterThan(0);
+    const after = run(before, UNDO);
+    expect(getGameConflicts(after.game)).toHaveLength(0);
+    expect(ann(after).text).toContain('Desfeito: valor 5 na linha 1, coluna 3');
+    expect(ann(after).text).toContain(messages.noConflicts);
+    expect(ann(after).id).toBe(ann(before).id + 1);
+  });
+
+  it('CA-005-23: undo que cria conflito anexa o aviso de conflito (CA-005-20) ao mesmo anúncio', () => {
+    const before = run(start(), sel(0, 2), dig(5), ERASE);
+    const after = run(before, UNDO); // devolve o 5, que repete a pista (0,0)
+    expect(ann(after).text).toContain('Desfeito: apagar na linha 1, coluna 3');
+    expect(ann(after).text).toContain('Conflito: 5 repetido na linha 1');
+  });
+
+  it('CA-005-24: redo que cria conflito anexa o aviso de conflito ao mesmo anúncio', () => {
+    const after = run(start(), sel(0, 2), dig(5), UNDO, REDO);
+    expect(ann(after).text).toContain('Refeito: valor 5 na linha 1, coluna 3');
+    expect(ann(after).text).toContain('Conflito: 5 repetido na linha 1');
+  });
+
+  it('CA-005-24: redo que elimina o último conflito anexa "sem conflitos"', () => {
+    const after = run(start(), sel(0, 2), dig(5), dig(4), UNDO, UNDO, REDO, REDO);
+    expect(getGameConflicts(after.game)).toHaveLength(0);
+    expect(ann(after).text).toContain('Refeito: valor 4 na linha 1, coluna 3');
+    expect(ann(after).text).toContain(messages.noConflicts);
+  });
+
+  it('CA-005-24: redo que vence anuncia só a vitória', () => {
+    // Pela UI a jogada que vence não pode ser desfeita (o domínio recusa depois da vitória, CA-005-42);
+    // o estado "vitória desfeita" vem de montar o Game à mão: histórico completo, cursor antes dela.
+    const pre = nearlyWon();
+    const won = run(pre, dig(3));
+    const undone = { ...pre.game, history: won.game.history };
+    const redone = gameRedo(undone);
+    expect(redone.ok && getGameStatus(redone.value) === 'won').toBe(true); // pré-condição
+    const after = run({ ...pre, game: undone }, REDO);
+    expect(getGameStatus(after.game)).toBe('won');
+    expect(ann(after).text).toBe(messages.won);
+  });
+
+  it('CA-005-24: nova jogada depois do undo descarta o redo (nada para refazer)', () => {
+    const after = run(start(), sel(0, 2), dig(4), UNDO, dig(2), REDO);
+    expect(ann(after).text).toBe(messages.nothingToRedo);
+    expect(valueAt(after, 0, 2)).toBe(2);
+  });
+});
+
+describe('gameReducer: nada a desfazer ou refazer (CA-005-25)', () => {
+  it('CA-005-25: undo com histórico vazio deixa tudo igual, inclusive focusTick, e anuncia', () => {
+    const before = run(start(), sel(3, 3));
+    const after = run(before, UNDO);
+    expect(after.game).toBe(before.game);
+    expect(after.selected).toEqual(before.selected);
+    expect(after.focusTick).toBe(before.focusTick);
+    expect(ann(after).text).toBe(messages.nothingToUndo);
+  });
+
+  it('CA-005-25: redo sem nada a refazer deixa tudo igual, inclusive focusTick, e anuncia', () => {
+    const before = run(start(), sel(0, 2), dig(4), sel(3, 3));
+    const after = run(before, REDO);
+    expect(after.game).toBe(before.game);
+    expect(after.selected).toEqual(before.selected);
+    expect(after.focusTick).toBe(before.focusTick);
+    expect(ann(after).text).toBe(messages.nothingToRedo);
+  });
+
+  it('CA-005-25: undo além do começo anuncia "nada para desfazer" e o id segue crescendo', () => {
+    const once = run(start(), sel(0, 2), dig(4), UNDO);
+    const twice = run(once, UNDO);
+    expect(ann(twice).text).toBe(messages.nothingToUndo);
+    expect(ann(twice).id).toBe(ann(once).id + 1);
+    expect(twice.focusTick).toBe(once.focusTick);
+  });
+});
+
+describe('gameReducer: partida vencida (CA-005-42)', () => {
+  function won(): UiState {
+    const state = run(nearlyWon(), dig(3));
+    expect(getGameStatus(state.game)).toBe('won');
+    return state;
+  }
+
+  for (const [label, action] of [
+    ['toggle-mode', TOGGLE],
+    ['undo', UNDO],
+    ['redo', REDO],
+  ] as const) {
+    it(`CA-005-42: depois da vitória, ${label} não muda nada e não anuncia`, () => {
+      const before = won();
+      const after = run(before, action);
+      expect(after.game).toBe(before.game);
+      expect(after.selected).toEqual(before.selected);
+      expect(after.noteMode).toBe(before.noteMode);
+      expect(after.focusTick).toBe(before.focusTick);
+      expect(after.announcement).toBeNull();
+    });
+  }
+
+  it('CA-005-42: depois da vitória, anotar não muda nada e não anuncia', () => {
+    // Pela UI o modo anotação não liga depois da vitória; o estado "vencida com modo ligado"
+    // (modo ligado antes, vitória vinda de fora do fluxo) é montado à mão.
+    const before = { ...won(), noteMode: true } as UiState;
+    const after = run(before, dig(1));
+    expect(after.game).toBe(before.game);
+    expect(after.noteMode).toBe(true);
+    expect(after.announcement).toBeNull();
   });
 });

@@ -1,8 +1,8 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { anyGame, anyGameAction, applyGameAction } from './__arbitraries__/moves';
+import { anyGame, anyGameAction, applyGameAction, prunedGame } from './__arbitraries__/moves';
 import { validPuzzleInput } from './__arbitraries__/puzzle';
-import { createGame, gameToggleNote, type Game } from './game';
+import { createGame, gameRedo, gameToggleNote, gameUndo, type Game } from './game';
 import { deserializeGame, serializeGame } from './serialize';
 
 /** Partida de `anyGame` seguida de ações do jogador (recusas e sem efeito ficam de fora do histórico). */
@@ -14,6 +14,8 @@ const playedGame: fc.Arbitrary<Game> = fc
       return next.ok ? next.value : game;
     }, start),
   );
+
+const PROP_TIMEOUT = 30_000;
 
 const REASONS = ['invalid-data', 'future-version', 'inconsistent-data'];
 
@@ -55,6 +57,24 @@ describe('serialize (propriedades)', () => {
       }),
     );
   });
+
+  it(
+    'CA-005-43 e invariante 7: com place-prune de poda real, deserialize(serialize(g)) é g; undo e redo lidos coincidem com os do original',
+    () => {
+      fc.assert(
+        fc.property(prunedGame, (game) => {
+          const read = deserializeGame(serializeGame(game));
+
+          expect(read).toEqual({ ok: true, value: game });
+          const lido = (read as { value: Game }).value;
+          expect(gameUndo(lido)).toEqual(gameUndo(game));
+          expect(gameRedo(lido)).toEqual(gameRedo(game));
+        }),
+        { seed: 20261128, numRuns: 50 },
+      );
+    },
+    PROP_TIMEOUT,
+  );
 
   it('CA-004-28: qualquer valor e texto arbitrário nunca lançam; devolvem ok ou um dos três motivos', () => {
     fc.assert(

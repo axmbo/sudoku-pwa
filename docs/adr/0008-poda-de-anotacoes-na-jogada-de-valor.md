@@ -38,6 +38,6 @@ Adotar a **opção A**.
 ## Fontes (consultadas em 27/11/2026)
 
 - `specs/_arquivo/004-estado-de-jogo/spec.md` (CA-004-06, CA-004-10, decisão 1 da spec, linhas 55 a 80, 219, 224) e `docs/estado.md` (decisão 9 do Diretor).
-- `specs/005b-anotacoes-e-tema/spec.md` (CA-005-17, 23, 43).
+- `specs/_arquivo/005b-anotacoes-e-tema/spec.md` (CA-005-17, 23, 43).
 - Código: `src/domain/history.ts`, `src/domain/game.ts`, `src/domain/serialize.ts`.
 - [ADR 0004](0004-persistencia-local.md) (envelope e `schemaVersion`) e [ADR 0007](0007-convencoes-do-dominio.md) (recusa como valor, índices 0–8).

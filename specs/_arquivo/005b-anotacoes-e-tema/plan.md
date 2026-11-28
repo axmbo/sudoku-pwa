@@ -1,7 +1,7 @@
 # Plano 005b — Anotações, desfazer/refazer e tema
 
-- **Spec:** [spec.md](spec.md) · **Autor:** `arquiteto` · **Base:** [plano da 005a](../_arquivo/005a-grade-acessivel/plan.md) e [RESUMO](../_arquivo/005a-grade-acessivel/RESUMO.md)
-- **ADRs:** [0001](../../docs/adr/0001-stack-e-ferramentas.md) (orçamento), [0003](../../docs/adr/0003-framework-de-ui.md) (Preact, `useReducer`, sem `preact/compat`), [0007](../../docs/adr/0007-convencoes-do-dominio.md) (recusa como valor, índices 0–8), [0004](../../docs/adr/0004-persistencia-local.md) (só contexto: o formato do jogo serializado). **Novo: [0008](../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), `Aceito`** (poda das anotações vizinhas como jogada de domínio; decisão 23).
+- **Spec:** [spec.md](spec.md) · **Autor:** `arquiteto` · **Base:** [plano da 005a](../005a-grade-acessivel/plan.md) e [RESUMO](../005a-grade-acessivel/RESUMO.md)
+- **ADRs:** [0001](../../../docs/adr/0001-stack-e-ferramentas.md) (orçamento), [0003](../../../docs/adr/0003-framework-de-ui.md) (Preact, `useReducer`, sem `preact/compat`), [0007](../../../docs/adr/0007-convencoes-do-dominio.md) (recusa como valor, índices 0–8), [0004](../../../docs/adr/0004-persistencia-local.md) (só contexto: o formato do jogo serializado). **Novo: [0008](../../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), `Aceito`** (poda das anotações vizinhas como jogada de domínio; decisão 23).
 
 ## Módulos e fronteiras
 

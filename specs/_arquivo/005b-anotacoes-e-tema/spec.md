@@ -3,7 +3,7 @@
 - **Status:** aprovada
 - **Issue:** #20
 - **Autor:** `produto-ux` · **Aprovação do Diretor:** 25/11/2026
-- **Item:** B-05 (parte 2 de 2) · **Depende de:** [005a](../_arquivo/005a-grade-acessivel/spec.md) (Issue #19), além de 001 e 004 (domínio já entregue)
+- **Item:** B-05 (parte 2 de 2) · **Depende de:** [005a](../005a-grade-acessivel/spec.md) (Issue #19), além de 001 e 004 (domínio já entregue)
 
 ## Problema e motivação
 
@@ -112,7 +112,7 @@ Resumo dos requisitos (os CA acima são a fonte verificável):
 
 ## Fora de escopo
 
-- **Na 005a ([spec](../_arquivo/005a-grade-acessivel/spec.md), Issue #19):** grade, navegação, valores, apagar, conflitos, toque, teclado na tela com dígitos e Apagar, vitória e grade cheia com erros, anúncios, movimento reduzido, retrato e zoom, contraste do tema claro.
+- **Na 005a ([spec](../005a-grade-acessivel/spec.md), Issue #19):** grade, navegação, valores, apagar, conflitos, toque, teclado na tela com dígitos e Apagar, vitória e grade cheia com erros, anúncios, movimento reduzido, retrato e zoom, contraste do tema claro.
 - Persistência e retomada da partida (B-06); timer e estatísticas (B-07); desafio diário (B-08); instalação, offline e atualização (B-09); novo jogo, reiniciar e seleção de nível (B-10).
 - Gerador e solver (specs 002 e 003).
 - Dicas, verificação do que está certo ou errado, preenchimento automático de anotações (pós-MVP).

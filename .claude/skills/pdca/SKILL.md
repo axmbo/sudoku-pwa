@@ -13,6 +13,8 @@ Fontes: `PROCESSO.md` §8–9; definições de coluna em `docs/process/metricas.
 3. Minutos: `min_est` provável = tokens prováveis ÷ vazão de 0,7M tokens/h (faixa medida 0,57 a 0,88M/h nos ciclos 02 e 03; M-009b), revista a cada retro; `min_real` segue a definição de `metricas.md`.
 4. Some o contexto inicial do manifesto (`ctx_inicial_est`) ao provável.
 5. Grave uma linha por tarefa × agente em `metrics.csv` **antes** de começar; `limpeza_antes` = `sim`/`nao`.
+6. Reancore só com 2 ou mais tarefas consecutivas acima de 1,5× do provável, pela mediana das razões, não pela razão acumulada (M-026).
+7. Tarefa de reducer com propriedade e gerador estendido: pessimista = 4× o provável (M-026).
 
 ## Coletar o real (depois)
 1. Recorte o log `~/.claude/projects/<projeto>/<sessão>.jsonl` do commit anterior ao commit da tarefa.

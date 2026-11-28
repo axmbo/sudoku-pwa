@@ -140,3 +140,278 @@ describe('App', () => {
     );
   });
 });
+
+// T05 (spec 005b): atalhos globais N, Ctrl+Z, Ctrl+Y (document), botões de ação e foco.
+// Contrato: o App compõe <Actions> (botões "Anotar", "Desfazer", "Refazer") ao lado do teclado;
+// o modo é lido por aria-pressed do botão Anotar; o foco real vai à célula afetada por undo/redo.
+const btn = (name: string): HTMLElement => screen.getByRole('button', { name });
+const mode = (): string | null => btn('Anotar').getAttribute('aria-pressed');
+const status = (): string => screen.getByRole('status').textContent ?? '';
+const label = (row: number, col: number): string =>
+  cellAtRC(row, col).getAttribute('aria-label') ?? '';
+const digitAt = (row: number, col: number): string =>
+  cellAtRC(row, col).querySelector('.cell-digit')?.textContent ?? '';
+const noteSlots = (row: number, col: number): string =>
+  [...cellAtRC(row, col).querySelectorAll('.cell-notes > *')].map((e) => e.textContent).join('');
+const ctrl = (key: string, target: Element | Document = document, init = {}): boolean =>
+  fireEvent.keyDown(target, { key, ctrlKey: true, ...init });
+
+describe('App: modo anotação', () => {
+  it('CA-005-16: N com o foco na grade alterna o modo, que é pegajoso, e anuncia', () => {
+    render(<App game={fixedGame()} />);
+    expect(mode()).toBe('false');
+    fireEvent.click(cellAtRC(4, 4));
+    cellAtRC(4, 4).focus();
+    fireEvent.keyDown(cellAtRC(4, 4), { key: 'n' });
+    expect(mode()).toBe('true');
+    expect(status()).toBe(messages.noteModeOn);
+    fireEvent.click(cellAtRC(0, 2));
+    expect(mode()).toBe('true');
+    fireEvent.keyDown(cellAtRC(0, 2), { key: 'N' });
+    expect(mode()).toBe('false');
+    expect(status()).toBe(messages.noteModeOff);
+  });
+
+  it('CA-005-16: N com o foco num botão do teclado na tela também alterna', () => {
+    render(<App game={fixedGame()} />);
+    const um = btn('Inserir 1');
+    um.focus();
+    fireEvent.keyDown(um, { key: 'n' });
+    expect(mode()).toBe('true');
+  });
+
+  it.each([
+    ['Ctrl', { ctrlKey: true }],
+    ['Alt', { altKey: true }],
+    ['Meta', { metaKey: true }],
+  ])(
+    'CA-005-16: N com %s não alterna o modo e não é impedido (segue para o navegador)',
+    (_n, mod) => {
+      render(<App game={fixedGame()} />);
+      const notPrevented = fireEvent.keyDown(document.body, { key: 'n', ...mod });
+      expect(mode()).toBe('false');
+      expect(notPrevented).toBe(true);
+    },
+  );
+
+  it('CA-005-16: N com repeat (tecla segurada) não alterna em rajada', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.keyDown(document.body, { key: 'n' });
+    expect(mode()).toBe('true');
+    fireEvent.keyDown(document.body, { key: 'n', repeat: true });
+    fireEvent.keyDown(document.body, { key: 'n', repeat: true });
+    expect(mode()).toBe('true');
+  });
+
+  it('CA-005-38: o botão Anotar alterna o modo e mantém a célula selecionada', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.click(cellAtRC(4, 4));
+    fireEvent.click(btn('Anotar'));
+    expect(mode()).toBe('true');
+    expect(status()).toBe(messages.noteModeOn);
+    expect(cellAtRC(4, 4).classList.contains('is-selected')).toBe(true);
+  });
+});
+
+describe('App: anotar e apagar anotações', () => {
+  it('CA-005-17: no modo anotação, 1 a 9 alternam o candidato, sem colocar valor, e anunciam as anotações', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.click(cellAtRC(0, 2));
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(btn('Inserir 4'));
+    fireEvent.click(btn('Inserir 2'));
+    expect(noteSlots(0, 2)).toBe('24');
+    expect(digitAt(0, 2)).toBe('');
+    expect(label(0, 2)).toBe('Linha 1, coluna 3, vazia, anotações 2 4');
+    expect(status()).toBe('anotações 2 4');
+    fireEvent.click(btn('Inserir 4'));
+    expect(noteSlots(0, 2)).toBe('2');
+    expect(status()).toBe('anotações 2');
+  });
+
+  it('CA-005-18: anotar em célula com valor não muda nada e anuncia que já tem valor', () => {
+    render(<App game={fixedGame()} />);
+    put(4, 4, 5);
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(btn('Inserir 3'));
+    expect(digitAt(4, 4)).toBe('5');
+    expect(cellAtRC(4, 4).querySelector('.cell-notes')).toBeNull();
+    expect(status()).toBe(messages.cellHasValue);
+  });
+
+  it('CA-005-18: anotar numa pista anuncia "pista, não pode ser alterada"', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.click(cellAtRC(0, 0));
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(btn('Inserir 3'));
+    expect(digitAt(0, 0)).toBe('5');
+    expect(status()).toBe(messages.givenImmutable);
+  });
+
+  it('CA-005-44: Apagar em célula vazia com anotações apaga todas e anuncia "vazia"', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.click(cellAtRC(0, 2));
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(btn('Inserir 1'));
+    fireEvent.click(btn('Inserir 6'));
+    expect(noteSlots(0, 2)).toBe('16');
+    fireEvent.click(btn('Apagar'));
+    expect(noteSlots(0, 2)).toBe('');
+    expect(label(0, 2)).toBe('Linha 1, coluna 3, vazia');
+    expect(status()).toBe('Linha 1, coluna 3, vazia');
+  });
+
+  it('CA-005-43: colocar um valor remove a anotação do mesmo valor nas vizinhas, visível na grade', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.click(cellAtRC(4, 1));
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(btn('Inserir 5'));
+    fireEvent.click(btn('Inserir 7'));
+    expect(noteSlots(4, 1)).toBe('57');
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(cellAtRC(4, 4));
+    fireEvent.click(btn('Inserir 5'));
+    expect(digitAt(4, 4)).toBe('5');
+    expect(noteSlots(4, 1)).toBe('7');
+    expect(label(4, 1)).toBe('Linha 5, coluna 2, vazia, anotações 7');
+  });
+});
+
+describe('App: desfazer e refazer', () => {
+  it('CA-005-23: Ctrl+Z com o foco na grade desfaz, anuncia e leva o foco à célula afetada', () => {
+    render(<App game={fixedGame()} />);
+    put(4, 4, 5);
+    fireEvent.click(cellAtRC(0, 2));
+    cellAtRC(0, 2).focus();
+    ctrl('z', cellAtRC(0, 2));
+    expect(digitAt(4, 4)).toBe('');
+    expect(status()).toBe('Desfeito: valor 5 na linha 5, coluna 5');
+    expect(cellAtRC(4, 4).classList.contains('is-selected')).toBe(true);
+    expect(document.activeElement).toBe(cellAtRC(4, 4));
+  });
+
+  it('CA-005-23: Ctrl+Z com o foco num botão do teclado na tela também desfaz e move o foco', () => {
+    render(<App game={fixedGame()} />);
+    put(4, 4, 5);
+    fireEvent.click(cellAtRC(0, 2));
+    const um = btn('Inserir 1');
+    um.focus();
+    ctrl('z', um);
+    expect(digitAt(4, 4)).toBe('');
+    expect(document.activeElement).toBe(cellAtRC(4, 4));
+  });
+
+  it('CA-005-23: o botão Desfazer desfaz e move o foco para a célula afetada', () => {
+    render(<App game={fixedGame()} />);
+    put(4, 4, 5);
+    fireEvent.click(cellAtRC(0, 2));
+    const desfazer = btn('Desfazer');
+    desfazer.focus();
+    fireEvent.click(desfazer);
+    expect(digitAt(4, 4)).toBe('');
+    expect(status()).toBe('Desfeito: valor 5 na linha 5, coluna 5');
+    expect(document.activeElement).toBe(cellAtRC(4, 4));
+  });
+
+  it('CA-005-24: Ctrl+Y e o botão Refazer reaplicam, anunciam e movem o foco', () => {
+    render(<App game={fixedGame()} />);
+    put(4, 4, 5);
+    fireEvent.click(btn('Desfazer'));
+    fireEvent.click(cellAtRC(0, 2));
+    const um = btn('Inserir 1');
+    um.focus();
+    ctrl('y', um);
+    expect(digitAt(4, 4)).toBe('5');
+    expect(status()).toBe('Refeito: valor 5 na linha 5, coluna 5');
+    expect(document.activeElement).toBe(cellAtRC(4, 4));
+    fireEvent.click(btn('Desfazer'));
+    fireEvent.click(cellAtRC(0, 2));
+    const refazer = btn('Refazer');
+    refazer.focus();
+    fireEvent.click(refazer);
+    expect(digitAt(4, 4)).toBe('5');
+    expect(document.activeElement).toBe(cellAtRC(4, 4));
+  });
+
+  it('CA-005-23: desfazer uma anotação restaura as anotações anteriores', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.click(cellAtRC(0, 2));
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(btn('Inserir 3'));
+    fireEvent.click(btn('Inserir 8'));
+    ctrl('z');
+    expect(noteSlots(0, 2)).toBe('3');
+    ctrl('z');
+    expect(noteSlots(0, 2)).toBe('');
+  });
+
+  it('CA-005-25: sem histórico, Desfazer e Refazer anunciam "nada para…" e ficam aria-disabled e focáveis', () => {
+    render(<App game={fixedGame()} />);
+    expect(btn('Desfazer').getAttribute('aria-disabled')).toBe('true');
+    expect(btn('Refazer').getAttribute('aria-disabled')).toBe('true');
+    fireEvent.click(btn('Desfazer'));
+    expect(status()).toBe(messages.nothingToUndo);
+    fireEvent.click(btn('Refazer'));
+    expect(status()).toBe(messages.nothingToRedo);
+    ctrl('z');
+    expect(status()).toBe(messages.nothingToUndo);
+  });
+
+  it('CA-005-25: com histórico, Desfazer deixa de ser aria-disabled; depois de desfazer, é o Refazer', () => {
+    render(<App game={fixedGame()} />);
+    put(4, 4, 5);
+    expect(btn('Desfazer').getAttribute('aria-disabled')).not.toBe('true');
+    expect(btn('Refazer').getAttribute('aria-disabled')).toBe('true');
+    fireEvent.click(btn('Desfazer'));
+    expect(btn('Desfazer').getAttribute('aria-disabled')).toBe('true');
+    expect(btn('Refazer').getAttribute('aria-disabled')).not.toBe('true');
+  });
+});
+
+describe('App: partida vencida', () => {
+  it('CA-005-42: após a vitória, N, Ctrl+Z, Ctrl+Y e os botões não mudam nada', () => {
+    render(<App game={fixedGame()} />);
+    fillGrid(false);
+    const before = screen.getAllByRole('gridcell').map((c) => c.textContent);
+    fireEvent.keyDown(document.body, { key: 'n' });
+    ctrl('z');
+    ctrl('y');
+    fireEvent.click(btn('Anotar'));
+    fireEvent.click(btn('Desfazer'));
+    fireEvent.click(btn('Refazer'));
+    expect(mode()).toBe('false');
+    expect(screen.getAllByRole('gridcell').map((c) => c.textContent)).toEqual(before);
+    expect(outsideStatus(messages.won)).toHaveLength(1);
+  });
+
+  it('CA-005-42: após a vitória, Desfazer e Refazer ficam aria-disabled', () => {
+    render(<App game={fixedGame()} />);
+    fillGrid(false);
+    expect(btn('Desfazer').getAttribute('aria-disabled')).toBe('true');
+    expect(btn('Refazer').getAttribute('aria-disabled')).toBe('true');
+  });
+
+  it('CA-005-42: após a vitória a grade segue navegável por seta', () => {
+    render(<App game={fixedGame()} />);
+    fillGrid(false);
+    fireEvent.click(cellAtRC(0, 2));
+    cellAtRC(0, 2).focus();
+    fireEvent.keyDown(cellAtRC(0, 2), { key: 'ArrowRight' });
+    expect(cellAtRC(0, 3).classList.contains('is-selected')).toBe(true);
+    expect(document.activeElement).toBe(cellAtRC(0, 3));
+  });
+});
+
+describe('App: regressão da 005a', () => {
+  it('CA-005-05: rajada de setas seguida pela grade mantém o foco real na célula selecionada', () => {
+    render(<App game={fixedGame()} />);
+    fireEvent.click(cellAtRC(0, 0));
+    cellAtRC(0, 0).focus();
+    for (let i = 0; i < 3; i += 1) {
+      fireEvent.keyDown(document.activeElement as Element, { key: 'ArrowRight' });
+    }
+    fireEvent.keyDown(document.activeElement as Element, { key: 'ArrowDown' });
+    expect(cellAtRC(1, 3).classList.contains('is-selected')).toBe(true);
+    expect(document.activeElement).toBe(cellAtRC(1, 3));
+  });
+});

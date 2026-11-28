@@ -104,7 +104,7 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
   - `src/ui/Grid.test.tsx#L1-60`, `Keypad.test.tsx#L1-40`, `App.test.tsx#L1-60` (convenções, `seed` e puzzle fixo) (~2,1k)
   - `vitest.config.ts#L10-16` (~0,2k)
   - Total ≈ 12,7k (sem L0); **pesada**: se o agente reportar leitura fora do manifesto ou passar de 15k, dividir em T05a (célula, botões) e T05b (atalhos globais e foco)
-- **Estimativa:** tokens 90k/130k/240k · minutos 6/11/25
+- **Estimativa:** tokens 180k/260k/480k · minutos 12/22/50 (×2, decisão 30; antes 90k/130k/240k)
 - **Agentes:** `eng-testes` → `dev`
 
 ## T06 — Tema escuro e tokens de anotação, com contraste estático
@@ -123,7 +123,7 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
   - `specs/_arquivo/005a-grade-acessivel/plan.md#CA-005-39` (linha da tabela, ~0,3k)
   - `.claude/skills/qualidade-web/SKILL.md` (~0,75k)
   - Total ≈ 6,8k (sem L0)
-- **Estimativa:** tokens 40k/60k/110k · minutos 3/5/12
+- **Estimativa:** tokens 80k/120k/220k · minutos 6/10/24 (×2, decisão 30; antes 40k/60k/110k)
 - **Agentes:** `eng-testes` → `dev`
 
 ## T07 — CSS: anotações, botões e layout lado a lado, com capturas
@@ -142,7 +142,7 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
   - `.claude/skills/qualidade-web/SKILL.md` (seção "Tarefa de CSS/layout") (~0,75k)
   - `e2e/helpers.ts` (como abrir o build e capturar) (~0,7k)
   - Total ≈ 6,9k (sem L0)
-- **Estimativa:** tokens 30k/50k/100k · minutos 2/4/11
+- **Estimativa:** tokens 60k/100k/200k · minutos 4/8/22 (×2, decisão 30; antes 30k/50k/100k)
 - **Agentes:** `dev` (sem `eng-testes`; isenta)
 
 ## T08 — E2E e acessibilidade: jornadas, modo anotação, tema escuro, lado a lado
@@ -159,7 +159,7 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
   - `e2e/helpers.ts` (~0,7k) · `e2e/a11y.spec.ts` (~2,0k) · `e2e/jogo.spec.ts` (~1,5k)
   - Gancho de seletores de T05/T07: `Actions.tsx`, `Cell.tsx` (classes `.cell-notes`, `.note-N`, `.is-on`, `.controls`) (~0,5k)
   - Total ≈ 10,3k (sem L0)
-- **Estimativa:** tokens 60k/90k/170k · minutos 4/8/18
+- **Estimativa:** tokens 120k/180k/340k · minutos 8/16/36 (×2, decisão 30; antes 60k/90k/170k)
 - **Agentes:** `eng-testes`
 
 ## Cobertura de CA (spec: CA-005-04, 16, 17, 18, 23, 24, 25, 32, 38, 40, 41, 42, 43, 44, 45)

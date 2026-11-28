@@ -123,6 +123,28 @@ describe('Grid: foco e seleção', () => {
     expect(tabbable()).toEqual([cellAtRC(1, 0)]);
   });
 
+  it('CA-005-16: rajada dígito + seta, sem os efeitos rodarem entre as teclas, leva o foco à célula selecionada', async () => {
+    render(<Harness />);
+    fireEvent.click(cellAtRC(0, 2));
+    cellAtRC(0, 2).focus();
+    // Sem act/fireEvent: o render roda (microtarefa), os efeitos do Preact (pós-pintura) não.
+    const press = (key: string): void => {
+      (document.activeElement ?? cellAtRC(0, 2)).dispatchEvent(
+        new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+      );
+    };
+    const flushRender = async (): Promise<void> => {
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+    };
+    press('9');
+    await flushRender();
+    press('ArrowRight');
+    await flushRender();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(cellAtRC(0, 3).classList.contains('is-selected')).toBe(true);
+    expect(document.activeElement).toBe(cellAtRC(0, 3));
+  });
+
   it('CA-005-10: nenhuma célula além da selecionada é alcançável por Tab', () => {
     render(<Harness />);
     fireEvent.keyDown(cellAtRC(0, 0), { key: 'End', ctrlKey: true });

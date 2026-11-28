@@ -1,6 +1,9 @@
 import type { JSX } from 'preact';
+import type { Digit } from '../domain/digit';
 import { cellLabel } from './model/messages';
 import type { GridCellView } from './model/view';
+
+const NOTE_DIGITS: readonly Digit[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export interface CellProps {
   readonly cell: GridCellView;
@@ -33,6 +36,15 @@ export function Cell({ cell, onClick, onKeyDown }: CellProps): JSX.Element {
       onKeyDown={onKeyDown}
     >
       <span class="cell-digit">{cell.value ?? ''}</span>
+      {cell.value === null && (
+        <div class="cell-notes">
+          {NOTE_DIGITS.map((digit) => (
+            <span key={digit} class={`note-${digit}`} aria-hidden="true">
+              {cell.notes.includes(digit) ? digit : ''}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

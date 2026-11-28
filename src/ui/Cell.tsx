@@ -1,3 +1,4 @@
+import { Fragment } from 'preact';
 import type { JSX } from 'preact';
 import type { Digit } from '../domain/digit';
 import { cellLabel } from './model/messages';
@@ -39,9 +40,12 @@ export function Cell({ cell, onClick, onKeyDown }: CellProps): JSX.Element {
       {cell.value === null && (
         <div class="cell-notes">
           {NOTE_DIGITS.map((digit) => (
-            <span key={digit} class={`note-${digit}`} aria-hidden="true">
-              {cell.notes.includes(digit) ? digit : ''}
-            </span>
+            <Fragment key={digit}>
+              {digit > 1 && ' '}
+              <span class={`note-${digit}`} aria-hidden="true">
+                {cell.notes.includes(digit) ? digit : ''}
+              </span>
+            </Fragment>
           ))}
         </div>
       )}

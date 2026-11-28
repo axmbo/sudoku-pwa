@@ -1,7 +1,7 @@
 import type { CellState, Grid } from './board';
 import { isDigit, type Digit } from './digit';
 import { createGame, type Game } from './game';
-import type { CellMemo, HistoryEntry, Move } from './history';
+import { applyPrune, pruneTargets, type CellMemo, type HistoryEntry, type Move } from './history';
 import { emptyNotes, toggleNote, type Notes } from './notes';
 import type { Result } from './result';
 
@@ -51,12 +51,13 @@ export function serializeGame(game: Game): string {
 
 export type DeserializeRefusal = 'invalid-data' | 'future-version' | 'inconsistent-data';
 
-/** Tipos lidos hoje; `place-prune` (código 4) entra na leitura na T02 da spec 005b (ADR 0008). */
-const MOVE_KINDS: readonly Exclude<Move['kind'], 'place-prune'>[] = [
+/** Tipos de jogada na ordem do código numérico (`MOVE_KIND_CODE`). */
+const MOVE_KINDS: readonly Move['kind'][] = [
   'place',
   'erase',
   'toggle-note',
   'clear-notes',
+  'place-prune',
 ];
 
 function parseGrid(text: unknown): (number | null)[][] | null {
@@ -71,7 +72,7 @@ function isIntegerIn(value: unknown, min: number, max: number): boolean {
   return Number.isInteger(value) && (value as number) >= min && (value as number) <= max;
 }
 
-/** Jogada bem formada: lista de 3 inteiros, tipo 0..3, índice 0..80 e dígito 0 em erase/clear-notes. */
+/** Jogada bem formada: lista de 3 inteiros, tipo 0..4, índice 0..80 e dígito 0 em erase/clear-notes. */
 function isMoveTuple(tuple: unknown): boolean {
   return (
     Array.isArray(tuple) &&
@@ -79,7 +80,7 @@ function isMoveTuple(tuple: unknown): boolean {
     isIntegerIn(tuple[0], 0, MOVE_KINDS.length - 1) &&
     isIntegerIn(tuple[1], 0, 80) &&
     Number.isInteger(tuple[2]) &&
-    (tuple[0] === 0 || tuple[0] === 2 || tuple[2] === 0)
+    (tuple[0] === 0 || tuple[0] === 2 || tuple[0] === 4 || tuple[2] === 0)
   );
 }
 
@@ -125,20 +126,25 @@ function applyTuple(scratch: Scratch, [code, index, digit]: MoveTuple): boolean 
   const cell = scratch.cells[index] as CellState;
   const current = scratch.notes[index] as Notes;
   const kind = MOVE_KINDS[code] as (typeof MOVE_KINDS)[number];
-  const needsDigit = kind === 'place' || kind === 'toggle-note';
+  const needsDigit = kind === 'place' || kind === 'toggle-note' || kind === 'place-prune';
   if (cell.given || (needsDigit && !isDigit(digit))) {
     return false;
   }
-  if (kind === 'place') {
+  if (kind === 'place' || kind === 'place-prune') {
     if (cell.value === digit) {
       return false;
     }
-    scratch.cells[index] = Object.freeze({ value: digit as Digit, given: false });
-    scratch.notes[index] = emptyNotes;
-    scratch.history.push({
+    const entry: HistoryEntry = {
       move: { kind, index, digit: digit as Digit },
       before: memo(cell, current),
-    });
+      ...(kind === 'place-prune' && {
+        pruned: pruneTargets(scratch.notes, index, digit as Digit),
+      }),
+    };
+    scratch.notes.splice(0, 81, ...applyPrune(scratch.notes, entry.pruned ?? [], digit as Digit));
+    scratch.cells[index] = Object.freeze({ value: digit as Digit, given: false });
+    scratch.notes[index] = emptyNotes;
+    scratch.history.push(entry);
   } else if (kind === 'erase') {
     if (cell.value === null) {
       return false;
@@ -195,7 +201,10 @@ function replay(
     return INCONSISTENT;
   }
   for (let i = moves.length - 1; i >= target; i--) {
-    const { move, before } = scratch.history[i] as HistoryEntry;
+    const { move, before, pruned } = scratch.history[i] as HistoryEntry;
+    for (const memo of pruned ?? []) {
+      scratch.notes[memo.index] = memo.notes;
+    }
     scratch.cells[move.index] = Object.freeze({ value: before.value, given: false });
     scratch.notes[move.index] = before.notes;
   }

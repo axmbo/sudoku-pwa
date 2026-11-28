@@ -9,3 +9,9 @@ Consequências para a T02:
 - `serializeGame` já grava `place-prune` com código 4, mas `deserializeGame` o recusa como `invalid-data` até a T02.
 - A `eng-testes` da T02 precisa mover esse teste de fronteira para o código 5 (ou equivalente); o `dev` amplia `MOVE_KINDS` e `isMoveTuple`.
 - Atenção ao risco já escrito na T02: o vermelho deve falhar por asserção (ida e volta diferente), não por exceção de tipo.
+
+## T02 -> T03: recado (27/11/2026)
+
+- `Move['kind']` já inclui `'place-prune'`; os `switch` da UI (`historyMessage`) precisam tratá-lo.
+- `serialize.ts` não muda mais. `deserialize.test.ts`: o teste de fronteira passou de kind 4 para kind 5.
+- Em `applyTuple`, `applyPrune` também roda no `place` comum, como no-op com `pruned ?? []`. Funciona, mas é indireto e é candidato a mutante no Stryker da `/revisar`.

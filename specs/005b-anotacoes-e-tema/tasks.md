@@ -1,7 +1,7 @@
 # Tarefas 005b — Anotações, desfazer/refazer e tema
 
 - **Spec:** [spec.md](spec.md) · **Plano:** [plan.md](plan.md)
-- **Autores:** `arquiteto` + `eng-testes` · **Análise de consistência:** pendente
+- **Autores:** `arquiteto` + `eng-testes` · **Análise de consistência:** ok em 27/11/2026 (2 rodadas; [analise.md](analise.md))
 
 Rascunho do `arquiteto` (etapa 1 do `/planejar`); testes e manifestos a refinar por `eng-testes` e `curador-pdca`. **8 tarefas.** T01 e T02 implementam o [ADR 0008](../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), aceito (decisão 23 do plano). Ordem: domínio, contratos e lógica pura, componentes, CSS, E2E.
 
@@ -17,7 +17,7 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 - **Manifesto de contexto** (lista fechada):
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md` (~1,6k) · `docs/constituicao.md` (~0,5k)
-  - `docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md#Decisão (proposta)` (~0,9k)
+  - `docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md#Decisão` (~0,9k)
   - `specs/005b-anotacoes-e-tema/spec.md#CA-005-43` (~0,3k) e `plan.md#Tipos públicos` (bloco do domínio, ~0,4k)
   - `src/domain/game.ts` inteiro (~1,9k) · `src/domain/history.ts` inteiro (~0,7k)
   - `src/domain/serialize.ts#L1-55` (`MOVE_KIND_CODE`, `MOVE_KINDS`) (~0,6k)
@@ -32,13 +32,13 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 
 - **CA cobertos:** CA-005-43 (invariante 7: ida e volta com histórico contendo `place-prune`)
 - **tdd:** sim
-- **Testes esperados:** `src/domain/serialize.test.ts` (acrescentar casos; ou novo `serialize.prune.test.ts` se o arquivo estiver grande, `CA-005-43:`): jogo com `place-prune` serializa e volta igual (inclusive `pruned` reconstruído e anotações), desfazer depois de ler dá o estado anterior à poda; `place-prune` com `index`/`digit` inválido ou incoerente com o estado → `invalid-data`/`inconsistent-data` como as demais jogadas; `src/domain/serialize.prop.test.ts` e `__arbitraries__/moves.ts` incluem `place-prune` (propriedade `CA-005-43:` `deserialize(serialize(g)) = g` com sequências mistas, invariante 7; depois da leitura, `undo` e `redo` coincidem com os do original). Adulteração: `pruned` omitido ou incoerente com o estado reconstruído → `inconsistent-data`. Cada gerador novo prova com mutante manual que produz jogadas `place-prune` com `pruned` não vazio (poda real, não só jogada sem vizinhas com X). Risco: a T01 deixa em `serialize.ts` só o código numérico; o vermelho da T02 deve falhar por asserção (ida e volta diferente), não por exceção de tipo.
+- **Testes esperados:** `src/domain/serialize.test.ts` (acrescentar casos; ou novo `serialize.prune.test.ts` se o arquivo estiver grande, `CA-005-43:`): jogo com `place-prune` serializa e volta igual (o JSON **não** ganha campo novo, ADR 0008; `pruned` é reconstruído pelo `replay` e comparado ao do original, inclusive anotações), desfazer depois de ler dá o estado anterior à poda; `place-prune` com `index`/`digit` inválido ou incoerente com o estado → `invalid-data`/`inconsistent-data` como as demais jogadas; `src/domain/serialize.prop.test.ts` e `__arbitraries__/moves.ts` incluem `place-prune` (propriedade `CA-005-43:` `deserialize(serialize(g)) = g` com sequências mistas, invariante 7; depois da leitura, `undo` e `redo` coincidem com os do original). Adulteração (viável sem campo `pruned`): `place-prune` incoerente com o estado reconstruído (célula pista; célula que o replay recusaria) → `inconsistent-data`. Cada gerador novo prova com mutante manual que produz jogadas `place-prune` com `pruned` não vazio (poda real, não só jogada sem vizinhas com X). Risco: a T01 deixa em `serialize.ts` só o código numérico; o vermelho da T02 deve falhar por asserção (ida e volta diferente), não por exceção de tipo.
 - **via 7b para mutantes:** não
-- **Arquivos a criar/alterar:** `src/domain/serialize.ts`, `src/domain/__arbitraries__/moves.ts`, `src/domain/__arbitraries__/board.ts` (se preciso), `src/domain/serialize.test.ts` (ou `serialize.prune.test.ts`), `src/domain/serialize.prop.test.ts`
+- **Arquivos a criar/alterar:** `src/domain/serialize.ts` (`replay` com ramo `place-prune`, sem campo novo no JSON), `src/domain/__arbitraries__/moves.ts`, `src/domain/__arbitraries__/board.ts` (se preciso), `src/domain/serialize.test.ts` (ou `serialize.prune.test.ts`), `src/domain/serialize.prop.test.ts`
 - **Manifesto de contexto** (lista fechada):
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md` · `docs/constituicao.md` (~2,1k)
-  - `docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md#Decisão (proposta)` (~0,9k)
+  - `docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md#Decisão` (~0,9k)
   - `specs/005b-anotacoes-e-tema/spec.md#CA-005-43` (~0,3k)
   - `src/domain/serialize.ts` inteiro (~2,2k) · `src/domain/history.ts` (~0,7k) · `src/domain/game.ts#L1-60,L136-160` (`Game`, `gamePlaceAndPrune` de T01) (~1,2k)
   - `src/domain/__arbitraries__/moves.ts` (~1,1k) e `board.ts` (~0,9k)
@@ -51,18 +51,19 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 
 - **CA cobertos:** CA-005-45, CA-005-04 (dado da visão: `notes` por célula), base de CA-005-16, 17, 18, 23, 24, 25, 44 (textos)
 - **tdd:** sim
-- **Testes esperados:** `src/ui/model/messages.test.ts` (acrescentar): `CA-005-45:` `cellLabel` "Linha 3, coluna 5, vazia, anotações 2 4 9" (ordem crescente), com "em conflito" depois, sem anotações igual à 005a, valor ou pista sem anotações; `notesMessage` ("anotações 2 4 9", "sem anotações"); `historyMessage` para cada tipo de jogada (valor, apagar, anotação, apagar anotações, valor com poda) em "Desfeito" e "Refeito" (`CA-005-23/24`); textos fixos de `messages` (modo ligado/desligado, "a célula já tem valor", "nada para desfazer/refazer"). `src/ui/model/view.test.ts` (acrescentar): `gridView` devolve `notes` da célula vazia e `[]` em célula com valor (`CA-005-04`); `controlsView` (`noteMode`, `canUndo`, `canRedo`; falsos após vitória, `CA-005-42`). `src/ui/model/messages.prop.test.ts` (acrescentar, `seed` fixa, `PROP_TIMEOUT`): `CA-005-45:` para qualquer conjunto de anotações o `cellLabel` lista os dígitos em ordem crescente, sem repetição, e sem o trecho de anotações quando o conjunto é vazio.
+- **Testes esperados:** `src/ui/model/messages.test.ts` (acrescentar): `CA-005-45:` `cellLabel` "Linha 3, coluna 5, vazia, anotações 2 4 9" (ordem crescente), com "em conflito" depois, sem anotações igual à 005a, valor ou pista sem anotações; `notesMessage` ("anotações 2 4 9", "sem anotações"); `historyMessage` para cada tipo de jogada (valor, apagar, anotação, apagar anotações, valor com poda) em "Desfeito" e "Refeito" (`CA-005-23/24`); textos fixos de `messages` (modo ligado/desligado, "a célula já tem valor", "nada para desfazer/refazer"). `src/ui/model/view.test.ts` (acrescentar): `gridView` devolve `notes` da célula vazia e `[]` em célula com valor (`CA-005-04`); `controlsView(game, noteMode)` (`noteMode`, `canUndo`, `canRedo`; falsos após vitória, `CA-005-42`; não lê `UiState`). `src/ui/model/reducer.test.ts`: nenhum caso novo; os existentes seguem verdes (a chamada de `cellLabel` em `playText` passa `notes: []`, correto porque a célula acabou de receber valor). `src/ui/model/messages.prop.test.ts` (acrescentar, `seed` fixa, `PROP_TIMEOUT`): `CA-005-45:` para qualquer conjunto de anotações o `cellLabel` lista os dígitos em ordem crescente, sem repetição, e sem o trecho de anotações quando o conjunto é vazio.
 - **via 7b para mutantes:** não
-- **Arquivos a criar/alterar:** `src/ui/model/messages.ts`, `src/ui/model/view.ts`, `src/ui/model/messages.test.ts`, `src/ui/model/view.test.ts`
+- **Fecha `npm run check` sozinha:** `notes` obrigatório em `CellView` quebraria `reducer.ts:57`; por isso `reducer.ts` entra aqui (só esse literal, `notes: []`). `UiState` (`noteMode`, `focusTick`) fica na T04; `controlsView` recebe `noteMode` como argumento.
+- **Arquivos a criar/alterar:** `src/ui/model/messages.ts`, `src/ui/model/view.ts`, `src/ui/model/reducer.ts` (só `playText`, L57), `src/ui/model/messages.test.ts`, `src/ui/model/view.test.ts`
 - **Manifesto de contexto** (lista fechada):
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md` · `docs/constituicao.md` (~2,1k)
   - `specs/005b-anotacoes-e-tema/spec.md#CA-005-04,16,17,18,23,24,25,44,45` (CA com texto fixo, ~1,8k) e `plan.md#Decisões de projeto` itens 3, 6, 10 e `#Tipos públicos` (~1,2k)
-  - `src/ui/model/messages.ts` (~0,3k) · `src/ui/model/view.ts` (~0,4k) · `src/ui/model/reducer.ts#L1-30` (`UiState`, `UiAction` atuais, ~0,3k)
+  - `src/ui/model/messages.ts` (~0,3k) · `src/ui/model/view.ts` (~0,4k) · `src/ui/model/reducer.ts#L1-65` (`UiState` atual e `playText`, ~0,6k)
   - `src/domain/game.ts#L21-40,L59-75` (`Game`, `GameStatus`, `getGameConflicts`, `canUndo`, `canRedo`, `notesAt`) (~0,5k) · `src/domain/history.ts#L1-25` (`Move`) (~0,3k) · `src/domain/notes.ts`, `digit.ts`, `units.ts#L1-15` (~0,4k)
   - `src/ui/model/messages.test.ts#L1-40` e `view.test.ts#L1-40` (convenção) (~1,0k)
   - `vitest.config.ts#L10-16` (projeto `ui`) (~0,2k)
-  - Total ≈ 8,2k (sem L0)
+  - Total ≈ 8,5k (sem L0)
 - **Estimativa:** tokens 40k/60k/110k · minutos 3/5/12
 - **Agentes:** `eng-testes` → `dev`
 
@@ -70,9 +71,9 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 
 - **CA cobertos:** CA-005-16, 17, 18, 23, 24, 25, 42, 43 (modo valor chama `gamePlaceAndPrune`), 44; política de anúncio única (CA-005-31 da 005a, estendida)
 - **tdd:** sim
-- **Testes esperados:** `src/ui/model/reducer.test.ts` (acrescentar, `CA-005-NN:`): `toggle-mode` alterna e anuncia ligado/desligado, não toca no jogo (16); `digit` no modo anotação alterna o candidato, anuncia as anotações atuais, sem valor (17); célula com valor e pista: estado igual, anúncios "a célula já tem valor" e "pista, não pode ser alterada" (18); `digit` no modo valor poda os vizinhos (43; um `undo` desfaz tudo); `erase` em célula vazia com anotações limpa e anuncia "vazia" (44); `undo`/`redo` de **cada tipo de jogada**: `selected` vai à célula afetada, `focusTick` sobe, anúncio "Desfeito/Refeito…", conflito criado ou eliminado anexado ao mesmo anúncio (23, 24, 20, 21); refazer que vence anuncia só a vitória; histórico vazio ou nada a refazer: estado igual, `focusTick` igual, anúncio "nada para…" (25); partida vencida: `toggle-mode`, anotação, `undo`, `redo` sem efeito e sem anúncio (42, decisão 25 do plano). `src/ui/model/reducer.prop.test.ts` (acrescentar, `seed` fixa, `PROP_TIMEOUT` M-017): `CA-005-31:` um anúncio por ação (estende a propriedade existente às ações novas); `CA-005-23:`/`CA-005-24:` ação de jogo seguida de `undo` devolve o `game` anterior, e `undo` seguido de `redo` (e vice-versa) devolve o `game` (invariante 8 pela UI), incluindo valor com poda; `CA-005-17:` duas anotações iguais seguidas = `game` original; `CA-005-16:` modo anotação nunca altera valores; `CA-005-42:` depois de `won`, `toggle-mode`, anotação, `undo` e `redo` não alteram o estado nem anunciam (estende a propriedade `CA-005-29` existente).
+- **Testes esperados:** `src/ui/model/reducer.test.ts` (acrescentar, `CA-005-NN:`): `toggle-mode` alterna e anuncia ligado/desligado, não toca no jogo (16); `digit` no modo anotação alterna o candidato, anuncia as anotações atuais, sem valor (17); célula com valor e pista: estado igual, anúncios "a célula já tem valor" e "pista, não pode ser alterada" (18); `digit` no modo valor poda os vizinhos (43; um `undo` desfaz tudo); `erase` em célula vazia com anotações limpa e anuncia "vazia" (44; a ação `erase` é a mesma de Backspace, Delete, `0` e botão Apagar, que o `Grid`/`Keypad` mapeiam na T05); `undo`/`redo` de **cada tipo de jogada**: `selected` vai à célula afetada, `focusTick` sobe, anúncio "Desfeito/Refeito…", conflito criado ou eliminado anexado ao mesmo anúncio (23, 24, 20, 21); refazer que vence anuncia só a vitória; histórico vazio ou nada a refazer: estado igual, `focusTick` igual, anúncio "nada para…" (25); partida vencida: `toggle-mode`, anotação, `undo`, `redo` sem efeito e sem anúncio (42, decisão 25 do plano). `src/ui/model/reducer.prop.test.ts` (acrescentar, `seed` fixa, `PROP_TIMEOUT` M-017): `CA-005-31:` um anúncio por ação (estende a propriedade existente às ações novas); `CA-005-23:`/`CA-005-24:` ação de jogo seguida de `undo` devolve o `game` anterior, e `undo` seguido de `redo` (e vice-versa) devolve o `game` (invariante 8 pela UI), incluindo valor com poda; `CA-005-44:` `erase` em célula vazia com anotações deixa `notesAt` vazio e `game` com uma jogada nova; `CA-005-17:` duas anotações iguais seguidas = `game` original; `CA-005-16:` modo anotação nunca altera valores; `CA-005-42:` depois de `won`, `toggle-mode`, anotação, `undo` e `redo` não alteram o estado nem anunciam (estende a propriedade `CA-005-29` existente).
 - **via 7b para mutantes:** não
-- **Arquivos a criar/alterar:** `src/ui/model/reducer.ts`, `src/ui/model/reducer.test.ts`, `src/ui/model/reducer.prop.test.ts`
+- **Arquivos a criar/alterar:** `src/ui/model/reducer.ts` (`UiState` ganha `noteMode` e `focusTick`; `initialState` e todo literal de estado atualizados), `src/ui/model/reducer.test.ts`, `src/ui/model/reducer.prop.test.ts`
 - **Manifesto de contexto** (lista fechada):
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md` · `docs/constituicao.md` (~2,1k)
@@ -90,15 +91,15 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 
 - **CA cobertos:** CA-005-04, 16, 17, 18, 23, 24, 25, 38, 42, 43, 44, 45 (na camada de componente)
 - **tdd:** sim
-- **Testes esperados:** `src/ui/Grid.test.tsx` (acrescentar; não existe `Cell.test.tsx`, a célula é testada pela grade): nove vagas fixas na ordem 1 a 9 e só as anotações presentes preenchidas, ausentes em célula com valor (04); `aria-label` com anotações (45); `aria-hidden` nas vagas. `src/ui/Actions.test.tsx` (novo): Anotar com `aria-pressed` e indicador textual; Desfazer e Refazer com `aria-disabled` (focáveis) quando indisponíveis; clique = efeito do atalho; `selected` não muda ao clicar Anotar (38, 16, 25); vencida: os três botões `aria-disabled` e sem efeito ao clicar (42). `src/ui/App.test.tsx` (acrescentar): `N`, Ctrl+Z, Ctrl+Y com foco na grade e **num botão do teclado na tela** (16, 23, 24); desfazer por botão e por teclado move o foco para a célula afetada (efeito de `focusTick`, 23); anotar, apagar anotações (17, 18, 44); valor remove anotação vizinha na tela (43); vencida: atalhos e botões sem efeito, seta ainda move (42); rajada de teclas da 005a segue passando (regressão do `byKeyboard`).
+- **Testes esperados:** `src/ui/Grid.test.tsx` (acrescentar; não existe `Cell.test.tsx`, a célula é testada pela grade): `CA-005-44:` Backspace, Delete e `0` em célula vazia com anotações apagam todas (cada tecla num `it`); nove vagas fixas na ordem 1 a 9 e só as anotações presentes preenchidas, ausentes em célula com valor (04); `aria-label` com anotações (45); `aria-hidden` nas vagas. `src/ui/Keypad.test.tsx` (acrescentar): `CA-005-44:` botão Apagar em célula vazia com anotações apaga todas. `src/ui/Actions.test.tsx` (novo): Anotar com `aria-pressed`, nome acessível exato "Anotar" nos dois estados (`getByRole('button', { name: 'Anotar' })`, o span `action-state` é `aria-hidden` e fora do nome) e indicador visual `ligado`/`desligado`; Desfazer e Refazer com `aria-disabled` (focáveis) quando indisponíveis; clique = efeito do atalho; `selected` não muda ao clicar Anotar (38, 16, 25); vencida: os três botões `aria-disabled` e sem efeito ao clicar (42). `src/ui/App.test.tsx` (acrescentar): `CA-005-16:` `N` com Ctrl, Alt ou Meta e `N` com `repeat` não alternam o modo (plano, decisão 5); `N`, Ctrl+Z, Ctrl+Y com foco na grade e **num botão do teclado na tela** (16, 23, 24); desfazer por botão e por teclado move o foco para a célula afetada (efeito de `focusTick`, 23); anotar, apagar anotações (17, 18, 44); valor remove anotação vizinha na tela (43); vencida: atalhos e botões sem efeito, seta ainda move (42); rajada de teclas da 005a segue passando (regressão do `byKeyboard`).
 - **via 7b para mutantes:** não
-- **Arquivos a criar/alterar:** `src/ui/Cell.tsx`, `src/ui/Grid.tsx`, `src/ui/Actions.tsx` (novo), `src/ui/App.tsx`, `src/ui/Grid.test.tsx`, `src/ui/Actions.test.tsx`, `src/ui/App.test.tsx`
+- **Arquivos a criar/alterar:** `src/ui/Cell.tsx`, `src/ui/Grid.tsx`, `src/ui/Actions.tsx` (novo), `src/ui/App.tsx`, `src/ui/Grid.test.tsx`, `src/ui/Keypad.test.tsx`, `src/ui/Actions.test.tsx`, `src/ui/App.test.tsx`
 - **Manifesto de contexto** (lista fechada):
   - `CLAUDE.md` (L0, automático)
   - `docs/estado.md` · `docs/constituicao.md` (~2,1k)
   - `specs/005b-anotacoes-e-tema/spec.md#CA-005-04,16,17,18,23,24,25,38,42,43,44,45` (~2,4k) e `plan.md#Decisões de projeto` itens 4 a 7, 9 (só o `<div class="controls">`) e `#Tipos públicos` (~1,6k)
   - `src/ui/Cell.tsx`, `Grid.tsx`, `Keypad.tsx`, `App.tsx`, `Announcer.tsx` (~1,8k)
-  - `src/ui/model/reducer.ts` (de T04, ~1,3k) · `messages.ts` e `view.ts` (de T03, ~1,0k)
+  - `src/ui/model/reducer.ts` (de T04, ~1,3k) · `messages.ts` e `view.ts` (de T03, ~1,0k; `controlsView(game, noteMode)` chamada pelo `App`)
   - `src/domain/game.ts#L38-40,L222-237` (`GameStatus`, `getGameStatus`) (~0,2k)
   - `src/ui/Grid.test.tsx#L1-60`, `Keypad.test.tsx#L1-40`, `App.test.tsx#L1-60` (convenções, `seed` e puzzle fixo) (~2,1k)
   - `vitest.config.ts#L10-16` (~0,2k)
@@ -181,4 +182,4 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 | CA-005-44 | T03, T04, T05 |
 | CA-005-45 | T03, T05 |
 
-Total: 480k/730k/1,35M tokens (T01 120k, T02 110k, T03 60k, T04 110k, T05 130k, T06 60k, T07 50k, T08 90k), 33/61/143 minutos de trabalho de subagente (vazão 0,88/0,7/0,57M tokens/h, M-009(b)). Manifestos conferidos por `wc -c` em 27/11/2026: nenhum passa de 15k; T05 (12,7k) fica inteira, com a divisão T05a (célula e botões) / T05b (atalhos globais e foco) como contingência se o agente passar de 15k ou reportar leitura fora do manifesto. Linhas por tarefa x agente em `docs/process/metrics.csv` (split 62/38 eng-testes/dev). `ctx_inicial_est` por tarefa para `metrics.csv` (sem L0): T01 9,5k · T02 10,6k · T03 8,2k · T04 9,9k · T05 12,7k · T06 6,8k · T07 6,9k · T08 10,3k.
+Total (inalterado na rodada 2, correções só de ordem e de texto): 480k/730k/1,35M tokens (T01 120k, T02 110k, T03 60k, T04 110k, T05 130k, T06 60k, T07 50k, T08 90k), 33/61/143 minutos de trabalho de subagente (vazão 0,88/0,7/0,57M tokens/h, M-009(b)). Manifestos conferidos por `wc -c` em 27/11/2026: nenhum passa de 15k; T05 (12,7k) fica inteira, com a divisão T05a (célula e botões) / T05b (atalhos globais e foco) como contingência se o agente passar de 15k ou reportar leitura fora do manifesto. Linhas por tarefa x agente em `docs/process/metrics.csv` (split 62/38 eng-testes/dev). `ctx_inicial_est` por tarefa para `metrics.csv` (sem L0): T01 9,5k · T02 10,6k · T03 8,5k · T04 9,9k · T05 12,7k · T06 6,8k · T07 6,9k · T08 10,3k.

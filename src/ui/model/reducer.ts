@@ -58,6 +58,7 @@ function playText(before: Game, after: Game, selected: Selection): string {
     value: cell?.value ?? null,
     given: false,
     conflicted: false,
+    notes: [],
   });
 }
 

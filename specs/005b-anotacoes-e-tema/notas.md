@@ -35,3 +35,16 @@ Consequências para a T02:
 - Pendência para a revisão: provar o INV "gerador estendido alcança ..." por mutante manual (tirar `TOGGLE`/`UNDO`/`REDO` do gerador e ver falhar).
 - Fechamento: RED `472cc97`, REDs de correção `a5eb4b9` e `4e6aee3`, GREEN `cc39bac`, REFACTOR `a16814d`; 970/970 testes, cobertura 100%, Stryker não rodado.
 - Lição candidata ao PDCA (para a retro, não é regra): a RED de propriedade deve rodar a prop nova isolada com meta de tempo (~≤ 3 s) e conferir as chaves de alcance do gerador com a seed fixa antes de commitar; sem isso custou duas idas e voltas RED↔GREEN. A lição da T03 (conjunto exato) foi aplicada e funcionou.
+
+## T05 -> T06/T07/T08: recado (27/11/2026)
+
+- Estilos de `.controls`, `.actions`, `.is-on`, `.cell-notes` e `.note-N` ainda não existem (T07).
+- `span.action-state` fica dentro do botão Anotar, separado por `{' '}`, com `aria-hidden`.
+- Desfazer e Refazer usam `aria-disabled` sem `disabled`; o CSS pode usar `[aria-disabled="true"]`.
+- As vagas `note-1` a `note-9` vão numa grade 3×3 por `cqi`.
+- Ganchos de layout para a T08: `.controls > .keypad` e `.controls > .actions`.
+- `focusTick` (prop opcional de `Grid`) só foca quando o valor muda.
+- Atalhos no `document` (em `App.tsx`); controles em `<div class="controls">`.
+- Fechamento: RED `feb5388` (44 testes novos, 39 vermelhos; `Actions.test.tsx` é módulo novo e não carregava, exceção do §6 declarada no commit; fixture `src/ui/tests/fixed-notes.ts`), GREEN `c93b725`, sem REFACTOR (código já limpo); 1014/1014 testes, cobertura 100% (330/330 statements, 266/266 branches, 92/92 funções, 305/305 linhas), Stryker não rodado.
+- **Deriva tasks×spec, a decidir na `/revisar` (não é defeito):** a `tasks.md` da T05 pede "os três botões `aria-disabled`" na vitória, mas o CA-005-42 só exige "nada muda" e `ControlsView` (plan) não tem `won`. Por isso o Anotar não fica `aria-disabled` e só ignora o clique; a RED segue a spec.
+- Lições candidatas ao PDCA (para a retro, não são regra): cabeçalho de commit com mais de 100 caracteres é barrado pelo commitlint (um commit da GREEN foi refeito).

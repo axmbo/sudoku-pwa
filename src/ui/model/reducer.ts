@@ -126,11 +126,7 @@ function travel(state: UiState, kind: 'Desfeito' | 'Refeito'): UiState {
   if (getGameStatus(after) === 'won') return announce(base, after, messages.won);
   const head = historyMessage(kind, move as NonNullable<typeof move>, selected.row, selected.col);
   const tail = conflictTail(state.game, after, selected);
-  return announce(
-    { ...base, announcement: state.announcement },
-    after,
-    tail === null ? head : `${head}. ${tail}`,
-  );
+  return announce(base, after, tail === null ? head : `${head}. ${tail}`);
 }
 
 export function gameReducer(state: UiState, action: UiAction): UiState {

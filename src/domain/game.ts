@@ -10,7 +10,7 @@ import {
   type PlaceRefusal,
 } from './board';
 import type { CellConflict } from './conflicts';
-import { redo, undo, type HistoryEntry } from './history';
+import { applyPrune, pruneTargets, redo, undo, type HistoryEntry } from './history';
 import { cellIndex, type Index } from './units';
 import { isDigit, type Digit } from './digit';
 import { emptyNotes, toggleNote, type Notes } from './notes';
@@ -160,6 +160,37 @@ export function gamePlace(
   return { ok: true, value: commit(game, entry, emptyNotes, placed.value) };
 }
 
+/** Como `gamePlace`, mas remove também `digit` das anotações das vizinhas, numa só jogada. */
+export function gamePlaceAndPrune(
+  game: Game,
+  row: unknown,
+  col: unknown,
+  digit: unknown,
+): Result<Game, GamePlaceRefusal> {
+  const placed = gamePlace(game, row, col, digit);
+  if (!placed.ok || placed.value === game) {
+    return placed;
+  }
+  const index = cellIndex(row as number, col as number);
+  const pruned = pruneTargets(game.notes, index, digit as Digit);
+  const { before } = placed.value.history[game.cursor] as HistoryEntry;
+  const entry: HistoryEntry = {
+    move: { kind: 'place-prune', index, digit: digit as Digit },
+    before,
+    pruned,
+  };
+  return {
+    ok: true,
+    value: commit(
+      game,
+      entry,
+      emptyNotes,
+      placed.value.board,
+      applyPrune(game.notes, pruned, digit as Digit),
+    ),
+  };
+}
+
 /** Apaga o valor da célula (row, col), limpando as anotações dela; célula vazia não tem efeito. */
 export function gameErase(game: Game, row: unknown, col: unknown): Result<Game, GameEraseRefusal> {
   if (isOver(game)) {
@@ -207,8 +238,9 @@ function commit(
   entry: HistoryEntry,
   cellNotes: Notes,
   board: Board = game.board,
+  base: readonly Notes[] = game.notes,
 ): Game {
-  const notes = game.notes.map((existing, i) => (i === entry.move.index ? cellNotes : existing));
+  const notes = base.map((existing, i) => (i === entry.move.index ? cellNotes : existing));
   return Object.freeze({
     ...game,
     board,

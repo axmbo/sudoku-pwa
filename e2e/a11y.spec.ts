@@ -231,22 +231,17 @@ test.describe('a11y: geometria', () => {
 });
 
 test.describe('a11y: modo anotação e tema escuro (005b)', () => {
-  // DEFEITO ACHADO (T08, notas.md): axe label-content-name-mismatch (serious) em célula com
-  // anotações: o texto visível "1259" não está no nome acessível "anotações 1 2 5 9".
-  // `test.fail` mantém o gate verde; quando a tarefa de correção chegar, o teste passa a falhar
-  // por "inesperadamente passou" e este `fail` deve ser removido.
-  test.fail(
-    'CA-005-41: sem violação séria ou crítica no modo anotação, com anotações na grade',
-    async ({ page }) => {
-      await page.goto('/');
-      await annotate(page, 1, 3, '1259');
-      await expect(page.getByRole('button', { name: /^Anotar/ })).toHaveAttribute(
-        'aria-pressed',
-        'true',
-      );
-      expect(await seriousViolations(page)).toEqual([]);
-    },
-  );
+  test('CA-005-41: sem violação séria ou crítica no modo anotação, com anotações na grade', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await annotate(page, 1, 3, '1259');
+    await expect(page.getByRole('button', { name: /^Anotar/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(await seriousViolations(page)).toEqual([]);
+  });
 
   test('CA-005-41: sem violação séria ou crítica no tema escuro', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });

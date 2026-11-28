@@ -37,18 +37,15 @@ export function Grid({ cells, dispatch, focusTick = 0 }: GridProps): JSX.Element
   const byKeyboard = useRef(false);
   const lastSelected = useRef(-1);
 
-  // Depois de uma ação de teclado, o foco real acompanha a célula selecionada.
-  // O efeito roda após a pintura e pode ser adiado para o render seguinte numa
-  // rajada de teclas; por isso a marca só cai quando a seleção não mudou (T10).
+  // Depois de uma tecla de navegação, o foco real acompanha a célula selecionada.
+  // O efeito roda após a pintura e o Preact o executa de forma adiada, até no início do
+  // render seguinte; por isso a decisão usa só a seleção do próprio render (`changed`) e
+  // a marca, armada só por navegação, nunca é apagada por efeito (T10). Clique a desarma.
   useEffect(() => {
     const selected = cells.findIndex((cell) => cell.selected);
     const changed = selected !== lastSelected.current;
     lastSelected.current = selected;
-    if (!byKeyboard.current) return;
-    if (!changed) {
-      byKeyboard.current = false;
-      return;
-    }
+    if (!changed || !byKeyboard.current) return;
     root.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')?.focus();
   });
 
@@ -63,7 +60,7 @@ export function Grid({ cells, dispatch, focusTick = 0 }: GridProps): JSX.Element
     const action = actionFor(event);
     if (action === null) return;
     event.preventDefault();
-    byKeyboard.current = true;
+    if (action.type === 'move') byKeyboard.current = true;
     dispatch(action);
   };
 
@@ -76,7 +73,10 @@ export function Grid({ cells, dispatch, focusTick = 0 }: GridProps): JSX.Element
             <Cell
               key={cell.col}
               cell={cell}
-              onClick={() => dispatch({ type: 'select', to: { row: cell.row, col: cell.col } })}
+              onClick={() => {
+                byKeyboard.current = false;
+                dispatch({ type: 'select', to: { row: cell.row, col: cell.col } });
+              }}
               onKeyDown={onKeyDown}
             />
           ))}

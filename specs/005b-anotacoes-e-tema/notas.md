@@ -57,3 +57,21 @@ Consequências para a T02:
 - Desabilitado = `[aria-disabled="true"]` (T05); a T07 aplica `--color-action-disabled-*` nele.
 - Para a `/revisar`: a eng-testes exigiu 4,5:1 no texto do botão desabilitado (letra da tarefa), embora o WCAG isente componente desabilitado; decidir se mantém.
 - Fechamento: RED `1cbf8f0` (82 testes, 61 vermelhos), GREEN `320e2da` (só `theme.css`), sem REFACTOR; 1096/1096 testes, cobertura 100%, Stryker não rodado.
+
+## T07: capturas e tamanho (28/11/2026)
+
+Capturas do build (`vite preview`), Playwright/Chromium, em `specs/005b-anotacoes-e-tema/capturas/`. Cena: Anotar ligado, anotações 1, 2, 3, 5, 9 na célula (1,3) e 1 a 9 na (1,4); sem rolagem horizontal em nenhuma.
+
+| Captura | Mostra | Corte | Sobreposição | Anotação ilegível |
+|---|---|---|---|---|
+| `320.png` | retrato, 3 botões numa linha | não | não | não (~9 px, pequena mas legível) |
+| `390.png` | retrato | não | não | não |
+| `1280.png` | grade e controles lado a lado | não | não | não |
+| `390-texto200.png` | texto a 200% (`font-size: 200%`); botões quebram linha, Apagar em fileira própria | não | não | não |
+| `800x360-paisagem.png` | paisagem, lado a lado, 3 botões numa linha | não | não | não |
+| `390-escuro.png` | tema escuro, anotações e botões com tokens | não | não | não |
+
+- Defeito achado e resolvido só com CSS: com texto a 200% os botões de ação eram cortados (grid de 3 colunas); virou `flex-wrap`. Nenhum candidato a tarefa nova.
+- Extra: os botões do teclado numérico ficaram cinza do navegador no escuro; passaram a usar os tokens `--color-action-*`.
+- Tamanho do build (gzip): JS 11,04 kB, CSS 1,59 kB (`dist/assets/index-*.js` 28,48 kB, `index-*.css` 5,37 kB brutos).
+- `npm run check`: 1096/1096 testes, cobertura 100%.

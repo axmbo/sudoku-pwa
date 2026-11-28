@@ -19,7 +19,7 @@ Fonte: `PROCESSO.md` §7 e [ADR 0006](../../../docs/adr/0006-plataforma-versiona
 - Commits da IA terminam com o trailer `Co-Authored-By` indicado na sessão.
 - Ordem por tarefa não isenta: `test(...)` vermelho → `feat|fix|refactor(...)` verde → `refactor(...)` opcional.
 - Um commit, uma intenção. Nada de `.env`, chave ou segredo (o push protection também barra).
-- Nunca `--no-verify` (M-025; barrado em `.claude/settings.json`). Hook que barra: relate e pare.
+- Nunca `--no-verify` (M-025; barrado em `.claude/settings.json`). Hook que barra: relate e pare. Mensagem que cite `--no-verify` ou ` -n ` também é barrada: grave-a num arquivo e use `git commit -F <arquivo>`. Flags agrupadas (`-an`) não são pegas; regra de Bash não é fronteira de segurança.
 
 ## PR
 - Um PR por spec. Título em Conventional Commits; corpo:

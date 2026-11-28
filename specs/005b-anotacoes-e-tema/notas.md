@@ -97,3 +97,6 @@ Declarada depois do fato em `tasks.md` (T02, T05, T06), a partir das mensagens d
 - **T02, `c5c58ee`:** nasceram verdes as guardas "JSON sem campo novo" e "índice 81" (valem desde a T01) e os `INV:` dos geradores (mutante manual em `applyGameAction`).
 - **T05, `feb5388`:** nasceram verdes CA-005-45 (`cellLabel` já inclui as anotações) e CA-005-42 (seta após a vitória), mais a regressão da rajada de setas; regressão de comportamento existente.
 - **T06, `1cbf8f0`:** 19 pares do tema claro e 2 testes de `styles.rules` verdes. A isenção de invariante pontual dentro de tarefa `tdd: sim` foi desvio do §6 (proíbe isenção pontual em tarefa não isenta); registrado depois do fato, com aprovação do Diretor em 28/11/2026.
+
+## Revisão r2, achado 9: `--no-verify` no RED da T10 (28/11/2026)
+O commit RED `a502ecf` foi feito com `--no-verify` sem necessidade: o pre-commit já aceita commit só de testes (`scripts/hooks/pre-commit.sh:14`), e o Diretor descartou o `--no-verify` caso a caso (`docs/process/CHANGELOG-processo.md:63`). O orquestrador reaplicou à mão prettier, eslint e `tsc` sobre `src/ui/Grid.test.tsx`, todos limpos; histórico intacto. Caso levado à retro do ciclo 04.

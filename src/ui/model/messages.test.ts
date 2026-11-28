@@ -87,9 +87,19 @@ describe('messages: constantes', () => {
   const english =
     /\b(conflict|won|win|error|errors|invalid|cell|row|column|box|given|empty|the|and|game|grid)\b/i;
 
-  it('CA-005-36: expõe exatamente as quatro constantes, todas texto não vazio', () => {
+  it('CA-005-36: expõe exatamente as nove constantes, todas texto não vazio', () => {
     expect(Object.keys(messages).sort()).toEqual(
-      ['fullWithErrors', 'givenImmutable', 'noConflicts', 'won'].sort(),
+      [
+        'cellHasValue',
+        'fullWithErrors',
+        'givenImmutable',
+        'noConflicts',
+        'noteModeOff',
+        'noteModeOn',
+        'nothingToRedo',
+        'nothingToUndo',
+        'won',
+      ].sort(),
     );
     for (const [, text] of texts) {
       expect(typeof text).toBe('string');

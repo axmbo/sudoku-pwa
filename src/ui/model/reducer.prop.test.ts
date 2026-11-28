@@ -395,12 +395,22 @@ const extMacroArb: fc.Arbitrary<UiAction[]> = fc.oneof(
   },
 );
 
+// Prefixo determinístico que vence a partida (modo valor, solução inteira) e já tenta desfazer ou
+// refazer: garante, sem depender de seed, o estado "vencida + undo/redo" coberto pelo INV de alcance.
+const wonPrefixArb: fc.Arbitrary<UiAction[]> = fc.constantFrom(
+  [...solutionPrefix([]), UNDO],
+  [...solutionPrefix([]), REDO],
+);
+
 const extActionsArb: fc.Arbitrary<UiAction[]> = fc
   .record({
-    prefix: fc.constantFrom<keyof typeof PREFIXES>('none', 'none', 'almost', 'almostWrong'),
+    prefix: fc.oneof(
+      { weight: 4, arbitrary: fc.constantFrom(...Object.values(PREFIXES)) },
+      { weight: 1, arbitrary: wonPrefixArb },
+    ),
     tail: fc.array(extMacroArb, { maxLength: 30 }),
   })
-  .map(({ prefix, tail }) => [...PREFIXES[prefix], ...tail.flat()]);
+  .map(({ prefix, tail }) => [...prefix, ...tail.flat()]);
 
 /** Tipo da ação como `string`: o union `UiAction` ainda não declara as ações novas. */
 const kind = (action: UiAction): string => action.type;

@@ -81,3 +81,9 @@ Capturas do build (`vite preview`), Playwright/Chromium, em `specs/005b-anotacoe
 - Layout lado a lado: `@media (min-width: 50rem), (orientation: landscape) and (min-width: 36rem)` em `src/ui/styles.css` (grade e `.controls` lado a lado); abaixo disso, retrato em coluna.
 - Ganchos para os E2E: `.controls > .keypad`, `.controls > .actions` (3 botões em `flex-wrap`), `.is-on` (Anotar ligado), `.cell-notes` e `.note-N`; desabilitado = `[aria-disabled="true"]`.
 - Capturas de referência (320, 390, 1280, 390 com texto a 200%, 800x360 paisagem, 390 escuro) em `capturas/`; a cena usa anotações 1, 2, 3, 5, 9 na célula (1,3) e 1 a 9 na (1,4).
+
+## T08: defeitos achados (28/11/2026)
+
+- **D1 (serious, axe `label-content-name-mismatch`, WCAG 2.5.3):** célula vazia com anotações tem `aria-label="Linha 1, coluna 3, vazia, anotações 1 2 5 9"`, mas o texto visível é "1259" (os `span.note-N` concatenados); o axe acusa que o texto visível não está no nome acessível. Reproduz no modo anotação (CA-005-41). Candidato a tarefa nova `tdd: sim` (correção em `Cell.tsx`/`messages`, p.ex. nome sem separador não serve ao CA-005-45; as opções são `aria-label` com as anotações coladas ou esconder o texto das anotações do cálculo do axe; decisão de produto, a levar à `/revisar`). O E2E `CA-005-41` do modo anotação está marcado `test.fail()` até a correção; ao corrigir, remover o `fail`.
+- O tema escuro passou no axe (sem violação séria/crítica) e `color-contrast` avalia e passa com anotações e conflito.
+

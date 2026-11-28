@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { cellAt } from '../../domain/board';
-import { gamePlace, getGameConflicts, type Game } from '../../domain/game';
+import {
+  gamePlace,
+  gameToggleNote,
+  getGameConflicts,
+  gameUndo,
+  type Game,
+} from '../../domain/game';
 import type { Index } from '../../domain/units';
 import { fixedGame } from '../fixed-puzzle';
 import type { Selection } from './navigation';
-import { gridView, type GridCellView } from './view';
+import { controlsView, gridView, type GridCellView } from './view';
 
 // Puzzle fixo (src/ui/fixed-puzzle.ts), células em base 0 (linha, coluna):
 //  - (0,0) = 5, (1,5) = 5 e (7,8) = 5 são pistas (o mesmo valor em unidades diferentes).
@@ -128,5 +134,84 @@ describe('gridView', () => {
   it('CA-005-19: sem jogadas conflitantes, nenhuma célula está em conflito', () => {
     const view = gridView(fixedGame(), sel(0, 0));
     expect(view.some((c: GridCellView) => c.conflicted)).toBe(false);
+  });
+});
+
+/** Partida vencida: todas as células vazias preenchidas com a solução do puzzle fixo. */
+function solvedGame(): Game {
+  let game = fixedGame();
+  const { givens, solution } = game.puzzle;
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      const answer = solution[row]?.[col];
+      if (answer == null) throw new Error('solução incompleta');
+      if (givens[row]?.[col] === null) game = withValue(game, row as Index, col as Index, answer);
+    }
+  }
+  return game;
+}
+
+function withNote(
+  game: Game,
+  row: Index,
+  col: Index,
+  digit: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+): Game {
+  const result = gameToggleNote(game, row, col, digit);
+  if (!result.ok) throw new Error(`anotação de preparo recusada: ${result.reason}`);
+  return result.value;
+}
+
+describe('gridView: notes', () => {
+  it('CA-005-04: célula vazia traz as anotações em ordem crescente', () => {
+    const game = withNote(withNote(withNote(fixedGame(), 4, 4, 9), 4, 4, 2), 4, 4, 4);
+    const view = gridView(game, sel(0, 0));
+    expect(view[4 * 9 + 4]?.notes).toEqual([2, 4, 9]);
+  });
+
+  it('CA-005-04: células sem anotação trazem lista vazia', () => {
+    const view = gridView(withNote(fixedGame(), 4, 4, 3), sel(0, 0));
+    expect(view[4 * 9 + 5]?.notes).toEqual([]);
+  });
+
+  it('CA-005-04: célula com valor ou pista traz notes vazio', () => {
+    const view = gridView(withValue(fixedGame(), 0, 2, 5), sel(0, 0));
+    expect(view[0]?.notes).toEqual([]);
+    expect(view[2]?.notes).toEqual([]);
+  });
+});
+
+describe('controlsView', () => {
+  it('CA-005-16: repete o noteMode recebido', () => {
+    expect(controlsView(fixedGame(), true).noteMode).toBe(true);
+    expect(controlsView(fixedGame(), false).noteMode).toBe(false);
+  });
+
+  it('CA-005-25: sem histórico, canUndo e canRedo são falsos', () => {
+    const c = controlsView(fixedGame(), false);
+    expect(c.canUndo).toBe(false);
+    expect(c.canRedo).toBe(false);
+  });
+
+  it('CA-005-23: com jogada feita, canUndo é verdadeiro e canRedo falso', () => {
+    const c = controlsView(withValue(fixedGame(), 4, 4, 1), false);
+    expect(c.canUndo).toBe(true);
+    expect(c.canRedo).toBe(false);
+  });
+
+  it('CA-005-24: depois de desfazer, canRedo é verdadeiro', () => {
+    const done = gameUndo(withValue(fixedGame(), 4, 4, 1));
+    if (!done.ok) throw new Error('undo recusado');
+    const c = controlsView(done.value, false);
+    expect(c.canUndo).toBe(false);
+    expect(c.canRedo).toBe(true);
+  });
+
+  it('CA-005-42: partida vencida tem canUndo e canRedo falsos', () => {
+    const solved = solvedGame();
+    const c = controlsView(solved, true);
+    expect(c.canUndo).toBe(false);
+    expect(c.canRedo).toBe(false);
+    expect(c.noteMode).toBe(true);
   });
 });

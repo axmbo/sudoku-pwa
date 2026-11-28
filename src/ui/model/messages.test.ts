@@ -1,13 +1,24 @@
 import { describe, expect, it } from 'vitest';
 import type { CellConflict } from '../../domain/conflicts';
 import type { Index, Unit } from '../../domain/units';
-import { cellLabel, conflictMessage, messages } from './messages';
+import type { Digit } from '../../domain/digit';
+import type { Move } from '../../domain/history';
+import { cellLabel, conflictMessage, historyMessage, messages, notesMessage } from './messages';
 
-const plain = { given: false, conflicted: false } as const;
+// `view` fixa o tipo com `notes` já na RED (literal direto em CellView falharia com TS2353 até a T03).
+interface NotedView {
+  readonly value: Digit | null;
+  readonly given: boolean;
+  readonly conflicted: boolean;
+  readonly notes: readonly Digit[];
+}
+const view = (v: NotedView): NotedView => v;
+
+const plain = { given: false, conflicted: false, notes: [] } as const;
 
 describe('messages: cellLabel', () => {
   it('CA-005-03: pista leva linha, coluna, valor e "pista"', () => {
-    expect(cellLabel(2, 4, { value: 7, given: true, conflicted: false })).toBe(
+    expect(cellLabel(2, 4, view({ value: 7, given: true, conflicted: false, notes: [] }))).toBe(
       'Linha 3, coluna 5, 7, pista',
     );
   });
@@ -21,13 +32,13 @@ describe('messages: cellLabel', () => {
   });
 
   it('CA-005-19: conflito acrescenta ", em conflito" ao valor do jogador', () => {
-    expect(cellLabel(2, 4, { value: 7, given: false, conflicted: true })).toBe(
+    expect(cellLabel(2, 4, view({ value: 7, given: false, conflicted: true, notes: [] }))).toBe(
       'Linha 3, coluna 5, 7, em conflito',
     );
   });
 
   it('CA-005-19: pista em conflito traz "pista" e depois "em conflito"', () => {
-    expect(cellLabel(2, 4, { value: 7, given: true, conflicted: true })).toBe(
+    expect(cellLabel(2, 4, view({ value: 7, given: true, conflicted: true, notes: [] }))).toBe(
       'Linha 3, coluna 5, 7, pista, em conflito',
     );
   });
@@ -113,9 +124,82 @@ describe('messages: constantes', () => {
   it('CA-005-36: textos dinâmicos também não trazem palavra inglesa da lista fixa', () => {
     const labels = [
       cellLabel(0, 0, { value: null, ...plain }),
-      cellLabel(1, 1, { value: 3, given: true, conflicted: true }),
+      cellLabel(1, 1, view({ value: 3, given: true, conflicted: true, notes: [] })),
       conflictMessage(conflict([{ kind: 'box', index: 4 }])),
     ];
     for (const text of labels) expect(text).not.toMatch(english);
+  });
+});
+
+describe('messages: anotações, histórico e textos fixos', () => {
+  it('CA-005-45: célula vazia com anotações lista os dígitos em ordem crescente', () => {
+    expect(
+      cellLabel(2, 4, view({ value: null, given: false, conflicted: false, notes: [2, 4, 9] })),
+    ).toBe('Linha 3, coluna 5, vazia, anotações 2 4 9');
+  });
+
+  it('CA-005-45: "em conflito" vem depois das anotações', () => {
+    expect(
+      cellLabel(2, 4, view({ value: null, given: false, conflicted: true, notes: [2, 4, 9] })),
+    ).toBe('Linha 3, coluna 5, vazia, anotações 2 4 9, em conflito');
+  });
+
+  it('CA-005-45: sem anotações o rótulo é igual ao da 005a', () => {
+    expect(cellLabel(2, 4, { value: null, ...plain })).toBe('Linha 3, coluna 5, vazia');
+  });
+
+  it('CA-005-45: valor ou pista sem anotações não ganham trecho de anotações', () => {
+    expect(cellLabel(2, 4, { value: 7, ...plain })).toBe('Linha 3, coluna 5, 7');
+    expect(cellLabel(2, 4, view({ value: 7, given: true, conflicted: false, notes: [] }))).toBe(
+      'Linha 3, coluna 5, 7, pista',
+    );
+  });
+
+  it('CA-005-17: notesMessage lista as anotações atuais', () => {
+    expect(notesMessage([2, 4, 9])).toBe('anotações 2 4 9');
+    expect(notesMessage([5])).toBe('anotações 5');
+  });
+
+  it('CA-005-17: notesMessage sem anotações diz "sem anotações"', () => {
+    expect(notesMessage([])).toBe('sem anotações');
+  });
+
+  const moves: readonly [string, Move, string][] = [
+    ['valor', { kind: 'place', index: 22, digit: 5 }, 'valor 5 na linha 3, coluna 5'],
+    [
+      'valor com poda',
+      { kind: 'place-prune', index: 22, digit: 5 },
+      'valor 5 na linha 3, coluna 5',
+    ],
+    ['apagar', { kind: 'erase', index: 22 }, 'apagar na linha 3, coluna 5'],
+    ['anotação', { kind: 'toggle-note', index: 22, digit: 5 }, 'anotação 5 na linha 3, coluna 5'],
+    [
+      'apagar anotações',
+      { kind: 'clear-notes', index: 22 },
+      'apagar anotações na linha 3, coluna 5',
+    ],
+  ];
+
+  for (const [name, move, tail] of moves) {
+    it(`CA-005-23: historyMessage "Desfeito" para ${name}`, () => {
+      expect(historyMessage('Desfeito', move, 2, 4)).toBe(`Desfeito: ${tail}`);
+    });
+    it(`CA-005-24: historyMessage "Refeito" para ${name}`, () => {
+      expect(historyMessage('Refeito', move, 2, 4)).toBe(`Refeito: ${tail}`);
+    });
+  }
+
+  it('CA-005-16: textos do modo anotação', () => {
+    expect(messages.noteModeOn).toBe('modo anotação ligado');
+    expect(messages.noteModeOff).toBe('modo anotação desligado');
+  });
+
+  it('CA-005-18: célula com valor diz "a célula já tem valor"', () => {
+    expect(messages.cellHasValue).toBe('a célula já tem valor');
+  });
+
+  it('CA-005-25: textos de nada a desfazer e a refazer', () => {
+    expect(messages.nothingToUndo).toBe('nada para desfazer');
+    expect(messages.nothingToRedo).toBe('nada para refazer');
   });
 });

@@ -89,3 +89,11 @@ Capturas do build (`vite preview`), Playwright/Chromium, em `specs/005b-anotacoe
 
 - **D1, decisão (28/11/2026):** opção A, decisão 31 do plano. As vagas já eram `aria-hidden`, mas o axe-core 4.14.1 avalia o texto visível sem considerar `aria-hidden`. Correção na T09: espaço entre as vagas, provado no Playwright (com espaço, nenhuma violação séria).
 - **D1: resolvido** no commit 5af97be (espaço entre as vagas em `Cell.tsx`; E2E CA-005-41 do modo anotação verde, suíte E2E 38/38).
+
+## Revisão r1, achado 1: via 7b não declarada (28/11/2026)
+
+Declarada depois do fato em `tasks.md` (T02, T05, T06), a partir das mensagens dos commits; histórico intacto.
+
+- **T02, `c5c58ee`:** nasceram verdes as guardas "JSON sem campo novo" e "índice 81" (valem desde a T01) e os `INV:` dos geradores (mutante manual em `applyGameAction`).
+- **T05, `feb5388`:** nasceram verdes CA-005-45 (`cellLabel` já inclui as anotações) e CA-005-42 (seta após a vitória), mais a regressão da rajada de setas; regressão de comportamento existente.
+- **T06, `1cbf8f0`:** 19 pares do tema claro e 2 testes de `styles.rules` verdes. A isenção de invariante pontual dentro de tarefa `tdd: sim` foi desvio do §6 (proíbe isenção pontual em tarefa não isenta); registrado depois do fato, com aprovação do Diretor em 28/11/2026.

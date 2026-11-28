@@ -4,6 +4,7 @@ import type { Digit } from './digit';
 import { solutionGrid, validPuzzleInput } from './__arbitraries__/puzzle';
 import {
   createGame,
+  gamePlace,
   gamePlaceAndPrune,
   gameRedo,
   gameToggleNote,
@@ -105,6 +106,19 @@ describe('serialize (place-prune)', () => {
       ok: false,
       reason: 'inconsistent-data',
     });
+  });
+
+  it('INV: CA-005-43: place desfeito (refazível) lido do JSON deixa notes só com as 81 chaves de índice', () => {
+    const placed = gamePlace(noted(), 4, 4, 7);
+    expect(placed.ok).toBe(true);
+    const undone = gameUndo((placed as { value: Game }).value);
+    expect(undone.ok).toBe(true);
+
+    const result = deserializeGame(serializeGame((undone as { value: Game }).value));
+
+    expect(result.ok).toBe(true);
+    const { notes } = (result as { value: Game }).value;
+    expect(Object.keys(notes)).toHaveLength(81);
   });
 
   it('CA-005-43: place-prune em célula pista é inconsistent-data', () => {

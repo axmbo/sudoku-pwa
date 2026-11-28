@@ -3,6 +3,7 @@ import { useReducer } from 'preact/hooks';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Grid } from './Grid';
 import { Keypad } from './Keypad';
+import { gameWithNotes } from './tests/fixed-notes';
 import { fixedGame } from './fixed-puzzle';
 import { gameReducer, initialState, type UiAction } from './model/reducer';
 import { gridView } from './model/view';
@@ -93,5 +94,30 @@ describe('Keypad', () => {
     const cell = cellAtRC(0, 0);
     expect(cell.querySelector('.cell-digit')?.textContent).toBe('5');
     expect(cell.classList.contains('is-selected')).toBe(true);
+  });
+
+  it('CA-005-44: Apagar em célula vazia com anotações apaga todas e a célula segue selecionada', () => {
+    function NotesHarness(): preact.JSX.Element {
+      const [state, dispatch] = useReducer(
+        gameReducer,
+        gameWithNotes([{ row: 4, col: 4, digits: [2, 6] }]),
+        initialState,
+      );
+      return (
+        <>
+          <Grid cells={gridView(state.game, state.selected)} dispatch={dispatch} />
+          <Keypad dispatch={dispatch} />
+        </>
+      );
+    }
+    render(<NotesHarness />);
+    fireEvent.click(cellAtRC(4, 4));
+    const slotsText = (): string =>
+      [...cellAtRC(4, 4).querySelectorAll('.cell-notes > *')].map((s) => s.textContent).join('');
+    expect(slotsText()).toBe('26');
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar' }));
+    expect(slotsText()).toBe('');
+    expect(cellAtRC(4, 4).getAttribute('aria-label')).toBe('Linha 5, coluna 5, vazia');
+    expect(cellAtRC(4, 4).classList.contains('is-selected')).toBe(true);
   });
 });

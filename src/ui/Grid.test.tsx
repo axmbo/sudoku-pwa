@@ -1,10 +1,12 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/preact';
 import { useReducer } from 'preact/hooks';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { Game } from '../domain/game';
 import { Grid } from './Grid';
 import { fixedGame } from './fixed-puzzle';
 import { gameReducer, initialState, type UiAction } from './model/reducer';
 import { gridView } from './model/view';
+import { gameWithNotes } from './tests/fixed-notes';
 
 // Contrato assumido de Grid (o dev implementa; decisão registrada no retorno do RED):
 //   <Grid cells={gridView(game, selected)} dispatch={(action: UiAction) => void} />
@@ -318,4 +320,70 @@ describe('Grid: conflito', () => {
       false,
     );
   });
+});
+
+// T05 (spec 005b). Contrato assumido da célula: célula vazia ganha, ao lado de `.cell-digit`,
+// um `<div class="cell-notes">` com nove filhos fixos na ordem 1..9 (classe `note-N`, `aria-hidden="true"`),
+// cada um com o dígito se a anotação existe e vazio se não. Célula com valor: sem `.cell-notes`.
+// Células vazias do puzzle fixo usadas: (4,4), (0,2), (4,1) — nenhuma com anotação no início, salvo a fixture.
+function NotesHarness({ game }: { game: Game }): preact.JSX.Element {
+  const [state, dispatch] = useReducer(gameReducer, game, initialState);
+  return <Grid cells={gridView(state.game, state.selected)} dispatch={dispatch} />;
+}
+
+const slots = (cell: HTMLElement): HTMLElement[] => [
+  ...cell.querySelectorAll<HTMLElement>('.cell-notes > *'),
+];
+const slotTexts = (cell: HTMLElement): string[] => slots(cell).map((s) => s.textContent ?? '');
+
+describe('Grid: anotações na célula', () => {
+  it('CA-005-04: célula vazia com anotações tem nove vagas fixas na ordem 1 a 9, só as presentes preenchidas', () => {
+    render(<NotesHarness game={gameWithNotes([{ row: 4, col: 4, digits: [9, 2, 4] }])} />);
+    const cell = cellAtRC(4, 4);
+    expect(slots(cell)).toHaveLength(9);
+    expect(slotTexts(cell)).toEqual(['', '2', '', '4', '', '', '', '', '9']);
+    slots(cell).forEach((slot, i) => {
+      expect(slot.classList.contains(`note-${i + 1}`)).toBe(true);
+    });
+  });
+
+  it('CA-005-04: as vagas não mudam de lugar quando uma anotação some', () => {
+    render(<NotesHarness game={gameWithNotes([{ row: 4, col: 4, digits: [1, 5, 9] }])} />);
+    expect(slotTexts(cellAtRC(4, 4))).toEqual(['1', '', '', '', '5', '', '', '', '9']);
+    expect(slots(cellAtRC(4, 4))).toHaveLength(9);
+  });
+
+  it('CA-005-04: célula com valor ou pista não tem bloco de anotações', () => {
+    render(<NotesHarness game={fixedGame()} />);
+    expect(cellAtRC(0, 0).querySelector('.cell-notes')).toBeNull();
+    fireEvent.click(cellAtRC(4, 4));
+    fireEvent.keyDown(cellAtRC(4, 4), { key: '7' });
+    expect(digitOf(cellAtRC(4, 4))).toBe('7');
+    expect(cellAtRC(4, 4).querySelector('.cell-notes')).toBeNull();
+  });
+
+  it('CA-005-04: as vagas são aria-hidden (o nome acessível já lê as anotações)', () => {
+    render(<NotesHarness game={gameWithNotes([{ row: 4, col: 4, digits: [2, 4, 9] }])} />);
+    for (const slot of slots(cellAtRC(4, 4))) expect(slot.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('CA-005-45: o aria-label da célula traz as anotações em ordem crescente e o conflito por último', () => {
+    render(<NotesHarness game={gameWithNotes([{ row: 4, col: 4, digits: [9, 2, 4] }])} />);
+    expect(cellAtRC(4, 4).getAttribute('aria-label')).toBe(
+      'Linha 5, coluna 5, vazia, anotações 2 4 9',
+    );
+  });
+
+  it.each(['Backspace', 'Delete', '0'])(
+    'CA-005-44: %s em célula vazia com anotações apaga todas',
+    (key) => {
+      render(<NotesHarness game={gameWithNotes([{ row: 4, col: 4, digits: [1, 5, 9] }])} />);
+      fireEvent.click(cellAtRC(4, 4));
+      expect(slotTexts(cellAtRC(4, 4)).join('')).toBe('159');
+      fireEvent.keyDown(cellAtRC(4, 4), { key });
+      const cell = cellAtRC(4, 4);
+      expect(slotTexts(cell).join('')).toBe('');
+      expect(cell.getAttribute('aria-label')).toBe('Linha 5, coluna 5, vazia');
+    },
+  );
 });

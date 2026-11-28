@@ -3,7 +3,7 @@
 - **Spec:** [spec.md](spec.md) · **Plano:** [plan.md](plan.md)
 - **Autores:** `arquiteto` + `eng-testes` · **Análise de consistência:** ok em 27/11/2026 (2 rodadas; [analise.md](analise.md))
 
-Rascunho do `arquiteto` (etapa 1 do `/planejar`); testes e manifestos a refinar por `eng-testes` e `curador-pdca`. **8 tarefas.** T01 e T02 implementam o [ADR 0008](../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), aceito (decisão 23 do plano). Ordem: domínio, contratos e lógica pura, componentes, CSS, E2E.
+Rascunho do `arquiteto` (etapa 1 do `/planejar`); testes e manifestos a refinar por `eng-testes` e `curador-pdca`. **9 tarefas** (T09 veio do D1, decisão 31). T01 e T02 implementam o [ADR 0008](../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), aceito (decisão 23 do plano). Ordem: domínio, contratos e lógica pura, componentes, CSS, E2E.
 
 Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03 em 0,91×); minutos = tokens prováveis ÷ 0,7M tokens/h (M-009(b)). Manifestos em ~4 caracteres por token (`wc -c` dos arquivos atuais: `estado.md` ≈ 1,6k; `constituicao.md` ≈ 0,5k; `game.ts` ≈ 1,9k; `history.ts` ≈ 0,7k; `serialize.ts` ≈ 2,2k; `reducer.ts` ≈ 0,85k; `styles.css` ≈ 0,9k). Todos abaixo de 15k. **Manifesto de UI** (M-020, passo 2b da `gestao-contexto`) já incluído nas tarefas de UI: exports de `game.ts` usados, projeto `ui` de `vitest.config.ts` (linhas 10 a 16) e a convenção de `seed`, CA de texto fixo e ganchos da tarefa anterior.
 
@@ -162,6 +162,23 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 - **Estimativa:** tokens 120k/180k/340k · minutos 8/16/36 (×2, decisão 30; antes 60k/90k/170k)
 - **Agentes:** `eng-testes`
 
+## T09 — Correção do D1: texto visível das anotações dentro do nome acessível
+
+- **CA cobertos:** CA-005-41 (axe no modo anotação), sem mudar CA-005-45 e CA-005-04
+- **tdd:** sim (defeito achado na T08; decisão 31 do plano)
+- **Testes esperados:** RED pela `eng-testes`: em `src/ui/Grid.test.tsx` (acrescentar), `CA-005-41:` o texto visível da `.cell-notes` de uma célula com anotações 1, 2, 5, 9, com espaços normalizados, é "1 2 5 9", e o nome acessível contém esse texto. Em `e2e/a11y.spec.ts`, tirar o `test.fail` do teste CA-005-41 do modo anotação e o comentário do defeito. Se algum teste de componente que lê o texto das vagas quebrar no GREEN, ajustar nesta fase RED. GREEN pelo `dev`: espaço entre as vagas em `src/ui/Cell.tsx`, sem tocar `messages.ts`. Os E2E de posição das anotações (CA-005-04) e de 44 px (CA-005-38) seguem verdes.
+- **via 7b para mutantes:** não
+- **Arquivos a criar/alterar:** `src/ui/Cell.tsx`, `src/ui/Grid.test.tsx`, `e2e/a11y.spec.ts`, `specs/005b-anotacoes-e-tema/notas.md` (D1 resolvido)
+- **Manifesto de contexto** (lista fechada):
+  - `CLAUDE.md` (L0, automático)
+  - `docs/estado.md` · `docs/constituicao.md` (~2,1k)
+  - `specs/005b-anotacoes-e-tema/spec.md#CA-005-04,41,45` (~0,5k) · `plan.md` decisão 31 (~0,3k) · `notas.md#T08: defeitos achados` (~0,3k)
+  - `src/ui/Cell.tsx` (~0,5k) · `src/ui/Grid.test.tsx#L1-60` e o bloco de `slotTexts` (~1,5k)
+  - `e2e/a11y.spec.ts#L232-250` e `e2e/helpers.ts#seriousViolations,annotate` (~0,6k)
+  - Total ≈ 5,8k (sem L0)
+- **Estimativa:** tokens 40k/80k/160k · minutos 3/7/15 (escala da T06 e da T07)
+- **Agentes:** `eng-testes` (RED) e depois `dev` (GREEN)
+
 ## Cobertura de CA (spec: CA-005-04, 16, 17, 18, 23, 24, 25, 32, 38, 40, 41, 42, 43, 44, 45)
 
 | CA | Tarefas |
@@ -176,7 +193,7 @@ Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03
 | CA-005-32 | T06, T08 |
 | CA-005-38 | T05, T07, T08 |
 | CA-005-40 | T07, T08 |
-| CA-005-41 | T08 |
+| CA-005-41 | T08, T09 |
 | CA-005-42 | T01, T03, T04, T05 |
 | CA-005-43 | T01, T02, T04, T05, T08 |
 | CA-005-44 | T03, T04, T05 |

@@ -4,7 +4,7 @@
 - **Issue:** #19
 - **Autor:** `produto-ux` · **Aprovação do Diretor:** 25/11/2026
 - **Item:** B-05 (parte 1 de 2) · **Depende de:** 001, 004 (domínio já entregue)
-- **Irmã:** [005b — Anotações e tema](../../005b-anotacoes-e-tema/spec.md) (Issue #20), que depende desta.
+- **Irmã:** [005b — Anotações e tema](../005b-anotacoes-e-tema/spec.md) (Issue #20), que depende desta.
 
 ## Problema e motivação
 
@@ -180,7 +180,7 @@ Resumo dos requisitos (os CA acima são a fonte verificável):
 
 ## Fora de escopo
 
-- **Na 005b ([spec](../../005b-anotacoes-e-tema/spec.md), Issue #20):** anotações na UI (modo, anotar, exibição), desfazer e refazer, botões Anotar/Desfazer/Refazer do teclado na tela, tema escuro e seguir o sistema, layout lado a lado em tela larga.
+- **Na 005b ([spec](../005b-anotacoes-e-tema/spec.md), Issue #20):** anotações na UI (modo, anotar, exibição), desfazer e refazer, botões Anotar/Desfazer/Refazer do teclado na tela, tema escuro e seguir o sistema, layout lado a lado em tela larga.
 - Persistência e retomada da partida (B-06); timer e estatísticas (B-07); desafio diário (B-08); instalação, offline e atualização (B-09); novo jogo, reiniciar e seleção de nível (B-10).
 - Gerador e solver (specs 002 e 003): a 005a usa um puzzle fixo.
 - Dicas, verificação do que está certo ou errado, preenchimento automático de anotações (pós-MVP).

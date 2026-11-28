@@ -2,6 +2,16 @@
 
 Toda mudança aprovada em regra (`PROCESSO.md`, `CLAUDE.md`, constituição, skills, agentes) entra aqui com versão. Mudanças vêm de candidatas aprovadas em [melhorias.md](melhorias.md).
 
+## v0.11 — 28/11/2026
+
+Aprovado pelo Diretor na retro do ciclo 04 ([ciclo-04](retro/ciclo-04.md), [melhorias.md](melhorias.md)):
+
+- M-024 (alternativa B), skill `implementar`: piloto de agentes vivos entre tarefas só na spec 002, com `spawns` e `cache_write` em `obs`; a regra M-004 só muda depois da medição.
+- M-025, `.claude/settings.json` e skill `git-fluxo`: `git commit --no-verify`/`-n` negado por permissão; hook que barra, o agente relata e para.
+- M-026 (a) e (b), skill `pdca`: reancorar só com 2 ou mais tarefas consecutivas acima de 1,5× do provável, pela mediana; reducer com propriedade tem pessimista 4×.
+- M-027: issue `débito` [#33](https://github.com/axmbo/sudoku-pwa/issues/33) (duplicatas em `theme.contrast.test.ts` e rodada `disableBail`).
+- `metrics.csv`: linhas 29 e 82 corrigidas (vírgula solta no `obs` gerava colunas a mais).
+
 ## v0.10 — 27/11/2026
 
 Aprovado em bloco pelo Diretor na retro do ciclo 03 e na revisão estrutural ([estrutural-ciclo-03](revisoes/estrutural-ciclo-03.md), [melhorias.md](melhorias.md)):

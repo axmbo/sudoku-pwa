@@ -3,7 +3,7 @@
 - **Spec:** [spec.md](spec.md) · **Plano:** [plan.md](plan.md)
 - **Autores:** `arquiteto` + `eng-testes` · **Análise de consistência:** ok em 27/11/2026 (2 rodadas; [analise.md](analise.md))
 
-Rascunho do `arquiteto` (etapa 1 do `/planejar`); testes e manifestos a refinar por `eng-testes` e `curador-pdca`. **10 tarefas** (T09 veio do D1, decisão 31; T10 veio do diagnóstico do E2E intermitente do CA-005-16, decisão do Diretor de 28/11/2026). T01 e T02 implementam o [ADR 0008](../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), aceito (decisão 23 do plano). Ordem: domínio, contratos e lógica pura, componentes, CSS, E2E.
+Rascunho do `arquiteto` (etapa 1 do `/planejar`); testes e manifestos a refinar por `eng-testes` e `curador-pdca`. **10 tarefas** (T09 veio do D1, decisão 31; T10 veio do diagnóstico do E2E intermitente do CA-005-16, decisão do Diretor de 28/11/2026). T01 e T02 implementam o [ADR 0008](../../../docs/adr/0008-poda-de-anotacoes-na-jogada-de-valor.md), aceito (decisão 23 do plano). Ordem: domínio, contratos e lógica pura, componentes, CSS, E2E.
 
 Estimativas: tokens prováveis a partir da 005a (média 86k por tarefa, ciclo 03 em 0,91×); minutos = tokens prováveis ÷ 0,7M tokens/h (M-009(b)). Manifestos em ~4 caracteres por token (`wc -c` dos arquivos atuais: `estado.md` ≈ 1,6k; `constituicao.md` ≈ 0,5k; `game.ts` ≈ 1,9k; `history.ts` ≈ 0,7k; `serialize.ts` ≈ 2,2k; `reducer.ts` ≈ 0,85k; `styles.css` ≈ 0,9k). Todos abaixo de 15k. **Manifesto de UI** (M-020, passo 2b da `gestao-contexto`) já incluído nas tarefas de UI: exports de `game.ts` usados, projeto `ui` de `vitest.config.ts` (linhas 10 a 16) e a convenção de `seed`, CA de texto fixo e ganchos da tarefa anterior.
 

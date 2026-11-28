@@ -19,7 +19,10 @@
       "Bash(ssh-keygen *)",
       "Bash(gpg --export-secret-keys *)",
       "Bash(git push --force *)",
-      "Bash(git push -f *)"
+      "Bash(git push -f *)",
+      "Bash(git commit *--no-verify*)",
+      "Bash(git commit -n *)",
+      "Bash(git commit * -n *)"
     ]
   },
   "hooks": {

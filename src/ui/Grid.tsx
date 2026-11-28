@@ -9,6 +9,8 @@ import type { GridCellView } from './model/view';
 export interface GridProps {
   readonly cells: readonly GridCellView[];
   readonly dispatch: (action: UiAction) => void;
+  /** Sobe a cada undo/redo aplicado; o foco real vai para a célula selecionada. */
+  readonly focusTick?: number;
 }
 
 const NAVIGATION_KEYS: readonly string[] = [
@@ -30,7 +32,7 @@ function actionFor(event: KeyboardEvent): UiAction | null {
   return null;
 }
 
-export function Grid({ cells, dispatch }: GridProps): JSX.Element {
+export function Grid({ cells, dispatch, focusTick = 0 }: GridProps): JSX.Element {
   const root = useRef<HTMLDivElement>(null);
   const byKeyboard = useRef(false);
   const lastSelected = useRef(-1);
@@ -49,6 +51,13 @@ export function Grid({ cells, dispatch }: GridProps): JSX.Element {
     }
     root.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')?.focus();
   });
+
+  const lastTick = useRef(focusTick);
+  useEffect(() => {
+    if (focusTick === lastTick.current) return;
+    lastTick.current = focusTick;
+    root.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')?.focus();
+  }, [focusTick]);
 
   const onKeyDown = (event: KeyboardEvent): void => {
     const action = actionFor(event);
